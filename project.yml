@@ -6,7 +6,7 @@ environments:
 primary:
   name: ribbon-quest
   image: us-west2-docker.pkg.dev/dezzles-apps/dezzles-apps-docker/rq-ui
-  port: 8080
+  port: 80
 sidecars:
   - name: rq-server
     image: us-west2-docker.pkg.dev/dezzles-apps/dezzles-apps-docker/rq-server
