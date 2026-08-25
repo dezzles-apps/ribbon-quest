@@ -1,16 +1,18 @@
 <script setup lang="ts">
-import type { Pokemon } from '@/types/api';
 
 const props = defineProps<{
   pokemon: string,
   nickname: string,
   region: string,
-  current: number,
-  target: number,
+  current?: number,
+  target?: number,
   includeLink: boolean
 }>()
 
 function getCounterClass(): string[] {
+  if (props.current === undefined || props.target === undefined) {
+    return [];
+  }
   const classes: string[] = [];
   if (props.current >= props.target) {
     classes.push('is-success');
