@@ -102,41 +102,48 @@ INSERT INTO pokemon_games (pokemon, game_key) VALUES
 CREATE TABLE IF NOT EXISTS ribbons (
   ribbon_key VARCHAR(255) PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  enabled BOOLEAN NOT NULL DEFAULT TRUE
+  enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  type VARCHAR(255) NOT NULL,
+  category VARCHAR(255) NOT NULL,
+  view_order int NOT NULL
 );
 
-INSERT INTO ribbons (ribbon_key, name, enabled) VALUES
-  ('SINNOH_CHAMPION', 'Sinnoh Champion', 1),
-  ('KALOS_CHAMPION', 'Kalos Champion', 1),
-  ('HOENN_CHAMPION', 'Hoenn Champion', 1),
-  ('ALOLA_CHAMPION', 'Alola Champion', 1),
-  ('TOWER_MASTER', 'Tower Master', 0),
-  ('MASTER_RANK', 'Master Rank', 0),
-  ('GALAR_CHAMPION', 'Galar Champion', 1),
-  ('PALDEA_CHAMPION', 'Paldea Champion', 1),
-  ('COOLNESS_MASTER', 'Coolness Master', 1),
-  ('BEAUTY_MASTER', 'Beauty Master', 1),
-  ('CUTENESS_MASTER', 'Cuteness Master', 1),
-  ('CLEVERNESS_MASTER', 'Cleverness Master', 1),
-  ('TOUGHNESS_MASTER', 'Toughness Master', 1),
-  ('CONTEST_STAR', 'Contest Star', 1),
-  ('TWINKLING_STAR', 'Twinkling Star', 1),
-  ('BATTLE_ROYAL_MASTER', 'Battle Royal Master', 1),
-  ('EFFORT', 'Effort', 1),
-  ('ALERT', 'Alert', 1),
-  ('SHOCK', 'Shock', 1),
-  ('DOWNCAST', 'Downcast', 1),
-  ('CARELESS', 'Careless', 1),
-  ('RELAX', 'Relax', 1),
-  ('SNOOZE', 'Snooze', 1),
-  ('SMILE', 'Smile', 1),
-  ('GORGEOUS', 'Gorgeous', 1),
-  ('ROYAL', 'Royal', 1),
-  ('GORGEOUS_ROYAL', 'Gorgeous Royal', 1),
-  ('FOOTPRINT', 'Footprint', 1),
-  ('BEST_FRIENDS', 'Best Friends', 1),
-  ('TRAINING', 'Training', 1),
-  ('HISUI', 'Hisui', 1);
+INSERT INTO ribbons (ribbon_key, name, enabled, type, category, view_order) VALUES
+('SINNOH_CHAMPION', 'Sinnoh Champion', 1,'RIBBON','CHAMPION',5),
+('KALOS_CHAMPION', 'Kalos Champion', 1,'RIBBON','CHAMPION',2),
+('HOENN_CHAMPION', 'Hoenn Champion', 1,'RIBBON','CHAMPION',1),
+('ALOLA_CHAMPION', 'Alola Champion', 1,'RIBBON','CHAMPION',3),
+('TOWER_MASTER', 'Tower Master', 0,'RIBBON','BATTLE',1),
+('MASTER_RANK', 'Master Rank', 0,'RIBBON','BATTLE',2),
+('GALAR_CHAMPION', 'Galar Champion', 1,'RIBBON','CHAMPION',4),
+('PALDEA_CHAMPION', 'Paldea Champion', 1,'RIBBON','CHAMPION',6),
+('COOLNESS_MASTER', 'Coolness Master', 1,'RIBBON','CONTEST',3),
+('BEAUTY_MASTER', 'Beauty Master', 1,'RIBBON','CONTEST',1),
+('CUTENESS_MASTER', 'Cuteness Master', 1,'RIBBON','CONTEST',4),
+('CLEVERNESS_MASTER', 'Cleverness Master', 1,'RIBBON','CONTEST',2),
+('TOUGHNESS_MASTER', 'Toughness Master', 1,'RIBBON','CONTEST',5),
+('CONTEST_STAR', 'Contest Star', 1,'RIBBON','CONTEST',6),
+('TWINKLING_STAR', 'Twinkling Star', 1,'RIBBON','CONTEST',7),
+('BATTLE_ROYAL_MASTER', 'Battle Royal Master', 1,'RIBBON','BATTLE',3),
+('EFFORT', 'Effort', 1,'RIBBON','STATS',1),
+('ALERT', 'Alert', 1,'RIBBON','JULIE',1),
+('SHOCK', 'Shock', 1,'RIBBON','JULIE',2),
+('DOWNCAST', 'Downcast', 1,'RIBBON','JULIE',3),
+('CARELESS', 'Careless', 1,'RIBBON','JULIE',4),
+('RELAX', 'Relax', 1,'RIBBON','JULIE',5),
+('SNOOZE', 'Snooze', 1,'RIBBON','JULIE',6),
+('SMILE', 'Smile', 1,'RIBBON','JULIE',7),
+('GORGEOUS', 'Gorgeous', 1,'RIBBON','SHOPPING',1),
+('ROYAL', 'Royal', 1,'RIBBON','SHOPPING',2),
+('GORGEOUS_ROYAL', 'Gorgeous Royal', 1,'RIBBON','SHOPPING',3),
+('FOOTPRINT', 'Footprint', 1,'RIBBON','STATS',2),
+('BEST_FRIENDS', 'Best Friends', 1,'RIBBON','STATS',3),
+('TRAINING', 'Training', 1,'RIBBON','STATS',4),
+('HISUI', 'Hisui', 1,'RIBBON','SHOPPING',4),
+('DESTINY', 'Destiny', 1,'MARK','STATS',5),
+('ITEMFINDER', 'Itemfinder', 1,'MARK','STATS',6),
+('GOURMAND', 'Gourmand', 1,'MARK','STATS',7),
+('PARTNER', 'Partner', 1,'MARK','STATS',8);
 
 CREATE TABLE IF NOT EXISTS game_ribbons (
   game_key VARCHAR(255) REFERENCES games(game_key),
@@ -207,10 +214,21 @@ INSERT INTO game_ribbons (ribbon_key, game_key) VALUES
 ('TRAINING', 'OMEGA_RUBY'),
 ('MASTER_RANK', 'BRILLIANT_DIAMOND'),
 ('MASTER_RANK', 'SCARLET'),
-('HISUI', 'LEGENDS_ARCEUS');
+('HISUI', 'LEGENDS_ARCEUS'),
+('DESTINY', 'SCARLET'),
+('ITEMFINDER', 'SCARLET'),
+('GOURMAND', 'SCARLET'),
+('PARTNER', 'SCARLET');
 
 CREATE TABLE IF NOT EXISTS pokemon_ribbons (
   pokemon VARCHAR(255) REFERENCES pokemon(pokemon),
   ribbon_key VARCHAR(255) REFERENCES ribbons(ribbon_key),
   PRIMARY KEY (pokemon, ribbon_key)
 );
+
+ALTER TABLE pokemon_ribbons ADD COLUMN achieved BOOL DEFAULT TRUE;
+ALTER TABLE pokemon_ribbons ADD COLUMN achieved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE pokemon ADD COLUMN caught_at TIMESTAMP NULL;
+ALTER TABLE pokemon ADD COLUMN shiny BOOL DEFAULT FALSE;
+ALTER TABLE pokemon ADD COLUMN nature VARCHAR(255) NULL;
+ALTER TABLE pokemon ADD COLUMN characteristic VARCHAR(255) NULL;

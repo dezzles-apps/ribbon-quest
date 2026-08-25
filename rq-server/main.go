@@ -15,6 +15,7 @@ import (
 var database *db.Database = &db.Database{}
 var configService *services.ConfigService = services.NewConfigService(database)
 var userService *services.UserService = services.NewUserService(database, configService)
+var pokemonService *services.PokemonService = services.NewPokemonService(database)
 
 func main() {
 	config, err := cmodel.LoadConfig[model.AppConfig]()
@@ -29,6 +30,7 @@ func main() {
 	router := gin.Default()
 	router.Use(ErrorHandler())
 	controllers.NewAuthController(router, &config.App, userService)
+	controllers.NewPokemonController(router, pokemonService)
 	router.Run(":8083")
 }
 

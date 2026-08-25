@@ -1,0 +1,32 @@
+name: ribbon-quest
+version: '1.0'
+environments:
+  - non
+  - prod
+primary:
+  name: ribbon-quest
+  image: us-west2-docker.pkg.dev/dezzles-apps/dezzles-apps-docker/rq-ui
+  port: 8080
+sidecars:
+  - name: rq-server
+    image: us-west2-docker.pkg.dev/dezzles-apps/dezzles-apps-docker/rq-server
+    port: 8083
+    secrets:
+      - envName: DATABASE_PASSWORD_PROD
+        secretName: ribbon-quest-db-prod
+      - envName: JWT_SECRET_PROD
+        secretName: ribbon-quest-jwt-prod
+publish:
+  enabled: true
+  title: Ribbon Quest
+  description: |
+    Ribbon Quest is a website for tracking my progress in completing various Ribbon challenges across the Pokemon games.<br>
+    This site uses VueJS for the frontend, GoLang for the backend,and MySQL for the database.<br>
+    The bulk of the CSS is provided by <a href="https://bulma.io/">Bulma</a>.
+  url: https://ribbon-quest.dezzles-apps.com
+  category: SITES
+  shareRepository: true
+  technologies:
+    - GoLang
+    - MySQL
+    - VueJS
