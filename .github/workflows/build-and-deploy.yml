@@ -7,7 +7,7 @@ jobs:
   notify-start:
     runs-on: ubuntu-latest
     steps:
-      - uses: dezzles-apps/action-event@main
+      - uses: dezzles-apps/action-event/actions/event@main
         with:
           credentialsJson: ${{ secrets.GCLOUD_KEY_FILE }}
           message: "Starting build process for commit: ${{ github.event.head_commit.url }}"
@@ -49,13 +49,20 @@ jobs:
       environment: prod
       app-name: ribbon-quest
     secrets: inherit
-    
+
+  publish:
+    uses: dezzles-apps/actions/.github/workflows/publish-to-portfolio.yml@main
+    needs: [ deploy-prod, configuration ]
+    with:
+      version: '${{ needs.configuration.outputs.version }}'
+    secrets: inherit
+
   notify-end:
     name: Post a message in a channel
     runs-on: ubuntu-latest
-    needs: [ deploy-prod, notify-start ]
+    needs: [ publish ]
     steps:
-      - uses: dezzles-apps/action-event@main
+      - uses: dezzles-apps/action-event/actions/event@main
         with:
           credentialsJson: ${{ secrets.GCLOUD_KEY_FILE }}
           message: "Build process completed for commit: ${{ github.event.head_commit.url }}"
