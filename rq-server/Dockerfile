@@ -12,6 +12,6 @@ FROM golang:1.26 AS runtime
 
 WORKDIR /app
 COPY --from=builder /rq-server /app/rq-server
-COPY config/config.prod.yaml /app/config/config.prod.yaml
+COPY config/config.prod.yml /app/config/config.prod.yml
 EXPOSE 8083
 ENTRYPOINT ["/app/rq-server"]
