@@ -1,11 +1,15 @@
 package dto
 
 type Pokemon struct {
-	Pokemon  string          `json:"pokemon"`
-	Nickname string          `json:"nickname"`
-	Region   string          `json:"region"`
-	Ribbons  []PokemonRibbon `json:"ribbons"`
-	Games    []PokemonGame   `json:"games"`
+	Pokemon        string          `json:"pokemon"`
+	Nickname       string          `json:"nickname"`
+	Region         string          `json:"region"`
+	CaughtAt       string          `json:"caughtAt"`
+	Nature         string          `json:"nature"`
+	Characteristic string          `json:"characteristic"`
+	Shiny          bool            `json:"shiny"`
+	Ribbons        []PokemonRibbon `json:"ribbons"`
+	Games          []PokemonGame   `json:"games"`
 }
 
 type PokemonRibbon struct {

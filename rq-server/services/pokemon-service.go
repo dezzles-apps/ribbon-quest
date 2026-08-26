@@ -55,12 +55,24 @@ func (ps *PokemonService) GetPokemon(pokemonName string) (*dto.Pokemon, error) {
 func (ps *PokemonService) getPokemon(pokemonName string) (*dto.Pokemon, error) {
 	Pokemon := &dto.Pokemon{}
 	row := ps.connection.GetDB().QueryRow(getPokemonInfo, pokemonName)
-	err := row.Scan(&Pokemon.Pokemon, &Pokemon.Nickname, &Pokemon.Region)
+	var caughtAt sql.NullString
+	var nature sql.NullString
+	var characteristic sql.NullString
+	err := row.Scan(&Pokemon.Pokemon, &Pokemon.Nickname, &Pokemon.Region, &caughtAt, &nature, &characteristic, &Pokemon.Shiny)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("No pokemon found")
 		}
 		return nil, err
+	}
+	if caughtAt.Valid {
+		Pokemon.CaughtAt = caughtAt.String
+	}
+	if nature.Valid {
+		Pokemon.Nature = nature.String
+	}
+	if characteristic.Valid {
+		Pokemon.Characteristic = characteristic.String
 	}
 	return Pokemon, nil
 }
@@ -179,4 +191,47 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 		allPokemon = append(allPokemon, *p)
 	}
 	return allPokemon, nil
+}
+
+func (ps *PokemonService) CatchPokemon(pokemon string) (*dto.Pokemon, error) {
+	details, err := ps.getPokemon(pokemon)
+	if err != nil {
+		return nil, err
+	}
+	if details.CaughtAt != "" {
+		return nil, errors.New("Pokemon already caught")
+	}
+	_, err = ps.connection.GetDB().Exec("UPDATE pokemon SET caught_at = CURRENT_TIMESTAMP WHERE pokemon = ?", pokemon)
+	if err != nil {
+		return nil, err
+	}
+	return ps.GetPokemon(pokemon)
+}
+
+func (ps *PokemonService) UpdatePokemon(pokemon string, updateData dto.UpdatePokemon) (*dto.Pokemon, error) {
+	details, err := ps.getPokemon(pokemon)
+	if err != nil {
+		return nil, err
+	}
+	if updateData.Nickname != "" {
+		details.Nickname = updateData.Nickname
+	}
+	if updateData.Nature != "" {
+		details.Nature = updateData.Nature
+	}
+	if updateData.Characteristic != "" {
+		details.Characteristic = updateData.Characteristic
+	}
+	_, err = ps.connection.GetDB().Exec(
+		"UPDATE pokemon SET nickname = ?, nature = ?, characteristic = ?, shiny = ? WHERE pokemon = ?",
+		details.Nickname,
+		details.Nature,
+		details.Characteristic,
+		details.Shiny,
+		pokemon,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return ps.GetPokemon(pokemon)
 }

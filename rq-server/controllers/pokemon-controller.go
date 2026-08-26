@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"dezzles-apps/rq-server/middleware"
+	"dezzles-apps/rq-server/model/dto"
 	"dezzles-apps/rq-server/services"
 
 	"github.com/gin-gonic/gin"
@@ -33,6 +34,8 @@ func (pc *PokemonController) registerRoutes(router *gin.Engine, authMiddleware *
 		pokemonGroup.GET("/:pokemon", pc.getPokemon)
 		pokemonGroup.POST("/:pokemon/ribbons/:ribbon", authMiddleware.ValidateUser, pc.addRibbon)
 		pokemonGroup.DELETE("/:pokemon/ribbons/:ribbon", authMiddleware.ValidateUser, pc.removeRibbon)
+		pokemonGroup.POST("/:pokemon/catch", authMiddleware.ValidateUser, pc.catchPokemon)
+		pokemonGroup.PUT("/:pokemon", authMiddleware.ValidateUser, pc.updatePokemon)
 	}
 }
 
@@ -81,4 +84,34 @@ func (pc *PokemonController) removeRibbon(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"data": ribbonData})
+}
+
+func (pc *PokemonController) catchPokemon(c *gin.Context) {
+	pokemon := c.Param("pokemon")
+
+	pokemonData, err := pc.pokemonService.CatchPokemon(pokemon)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": pokemonData})
+}
+
+func (pc *PokemonController) updatePokemon(c *gin.Context) {
+	pokemon := c.Param("pokemon")
+
+	var updateData dto.UpdatePokemon
+	if err := c.ShouldBindJSON(&updateData); err != nil {
+		c.JSON(400, gin.H{"error": "Invalid request body"})
+		return
+	}
+
+	updatedPokemon, err := pc.pokemonService.UpdatePokemon(pokemon, updateData)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": updatedPokemon})
 }

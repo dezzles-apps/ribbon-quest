@@ -1,3 +1,3 @@
-SELECT pokemon, nickname, region
+SELECT pokemon, nickname, region, caught_at, nature, characteristic, shiny
 FROM pokemon
 WHERE pokemon = ?

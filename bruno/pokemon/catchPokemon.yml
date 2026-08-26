@@ -1,14 +1,20 @@
 info:
-  name: addRibbon
+  name: catchPokemon
   type: http
-  seq: 3
+  seq: 5
 
 http:
-  method: DELETE
-  url: http://localhost:5173/api/pokemon/v1/Vulpix/ribbons/SHOCK
+  method: PUT
+  url: http://localhost:5173/api/pokemon/v1/Vulpix
   headers:
     - name: Authorization
       value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODc4NTYzMjIsImlkIjoiZGV6emxlcyJ9.LO1uRIWOBuMXTTVwwUGn6iA2ZzF07dYZ0y7JLvDWcig
+  body:
+    type: json
+    data: |-
+      {
+        "nature": "Modest"
+      }
   auth: inherit
 
 settings:
