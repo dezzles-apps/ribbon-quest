@@ -1,9 +1,18 @@
 <script setup lang="ts">
 
 const props = defineProps({
-  pokemon: String,
-  nickname: String,
-  region: String,
+  pokemon: {
+    type: String,
+    required: true
+  },
+  nickname: {
+    type: String,
+    required: true
+  },
+  region: {
+    type: String,
+    required: true
+  },
   current: Number,
   total: Number,
   includeLink:{
