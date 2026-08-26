@@ -24,7 +24,7 @@ func NewAuthMiddleware(config *model.AppConfig) *AuthMiddleware {
 func (am *AuthMiddleware) ValidateUser(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
-		c.JSON(401, gin.H{"error": "authorization header is required"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "authorization header is required"})
 		c.Abort()
 		return
 	}
@@ -32,7 +32,7 @@ func (am *AuthMiddleware) ValidateUser(c *gin.Context) {
 	authToken := strings.Split(authHeader, " ")
 	if len(authToken) != 2 || authToken[0] != "Bearer" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.Abort()
 		return
 	}
 
@@ -45,7 +45,7 @@ func (am *AuthMiddleware) ValidateUser(c *gin.Context) {
 	})
 	if err != nil || !token.Valid {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.Abort()
 		return
 	}
 
@@ -57,8 +57,8 @@ func (am *AuthMiddleware) ValidateUser(c *gin.Context) {
 	}
 
 	if float64(time.Now().Unix()) > claims["exp"].(float64) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "token expired"})
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expired"})
+		c.Abort()
 		return
 	}
 
