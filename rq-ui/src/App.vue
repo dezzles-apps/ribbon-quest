@@ -1,9 +1,43 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
+import { ref } from 'vue'
+const isActive = ref(false)
+
+function toggleNavbar() {
+  isActive.value = !isActive.value
+}
 </script>
 
 <template>
+  <nav class="navbar" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+      <a class="navbar-item" href="/">
+        <img src="/favicon.svg" />
+        Dezzles' Ribbon Quest
+      </a>
 
+      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="rq-navbar" @click="toggleNavbar">
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+        <span aria-hidden="true"></span>
+      </a>
+    </div>
+
+    <div id="rq-navbar" class="navbar-menu" :class="isActive ? 'is-active' : ''">
+      <div class="navbar-start">
+        <a class="navbar-item" href="/">
+          Home
+        </a>
+
+        <a class="navbar-item" href="/pokemon">
+          Pokemon
+        </a>
+
+      </div>
+
+    </div>
+  </nav>
   <section class="section">
     <div class="container">
       <RouterView />
@@ -20,65 +54,5 @@ import { RouterLink, RouterView } from 'vue-router'
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
 </style>

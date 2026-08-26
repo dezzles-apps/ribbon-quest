@@ -6,7 +6,6 @@ import (
 	"errors"
 
 	_ "embed"
-	"log"
 
 	cdb "github.com/dezzles-apps/go-common/db"
 )
@@ -98,7 +97,6 @@ func (ps *PokemonService) getPokemonGames(pokemonName string) ([]dto.PokemonGame
 	for _, game := range gamesMap {
 		games = append(games, *game)
 	}
-	log.Println(games)
 
 	return games, nil
 }

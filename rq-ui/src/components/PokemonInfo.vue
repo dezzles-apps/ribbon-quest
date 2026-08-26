@@ -68,9 +68,17 @@ function getPokemonImage(): string {
               <span class="tag" :class="getCounterClass()">{{ props.current }} / {{ props.target }}</span>
             </div>
           </div>
-        <img :src="getPokemonImage()" :alt="props.pokemon" style="max-height: 150px;">
+        <img :src="getPokemonImage()" :alt="props.pokemon" class="pokemon-image" />
       </div>
     </div>
 
   </div>
 </template>
+
+<style lang="css" scoped>
+.pokemon-image {
+  max-height: 150px;
+  display: block;
+  margin: auto;
+}
+</style>
