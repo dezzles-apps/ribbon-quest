@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import type { PokemonRibbon } from '@/types/api';
+import { ref } from 'vue';
+import { useAuthStore } from '@/stores/authStore';
+import { useApi } from '@/composables/useApi';
+const authStore = useAuthStore();
+const api = useApi();
 
 const props = defineProps<{
   title?: string;
+  pokemon: string;
   ribbons: PokemonRibbon[]
 }>()
+
+const loadingRibbons = ref(new Map<string, boolean>());
 
 function getRibbonClass(ribbon: PokemonRibbon): string[] {
   const classes: string[] = [];
@@ -13,10 +21,53 @@ function getRibbonClass(ribbon: PokemonRibbon): string[] {
   } else {
     classes.push('ribbon-not-achieved');
   }
+  if (authStore.isAuthenticated) {
+    if (loadingRibbons.value.get(ribbon.ribbonKey)) {
+      classes.push('ribbon-loading');
+    } else {
+      classes.push('ribbon-clickable');
+    }
+  }
   classes.push(`ribbon-${ribbon.category.toLowerCase()}`);
 
   return classes;
 }
+
+function toggleRibbon(ribbon: PokemonRibbon) {
+  if (!authStore.isAuthenticated) {
+    return;
+  }
+
+  const isLoading = loadingRibbons.value.get(ribbon.ribbonKey) || false;
+  if (isLoading) {
+    return;
+  }
+
+  loadingRibbons.value.set(ribbon.ribbonKey, true);
+  let method = ribbon.achieved ? 'DELETE' : 'POST';
+  api.apiFetchWithAuth(`/api/pokemon/v1/${props.pokemon}/ribbons/${ribbon.ribbonKey}`, {
+    method: method,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(async response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      let newRibbon = await response.json();
+      ribbon.achieved = newRibbon.data.achieved;
+      ribbon.achievedAt = newRibbon.data.achievedAt;
+    })
+    .catch(error => {
+      console.error('Error toggling ribbon:', error);
+    })
+    .finally(() => {
+      loadingRibbons.value.set(ribbon.ribbonKey, false);
+    });
+}
+
+
 </script>
 
 <template>
@@ -25,7 +76,13 @@ function getRibbonClass(ribbon: PokemonRibbon): string[] {
       <h2 class="title is-4">{{ props.title }}</h2>
     </slot>
     <div style="display: inline-flex; flex-wrap: wrap;">
-      <div class="ribbon" :class="getRibbonClass(ribbon)" v-for="ribbon in props.ribbons" :key="ribbon.ribbonKey">
+      <div
+        class="ribbon"
+        :class="getRibbonClass(ribbon)"
+        v-for="ribbon in props.ribbons"
+        :key="ribbon.ribbonKey"
+        @click="toggleRibbon(ribbon)"
+      >
         <span :class="['icon', ribbon.achieved ? 'has-text-success' : 'has-text-grey']">
           <i class="mdi mdi-seal mdi-36px"></i>
         </span>
@@ -50,6 +107,15 @@ function getRibbonClass(ribbon: PokemonRibbon): string[] {
   outline-style: solid;
   border-radius: 10px;
 }
+
+.ribbon-loading {
+  cursor: wait;
+}
+
+.ribbon-clickable {
+  cursor: pointer;
+}
+
 .ribbon-name {
   font-weight: bold;
   margin-right: 10px;

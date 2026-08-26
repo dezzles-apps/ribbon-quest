@@ -50,12 +50,17 @@ onMounted(fetchPokemon);
         :includeLink="false"
       />
     </section>
-    <Ribbons title="All Ribbons" :ribbons="pokemon.ribbons" />
+    <Ribbons
+      title="All Ribbons"
+      :ribbons="pokemon.ribbons"
+      :pokemon="pokemon.pokemon"
+    />
     <Ribbons
       v-for="game in pokemon.games"
       :key="game.gameKey"
       :title="game.name"
       :ribbons="game.ribbons.map(ribbonKey => ribbonMap.get(ribbonKey)!).filter(ribbon => ribbon !== undefined)"
+      :pokemon="pokemon.pokemon"
     >
       <template v-slot:title>
         <GameInfo

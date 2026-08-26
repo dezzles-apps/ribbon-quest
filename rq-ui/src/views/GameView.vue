@@ -45,6 +45,7 @@ onMounted(fetchGame);
       v-for="pokemon in game.pokemon"
       :key="pokemon.pokemon"
       :ribbons="pokemon.ribbons"
+      :pokemon="pokemon.pokemon"
     >
       <template v-slot:title>
         <PokemonInfo

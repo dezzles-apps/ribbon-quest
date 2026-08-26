@@ -15,7 +15,7 @@ type AuthMiddleware struct {
 	config *model.AppConfig
 }
 
-func NewAuth(config *model.AppConfig) *AuthMiddleware {
+func NewAuthMiddleware(config *model.AppConfig) *AuthMiddleware {
 	return &AuthMiddleware{
 		config: config,
 	}
@@ -25,6 +25,7 @@ func (am *AuthMiddleware) ValidateUser(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		c.JSON(401, gin.H{"error": "authorization header is required"})
+		c.Abort()
 		return
 	}
 

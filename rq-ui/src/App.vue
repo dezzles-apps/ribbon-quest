@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
+import { RouterView } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore'
 import { ref } from 'vue'
 const isActive = ref(false)
+const authStore = useAuthStore()
 
 function toggleNavbar() {
   isActive.value = !isActive.value
@@ -34,6 +36,12 @@ function toggleNavbar() {
         </a>
         <a class="navbar-item" href="/pokemon" @click="toggleNavbar">
           Pokemon
+        </a>
+        <a class="navbar-item" href="/login" v-if="!authStore.isAuthenticated" @click="toggleNavbar">
+          Login
+        </a>
+        <a class="navbar-item" href="/logout" v-if="authStore.isAuthenticated" @click="toggleNavbar">
+          Logout
         </a>
 
       </div>
