@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8083/api/auth/v1/register
+  url: http://localhost:5173/api/auth/v1/register
   body:
     type: json
     data: |-

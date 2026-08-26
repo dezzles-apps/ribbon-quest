@@ -2,7 +2,7 @@
 import type { PokemonRibbon } from '@/types/api';
 
 const props = defineProps<{
-  title: string;
+  title?: string;
   ribbons: PokemonRibbon[]
 }>()
 
@@ -21,7 +21,9 @@ function getRibbonClass(ribbon: PokemonRibbon): string[] {
 
 <template>
   <div class="box mb-4">
-    <h1 class="title is-4">{{ props.title }}</h1>
+    <slot name="title">
+      <h2 class="title is-4">{{ props.title }}</h2>
+    </slot>
     <div style="display: inline-flex; flex-wrap: wrap;">
       <div class="ribbon" :class="getRibbonClass(ribbon)" v-for="ribbon in props.ribbons" :key="ribbon.ribbonKey">
         <span :class="['icon', ribbon.achieved ? 'has-text-success' : 'has-text-grey']">
@@ -42,7 +44,7 @@ function getRibbonClass(ribbon: PokemonRibbon): string[] {
   padding-top: 15px;
   align-items: center;
   text-align: center;
-  width: 125px;
+  width: 115px;
   height: 100px;
   outline-width: 5px;
   outline-style: solid;

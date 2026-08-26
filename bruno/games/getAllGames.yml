@@ -1,11 +1,11 @@
 info:
-  name: getAllPokemon
+  name: getAllGames
   type: http
   seq: 2
 
 http:
   method: GET
-  url: http://localhost:5173/api/pokemon/v1/
+  url: http://localhost:5173/api/games/v1
   auth: inherit
 
 settings:

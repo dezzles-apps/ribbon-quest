@@ -1,7 +1,7 @@
 SELECT DISTINCT
-  ribbons.ribbon_key as ribbon_key,
-  ribbons.name as ribbon_name,
-  pokemon_ribbons.achieved as achieved,
+  ribbons.ribbon_key AS ribbon_key,
+  ribbons.name AS ribbon_name,
+  IF (pokemon_ribbons.achieved_at IS NULL, false, true) AS achieved,
   ribbons.category,
   ribbons.view_order
 FROM pokemon

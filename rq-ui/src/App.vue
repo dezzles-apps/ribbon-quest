@@ -26,11 +26,13 @@ function toggleNavbar() {
 
     <div id="rq-navbar" class="navbar-menu" :class="isActive ? 'is-active' : ''">
       <div class="navbar-start">
-        <a class="navbar-item" href="/">
+        <a class="navbar-item" href="/" @click="toggleNavbar">
           Home
         </a>
-
-        <a class="navbar-item" href="/pokemon">
+        <a class="navbar-item" href="/games" @click="toggleNavbar">
+          Games
+        </a>
+        <a class="navbar-item" href="/pokemon" @click="toggleNavbar">
           Pokemon
         </a>
 

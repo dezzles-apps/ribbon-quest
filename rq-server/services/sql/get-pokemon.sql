@@ -1,13 +1,13 @@
 SELECT
-  pokemon.pokemon as pokemon,
-  pokemon.nickname as nickname,
-  pokemon.region as region,
-  games.game_key as game_key,
-  games.name as game_name,
-  games.view_order as game_view_order,
-  ribbons.ribbon_key as ribbon_key,
-  ribbons.name as ribbon_name,
-  pokemon_ribbons.achieved as achieved
+  pokemon.pokemon AS pokemon,
+  pokemon.nickname AS nickname,
+  pokemon.region AS region,
+  games.game_key AS game_key,
+  games.name AS game_name,
+  games.view_order AS game_view_order,
+  ribbons.ribbon_key AS ribbon_key,
+  ribbons.name AS ribbon_name,
+  IF (pokemon_ribbons.achieved_at IS NULL, false, true) AS achieved,
 FROM pokemon
   LEFT JOIN pokemon_games ON pokemon.pokemon = pokemon_games.pokemon
   LEFT JOIN games ON pokemon_games.game_key = games.game_key

@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import type { Pokemon, PokemonRibbon, Response } from '@/types/api';
 import { useApi } from '@/composables/useApi';
 import PokemonInfo from '@/components/PokemonInfo.vue';
+import GameInfo from '@/components/GameInfo.vue';
 const route = useRoute();
 const loading = ref(true);
 const { apiFetch } = useApi();
@@ -31,26 +32,15 @@ async function fetchPokemon() {
   }
 }
 
-function getRibbonClass(ribbon: PokemonRibbon): string[] {
-  const classes: string[] = [];
-  if (ribbon.achieved) {
-    classes.push('ribbon-achieved');
-  } else {
-    classes.push('ribbon-not-achieved');
-  }
-  classes.push(`ribbon-${ribbon.category.toLowerCase()}`);
-
-  return classes;
-}
-
-
 onMounted(fetchPokemon);
 </script>
 
 
 
 <template>
-  <div v-if="loading">Loading...</div>
+  <div v-if="loading">
+    <progress class="progress is-large is-info" max="100">60%</progress>
+  </div>
   <div v-else-if="pokemon">
     <section>
       <PokemonInfo
@@ -66,7 +56,15 @@ onMounted(fetchPokemon);
       :key="game.gameKey"
       :title="game.name"
       :ribbons="game.ribbons.map(ribbonKey => ribbonMap.get(ribbonKey)!).filter(ribbon => ribbon !== undefined)"
-    />
+    >
+      <template v-slot:title>
+        <GameInfo
+          :gameKey="game.gameKey"
+          :name="game.name"
+          :includeLink="true"
+        />
+      </template>
+    </Ribbons>
   </div>
   <div v-else>
     <p>Pokemon not found.</p>
