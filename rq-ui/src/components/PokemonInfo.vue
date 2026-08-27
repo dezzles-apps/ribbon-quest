@@ -62,7 +62,7 @@ function getPokemonImage(): string {
         <div class="level" v-if="props.includeDescription">
           <div class="level-left">
             <div class="level-item">
-              This {{ props.pokemon }} is originally from the {{ props.region }} region.
+              This {{ props.pokemon }} is representing the {{ props.region }} region.
             </div>
           </div>
         </div>

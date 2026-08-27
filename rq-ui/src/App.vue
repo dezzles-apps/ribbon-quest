@@ -37,6 +37,9 @@ function toggleNavbar() {
         <a class="navbar-item" href="/pokemon" @click="toggleNavbar">
           Pokemon
         </a>
+        <a class="navbar-item" href="/admin/pokemon" v-if="authStore.isAuthenticated" @click="toggleNavbar">
+          Admin
+        </a>
         <a class="navbar-item" href="/login" v-if="!authStore.isAuthenticated" @click="toggleNavbar">
           Login
         </a>
