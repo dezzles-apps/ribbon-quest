@@ -1,8 +1,12 @@
-SELECT pokemon, nickname, region, achieved, COUNT(*) FROM (
+SELECT pokemon, nickname, region, caught_at, nature, characteristic, shiny, achieved, COUNT(*) FROM (
   SELECT DISTINCT
     pokemon.pokemon,
     pokemon.nickname,
     pokemon.region,
+    pokemon.caught_at,
+    pokemon.nature,
+    pokemon.characteristic,
+    pokemon.shiny,
     pokemon.view_order,
     ribbons.ribbon_key as ribbon_key,
     ribbons.name as ribbon_name,

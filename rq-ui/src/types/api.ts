@@ -24,6 +24,10 @@ interface PokemonStats {
   pokemon: string
   nickname: string
   region: string
+  caughtAt: string
+  nature: string
+  characteristic: string
+  shiny: boolean
   current: number
   target: number
 }

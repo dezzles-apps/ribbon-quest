@@ -28,9 +28,13 @@ type PokemonGame struct {
 }
 
 type AllPokemon struct {
-	Pokemon  string `json:"pokemon"`
-	Nickname string `json:"nickname"`
-	Region   string `json:"region"`
-	Current  int    `json:"current"`
-	Target   int    `json:"target"`
+	Pokemon        string `json:"pokemon"`
+	Nickname       string `json:"nickname"`
+	Region         string `json:"region"`
+	CaughtAt       string `json:"caughtAt"`
+	Nature         string `json:"nature"`
+	Characteristic string `json:"characteristic"`
+	Shiny          bool   `json:"shiny"`
+	Current        int    `json:"current"`
+	Target         int    `json:"target"`
 }

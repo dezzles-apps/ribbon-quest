@@ -157,9 +157,13 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 		var pokemon string
 		var nickname string
 		var region string
+		var caughtAt sql.NullString
+		var nature sql.NullString
+		var characteristic sql.NullString
+		var shiny sql.NullBool
 		var achieved sql.NullBool
 		var count int
-		err := rows.Scan(&pokemon, &nickname, &region, &achieved, &count)
+		err := rows.Scan(&pokemon, &nickname, &region, &caughtAt, &nature, &characteristic, &shiny, &achieved, &count)
 		if err != nil {
 			return nil, err
 		}
@@ -173,11 +177,15 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 			p.Target += count
 		} else {
 			p := &dto.AllPokemon{
-				Pokemon:  pokemon,
-				Nickname: nickname,
-				Region:   region,
-				Current:  0,
-				Target:   0,
+				Pokemon:        pokemon,
+				Nickname:       nickname,
+				Region:         region,
+				CaughtAt:       caughtAt.String,
+				Nature:         nature.String,
+				Characteristic: characteristic.String,
+				Shiny:          shiny.Bool,
+				Current:        0,
+				Target:         0,
 			}
 			if achieved.Bool {
 				p.Current = count
