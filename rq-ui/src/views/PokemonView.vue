@@ -44,9 +44,7 @@ onMounted(fetchPokemon);
   <div v-else-if="pokemon">
     <section>
       <PokemonInfo
-        :pokemon="pokemon.pokemon"
-        :nickname="pokemon.nickname"
-        :region="pokemon.region"
+        :details="pokemon"
         :includeLink="false"
       />
     </section>

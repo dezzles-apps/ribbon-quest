@@ -33,9 +33,7 @@ onMounted(fetchPokemonStats);
   <div class="about" v-for="pokemon in stats" :key="pokemon.pokemon" v-if="stats">
     <div class="box mb-5">
       <PokemonInfo
-        :pokemon="pokemon.pokemon"
-        :nickname="pokemon.nickname"
-        :region="pokemon.region"
+        :details="pokemon"
         :current="pokemon.current"
         :target="pokemon.target"
         :includeLink="true"

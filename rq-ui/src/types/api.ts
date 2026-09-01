@@ -1,7 +1,15 @@
-interface Pokemon {
+interface PokemonDetails {
   pokemon: string
   nickname: string
   region: string
+  caughtAt: string
+  caught: boolean
+  nature: string
+  characteristic: string
+  shiny: boolean
+}
+
+interface Pokemon extends PokemonDetails {
   ribbons: PokemonRibbon[]
   games: PokemonGame[]
 }
@@ -20,14 +28,7 @@ interface PokemonGame {
   ribbons: string[]
 }
 
-interface PokemonStats {
-  pokemon: string
-  nickname: string
-  region: string
-  caughtAt: string
-  nature: string
-  characteristic: string
-  shiny: boolean
+interface PokemonStats extends PokemonDetails {
   current: number
   target: number
 }
@@ -38,14 +39,10 @@ interface Game {
   pokemon: GamePokemon[]
 }
 
-interface GamePokemon {
+interface GamePokemon extends PokemonDetails {
   pokemon: string
   nickname: string
   region: string
-  caughtAt: string
-  nature: string
-  characteristic: string
-  shiny: boolean
   ribbons: PokemonRibbon[]
 }
 
@@ -66,6 +63,7 @@ export type {
   GamePokemon,
   GameWithStats,
   Pokemon,
+  PokemonDetails,
   PokemonRibbon,
   PokemonGame,
   PokemonStats,

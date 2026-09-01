@@ -49,9 +49,7 @@ onMounted(fetchGame);
     >
       <template v-slot:title>
         <PokemonInfo
-          :pokemon="pokemon.pokemon"
-          :nickname="pokemon.nickname"
-          :region="pokemon.region"
+          :details="pokemon"
           :includeDescription="false"
           :includeLink="true"
         />

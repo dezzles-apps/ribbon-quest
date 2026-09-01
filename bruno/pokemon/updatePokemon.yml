@@ -8,12 +8,12 @@ http:
   url: http://localhost:5173/api/pokemon/v1/Vulpix
   headers:
     - name: Authorization
-      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODc4NTYzMjIsImlkIjoiZGV6emxlcyJ9.LO1uRIWOBuMXTTVwwUGn6iA2ZzF07dYZ0y7JLvDWcig
+      value: Bearer {{ token }}
   body:
     type: json
     data: |-
       {
-        "nature": "Modest"
+        "shiny": true
       }
   auth: inherit
 

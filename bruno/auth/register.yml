@@ -5,13 +5,13 @@ info:
 
 http:
   method: POST
-  url: http://localhost:8083/api/auth/v1/register
+  url: https://ribbon-quest.dezzles-apps.com/api/auth/v1/register
   body:
     type: json
     data: |-
       {
         "username": "dezzles",
-        "password": "MyPassword123!"
+        "password": ""
       }
   auth: inherit
 

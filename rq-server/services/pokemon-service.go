@@ -230,6 +230,10 @@ func (ps *PokemonService) UpdatePokemon(pokemon string, updateData dto.UpdatePok
 	if updateData.Characteristic != "" {
 		details.Characteristic = updateData.Characteristic
 	}
+	if updateData.Shiny != nil {
+		details.Shiny = *updateData.Shiny
+	}
+
 	_, err = ps.connection.GetDB().Exec(
 		"UPDATE pokemon SET nickname = ?, nature = ?, characteristic = ?, shiny = ? WHERE pokemon = ?",
 		details.Nickname,
