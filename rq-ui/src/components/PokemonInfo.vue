@@ -70,7 +70,10 @@ function getPokemonImage(): string {
             <tr v-if="props.details.characteristic">
               <td colspan="2">{{ props.details.characteristic }}</td>
             </tr>
-            
+            <tr v-if="props.details.caughtAt">
+              <td>Caught at:</td>
+              <td>{{ props.details.caughtAt }}</td>
+            </tr>
           </table>
         </div>
         <div class="level" v-if="props.includeLink">
