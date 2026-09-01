@@ -6,7 +6,7 @@ import type { PokemonStats, Response } from '@/types/api';
 import { useApi } from '@/composables/useApi';
 const route = useRoute();
 const loading = ref(true);
-const { apiFetch, apiFetchWithAuth } = useApi();
+const { apiFetch } = useApi();
 
 const stats = ref<PokemonStats[] | null>(null);
 async function fetchPokemonStats() {
@@ -33,7 +33,7 @@ const updatingPokemon = ref<Map<String, boolean>>(new Map());
 
 function catchPokemon(pokemon: PokemonStats) {
   updatingPokemon.value.set(pokemon.pokemon, true);
-  apiFetchWithAuth(`/api/pokemon/v1/${pokemon.pokemon}/catch`, {
+  apiFetch(`/api/pokemon/v1/${pokemon.pokemon}/catch`, {
     method: 'POST'
   }).then(async response => {
     if (!response.ok) {
@@ -54,7 +54,7 @@ function catchPokemon(pokemon: PokemonStats) {
 
 function updatePokemon(pokemon: PokemonStats) {
   updatingPokemon.value.set(pokemon.pokemon, true);
-  apiFetchWithAuth(`/api/pokemon/v1/${pokemon.pokemon}`, {
+  apiFetch(`/api/pokemon/v1/${pokemon.pokemon}`, {
     method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

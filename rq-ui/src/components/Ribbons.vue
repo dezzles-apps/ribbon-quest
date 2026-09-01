@@ -45,7 +45,7 @@ function toggleRibbon(ribbon: PokemonRibbon) {
 
   loadingRibbons.value.set(ribbon.ribbonKey, true);
   let method = ribbon.achieved ? 'DELETE' : 'POST';
-  api.apiFetchWithAuth(`/api/pokemon/v1/${props.pokemon}/ribbons/${ribbon.ribbonKey}`, {
+  api.apiFetch(`/api/pokemon/v1/${props.pokemon}/ribbons/${ribbon.ribbonKey}`, {
     method: method,
     headers: {
       'Content-Type': 'application/json'

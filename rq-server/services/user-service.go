@@ -5,6 +5,7 @@ import (
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/db"
 	"errors"
+	"strings"
 
 	cdb "github.com/dezzles-apps/go-common/db"
 	"golang.org/x/crypto/bcrypt"
@@ -45,6 +46,7 @@ func (us *UserService) RegisterUser(input model.AuthInput) error {
 	if !us.configService.CanRegisterUsers() {
 		return errors.New("user registration is disabled")
 	}
+	input.Username = strings.ToLower(input.Username)
 	existingUser, err := us.GetUserByUsername(input.Username)
 	if err == nil && existingUser != nil {
 		return errors.New("username already exists")
@@ -64,6 +66,7 @@ func (us *UserService) RegisterUser(input model.AuthInput) error {
 }
 
 func (us *UserService) GetUserByUsername(username string) (*db.User, error) {
+	username = strings.ToLower(username)
 	var user db.User
 	err := us.database.GetDB().QueryRow("SELECT username, password_hash FROM users WHERE username = ?", username).Scan(&user.Username, &user.Password)
 	if err != nil {

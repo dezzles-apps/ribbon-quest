@@ -15,6 +15,9 @@ const loading = ref<boolean>(false);
 const viewError = ref<string | null>(null);
 const apiResponse = ref<any>(null);
 async function handleLogin() {
+  if (loading.value) {
+    return;
+  }
   if (!username.value || !password.value) {
     viewError.value = 'Username and password are required.';
     return;
@@ -51,13 +54,12 @@ async function handleLogin() {
 </script>
 
 <template>
-  {{  apiResponse }}
   <div class="about">
     <div class="box mb-5">
     <h1 class="title is-3">Login</h1>
       <div class="field">
         <p class="control has-icons-left has-icons-right">
-          <input class="input" type="username" placeholder="Username" v-model="username">
+          <input class="input" type="username" placeholder="Username" v-model="username" @keyup.enter="handleLogin">
           <span class="icon is-small is-left">
             <i class="mdi mdi-account"></i>
           </span>
@@ -68,7 +70,7 @@ async function handleLogin() {
       </div>
       <div class="field">
         <p class="control has-icons-left">
-          <input class="input" type="password" placeholder="Password" v-model="password">
+          <input class="input" type="password" placeholder="Password" v-model="password" @keyup.enter="handleLogin" >
           <span class="icon is-small is-left">
             <i class="mdi mdi-lock"></i>
           </span>
