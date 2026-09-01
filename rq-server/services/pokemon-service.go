@@ -128,9 +128,10 @@ func (ps *PokemonService) getPokemonRibbons(pokemonName string) ([]dto.PokemonRi
 		var ribbonKey string
 		var name string
 		var achieved sql.NullBool
+		var achieved_at sql.NullTime
 		var category string
 		var order int
-		err := rows.Scan(&ribbonKey, &name, &achieved, &category, &order)
+		err := rows.Scan(&ribbonKey, &name, &achieved, &achieved_at, &category, &order)
 		if err != nil {
 			return nil, err
 		}
@@ -142,6 +143,9 @@ func (ps *PokemonService) getPokemonRibbons(pokemonName string) ([]dto.PokemonRi
 			Name:      name,
 			Achieved:  achieved.Bool,
 			Category:  category,
+		}
+		if achieved_at.Valid {
+			ribbon.AchievedAt = &achieved_at.Time
 		}
 		ribbons = append(ribbons, ribbon)
 	}
@@ -184,12 +188,14 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 				Pokemon:        pokemon,
 				Nickname:       nickname,
 				Region:         region,
-				CaughtAt:       caughtAt.Time,
 				Nature:         nature.String,
 				Characteristic: characteristic.String,
 				Shiny:          shiny.Bool,
 				Current:        0,
 				Target:         0,
+			}
+			if caughtAt.Valid {
+				p.CaughtAt = &caughtAt.Time
 			}
 			if achieved.Bool {
 				p.Current = count

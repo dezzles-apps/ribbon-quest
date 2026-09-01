@@ -69,7 +69,7 @@ func (gs *GameService) getPokemonByGame(gameName string) ([]*dto.GamePokemon, er
 	}
 	defer rows.Close()
 
-	var caughtAt sql.NullString
+	var caughtAt sql.NullTime
 	var nature sql.NullString
 	var characteristic sql.NullString
 	var shiny sql.NullBool
@@ -88,7 +88,7 @@ func (gs *GameService) getPokemonByGame(gameName string) ([]*dto.GamePokemon, er
 			return nil, err
 		}
 		if caughtAt.Valid {
-			pokemon.CaughtAt = caughtAt.String
+			pokemon.CaughtAt = &caughtAt.Time
 		}
 		if nature.Valid {
 			pokemon.Nature = nature.String
@@ -121,13 +121,13 @@ func (gs *GameService) loadRibbonsForPokemon(game string, pokemon []*dto.GamePok
 	for rows.Next() {
 		var pokemonName string
 		var ribbon dto.PokemonRibbon
-		var achievedAt sql.NullString
+		var achievedAt sql.NullTime
 		err := rows.Scan(&pokemonName, &ribbon.RibbonKey, &ribbon.Name, &ribbon.Achieved, &achievedAt, &ribbon.Category)
 		if err != nil {
 			return err
 		}
 		if achievedAt.Valid {
-			ribbon.AchievedAt = achievedAt.String
+			ribbon.AchievedAt = &achievedAt.Time
 		}
 		for _, p := range pokemon {
 			if p.Pokemon == pokemonName {

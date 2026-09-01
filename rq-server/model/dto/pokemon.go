@@ -17,11 +17,11 @@ type Pokemon struct {
 }
 
 type PokemonRibbon struct {
-	RibbonKey  string `json:"ribbonKey"`
-	Name       string `json:"name"`
-	Achieved   bool   `json:"achieved"`
-	AchievedAt string `json:"achievedAt"`
-	Category   string `json:"category"`
+	RibbonKey  string     `json:"ribbonKey"`
+	Name       string     `json:"name"`
+	Achieved   bool       `json:"achieved"`
+	AchievedAt *time.Time `json:"achievedAt"`
+	Category   string     `json:"category"`
 }
 
 type PokemonGame struct {
@@ -32,13 +32,13 @@ type PokemonGame struct {
 }
 
 type AllPokemon struct {
-	Pokemon        string    `json:"pokemon"`
-	Nickname       string    `json:"nickname"`
-	Region         string    `json:"region"`
-	CaughtAt       time.Time `json:"caughtAt"`
-	Nature         string    `json:"nature"`
-	Characteristic string    `json:"characteristic"`
-	Shiny          bool      `json:"shiny"`
-	Current        int       `json:"current"`
-	Target         int       `json:"target"`
+	Pokemon        string     `json:"pokemon"`
+	Nickname       string     `json:"nickname"`
+	Region         string     `json:"region"`
+	CaughtAt       *time.Time `json:"caughtAt"`
+	Nature         string     `json:"nature"`
+	Characteristic string     `json:"characteristic"`
+	Shiny          bool       `json:"shiny"`
+	Current        int        `json:"current"`
+	Target         int        `json:"target"`
 }

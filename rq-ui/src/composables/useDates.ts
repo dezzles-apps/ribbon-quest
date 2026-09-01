@@ -8,7 +8,7 @@ export function useDates() {
       return '';
     }
     const date = dayjs(input);
-    return input + date.format("L LT"); + ' :)';
+    return date.format("DD-MM-YYYY HH:mm");;
   }
 
   return { toLocal }

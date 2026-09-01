@@ -1,5 +1,9 @@
 package dto
 
+import (
+	"time"
+)
+
 type Game struct {
 	GameKey string         `json:"gameKey"`
 	Name    string         `json:"name"`
@@ -10,7 +14,7 @@ type GamePokemon struct {
 	Pokemon        string          `json:"pokemon"`
 	Nickname       string          `json:"nickname"`
 	Region         string          `json:"region"`
-	CaughtAt       string          `json:"caughtAt"`
+	CaughtAt       *time.Time      `json:"caughtAt"`
 	Nature         string          `json:"nature"`
 	Characteristic string          `json:"characteristic"`
 	Shiny          bool            `json:"shiny"`
