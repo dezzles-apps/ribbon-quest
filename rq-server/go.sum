@@ -12,6 +12,8 @@ github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dezzles-apps/go-common v0.0.0-20260817110514-1115c970531b h1:zEe8sZ8RpigVu6v+OOBX+NZuohYYL0J5zHhOakN0Zzw=
 github.com/dezzles-apps/go-common v0.0.0-20260817110514-1115c970531b/go.mod h1:2O5dDVUPmCEOFeW8c0fx1rFrORzIBa9EQf/C/WAPrwQ=
+github.com/dezzles-apps/go-common v0.0.0-20260901141933-2b76684ef017 h1:s4lAqhD+YPEqgIplYUSMco6PBHPKJxZhjdTiEDMHObM=
+github.com/dezzles-apps/go-common v0.0.0-20260901141933-2b76684ef017/go.mod h1:2O5dDVUPmCEOFeW8c0fx1rFrORzIBa9EQf/C/WAPrwQ=
 github.com/gabriel-vasile/mimetype v1.4.12 h1:e9hWvmLYvtp846tLHam2o++qitpguFiYCKbn0w9jyqw=
 github.com/gabriel-vasile/mimetype v1.4.12/go.mod h1:d+9Oxyo1wTzWdyVUPMmXFvp4F9tea18J8ufA774AB3s=
 github.com/gin-contrib/sse v1.1.0 h1:n0w2GMuUpWDVp7qSpvze6fAu9iRxJY4Hmj6AmBOU05w=

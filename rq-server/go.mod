@@ -3,7 +3,7 @@ module dezzles-apps/rq-server
 go 1.26.4
 
 require (
-	github.com/dezzles-apps/go-common v0.0.0-20260817110514-1115c970531b
+	github.com/dezzles-apps/go-common v0.0.0-20260901141933-2b76684ef017
 	github.com/gin-gonic/gin v1.12.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
 	golang.org/x/crypto v0.55.0

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dezzles-apps/rq-server/model/dto"
 	"errors"
+	"log"
 
 	_ "embed"
 
@@ -55,18 +56,21 @@ func (ps *PokemonService) GetPokemon(pokemonName string) (*dto.Pokemon, error) {
 func (ps *PokemonService) getPokemon(pokemonName string) (*dto.Pokemon, error) {
 	Pokemon := &dto.Pokemon{}
 	row := ps.connection.GetDB().QueryRow(getPokemonInfo, pokemonName)
-	var caughtAt sql.NullString
+	var caughtAt sql.NullTime
 	var nature sql.NullString
 	var characteristic sql.NullString
+	log.Println("Reading getPokemon")
 	err := row.Scan(&Pokemon.Pokemon, &Pokemon.Nickname, &Pokemon.Region, &caughtAt, &nature, &characteristic, &Pokemon.Shiny)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("No pokemon found")
 		}
+		log.Printf("Err getPokemon %s", err.Error())
 		return nil, err
 	}
+	log.Println("Read getPokemon")
 	if caughtAt.Valid {
-		Pokemon.CaughtAt = caughtAt.String
+		Pokemon.CaughtAt = &caughtAt.Time
 	}
 	if nature.Valid {
 		Pokemon.Nature = nature.String
@@ -157,7 +161,7 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 		var pokemon string
 		var nickname string
 		var region string
-		var caughtAt sql.NullString
+		var caughtAt sql.NullTime
 		var nature sql.NullString
 		var characteristic sql.NullString
 		var shiny sql.NullBool
@@ -180,7 +184,7 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 				Pokemon:        pokemon,
 				Nickname:       nickname,
 				Region:         region,
-				CaughtAt:       caughtAt.String,
+				CaughtAt:       caughtAt.Time,
 				Nature:         nature.String,
 				Characteristic: characteristic.String,
 				Shiny:          shiny.Bool,
@@ -206,7 +210,7 @@ func (ps *PokemonService) CatchPokemon(pokemon string) (*dto.Pokemon, error) {
 	if err != nil {
 		return nil, err
 	}
-	if details.CaughtAt != "" {
+	if details.CaughtAt != nil {
 		return nil, errors.New("Pokemon already caught")
 	}
 	_, err = ps.connection.GetDB().Exec("UPDATE pokemon SET caught_at = CURRENT_TIMESTAMP WHERE pokemon = ?", pokemon)

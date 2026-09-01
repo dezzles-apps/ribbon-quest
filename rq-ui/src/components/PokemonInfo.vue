@@ -2,6 +2,9 @@
 
 import type { PropType } from 'vue';
 import type { PokemonDetails } from '@/types/api.ts';
+import { useDates } from '@/composables/useDates.ts';
+
+const dates = useDates();
 
 const props = defineProps({
   details: {
@@ -35,7 +38,7 @@ function getCounterClass(): string[] {
 }
 
 function getPokemonImage(): string {
-  return `/sprites/${props.details.pokemon.toLowerCase()}.png`;
+  return `/sprites/${props.details.pokemon.toLowerCase()}${props.details.shiny ? '-s' : ''}.png`;
 }
 </script>
 
@@ -59,21 +62,23 @@ function getPokemonImage(): string {
         </div>
         <div>
           <table>
-            <tr>
-              <td colspan="2">
-                {{ props.details.nickname }} is representing the {{ props.details.region }} region.
-              </td>
-            </tr>
-            <tr v-if="props.details.nature">
-              <td>{{props.details.nickname }} is {{ props.details.nature ?? 'Unknown' }}</td>
-            </tr>
-            <tr v-if="props.details.characteristic">
-              <td colspan="2">{{ props.details.characteristic }}</td>
-            </tr>
-            <tr v-if="props.details.caughtAt">
-              <td>Caught at:</td>
-              <td>{{ props.details.caughtAt }}</td>
-            </tr>
+            <tbody>
+              <tr>
+                <td colspan="2">
+                  {{ props.details.nickname }} is representing the {{ props.details.region }} region.
+                </td>
+              </tr>
+              <tr v-if="props.details.nature">
+                <td>{{props.details.nickname }} is {{ props.details.nature ?? 'Unknown' }}</td>
+              </tr>
+              <tr v-if="props.details.characteristic">
+                <td colspan="2">{{ props.details.characteristic }}</td>
+              </tr>
+              <tr v-if="props.details.caughtAt">
+                <td>Caught at:</td>
+                <td>{{ dates.toLocal(props.details.caughtAt) }}</td>
+              </tr>
+            </tbody>
           </table>
         </div>
         <div class="level" v-if="props.includeLink">
