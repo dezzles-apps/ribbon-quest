@@ -3,10 +3,11 @@ server:
 firebase:
   enabled: false
 database:
-  host: localhost
-  port: 3306
-  username: testuser
-  password: testuser
-  database: ribbon-quest
+  host: dezzles-apps-do-user-35978446-0.h.db.ondigitalocean.com
+  port: 25060
+  username: ribbon-quest-prod
+  password: $DATABASE_PASSWORD_PROD
+  database: ribbon-quest-prod
+  prod: true
 app:
-  jwtSecret: SOME_SECRET
+  jwtSecret: $JWT_SECRET_PROD
