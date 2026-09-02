@@ -23,10 +23,10 @@ export function useCrumbs() {
   function getCrumbs() : any[] {
     const routes = router.options.routes.reduce((prev, n) => {
       if (n.name) {
-        prev.set(n.name, n);
+        prev.set(n.name as string, n);
       }
       return prev;
-    }, new Map<string | symbol, RouteRecordRaw>())
+    }, new Map<string | null, RouteRecordRaw>())
 
     let result = [] as any[]
     let next = route.matched[0] as RouteRecordRaw | undefined
