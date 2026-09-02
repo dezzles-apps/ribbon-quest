@@ -40,7 +40,6 @@ export function useCrumbs() {
       })
 
       next = routes.get(crumbData.parent)
-      console.log(next)
     }
     return result
   }

@@ -55,36 +55,43 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="about">
-    <div class="box mb-5">
-    <h1 class="title is-3">Login</h1>
-      <div class="field">
-        <p class="control has-icons-left has-icons-right">
-          <input class="input" type="username" placeholder="Username" v-model="username" @keyup.enter="handleLogin">
-          <span class="icon is-small is-left">
-            <i class="mdi mdi-account"></i>
-          </span>
-          <span class="icon is-small is-right">
-            <i class="mdi mdi-check"></i>
-          </span>
-        </p>
-      </div>
-      <div class="field">
-        <p class="control has-icons-left">
-          <input class="input" type="password" placeholder="Password" v-model="password" @keyup.enter="handleLogin" >
-          <span class="icon is-small is-left">
-            <i class="mdi mdi-lock"></i>
-          </span>
-        </p>
-      </div>
-      {{ viewError }}
-      <div class="field">
-        <p class="control">
-          <button class="button is-success" @click="handleLogin" :class="{ 'is-loading': loading }">
-            Login
-          </button>
-        </p>
-      </div>
+    <v-sheet
+    class="align-center flex-wrap text-center mx-auto px-4"
+    elevation="2"
+    maxWidth="800"
+    width="100%"
+    rounded
+  >
+    <div class="pb-4 pt-4">
+      <h2 class="text-headline-large font-weight-black my-0">Login</h2>
+
+      <v-text-field
+        label="Username"
+        type="text"
+        v-model="username"
+        @keyup.enter="handleLogin"
+      ></v-text-field>
+
+      <v-text-field
+        label="Password"
+        type="password"
+        v-model="password"
+        @keyup.enter="handleLogin"
+      ></v-text-field>
+      <v-alert
+        v-if="viewError"
+        type="error"
+        class="my-2"
+      >
+        {{ viewError }}
+      </v-alert>
+      <v-btn
+        color="orange"
+        variant="flat"
+        @click="handleLogin"
+      >
+        Login
+    </v-btn>
     </div>
-  </div>
+  </v-sheet>
 </template>

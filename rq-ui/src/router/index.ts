@@ -7,6 +7,7 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
 import Index from '@/pages/HomeView.vue'
+import { Games } from '@/data/games';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -54,8 +55,8 @@ const router = createRouter({
       meta: {
         crumbs: {
           parent: 'ribbons-all-pokemon',
-          title: i => i.pokemon,
-          href: i => (`/ribbons/pokemon/${i.pokemon}`)
+          title: (i: any) => i.pokemon,
+          href: (i: any) => (`/ribbons/pokemon/${i.pokemon}`)
         }
       }
     },
@@ -63,21 +64,49 @@ const router = createRouter({
       path: '/ribbons/games',
       name: 'ribbons-all-games',
       component: () => import('@/pages/ribbons/AllGamesView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'ribbons',
+          title: 'Games',
+          href: '/ribbons/games'
+        }
+      }
     },
     {
       path: '/ribbons/games/:game',
       name: 'ribbons-game',
       component: () => import('@/pages/ribbons/GameView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'ribbons-all-games',
+          title: (i: any) => Games[i.game] || i.game,
+          href: (i: any) => (`/ribbons/games/${i.game}`)
+        }
+      }
     },
     {
       path: '/login',
       name: 'login',
       component: () => import('@/pages/LoginView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'home',
+          title: 'Login',
+          href: '/login'
+        }
+      }
     },
     {
       path: '/admin/pokemon',
       name: 'admin-pokemon',
       component: () => import('@/pages/admin/PokemonView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'home',
+          title: 'Ribbon Pokemon',
+          href: '/admin/pokemon'
+        }
+      }
     }
   ],
 })

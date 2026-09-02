@@ -91,58 +91,57 @@ onMounted(fetchPokemonStats);
 <template>
   <div class="about" v-for="(pokemon, idx) in stats" :key="pokemon.pokemon" v-if="stats">
     <div class="box mb-5">
-      <h1 class="title is-3">{{ pokemon.pokemon }}</h1>
-      <div v-if="pokemon.caughtAt">
-        <div class="field">
-          <p class="control has-icons-left has-icons">
-            <input class="input" type="text" placeholder="Nickname" v-model="pokemon.nickname">
-            <span class="icon is-small is-left">
-              <i class="mdi mdi-account"></i>
-            </span>
-          </p>
+      <v-card
+        elevation="2"
+        rounded
+        style="padding: 10px;"
+        :title="pokemon.pokemon"
+      >
+        <div v-if="pokemon.caughtAt">
+          <v-text-field
+            label="Nickname"
+            v-model="pokemon.nickname"
+            type="text"
+          ></v-text-field>
+          <v-select
+            label="Nature"
+            v-model="pokemon.nature"
+            :items="natures"
+          ></v-select>
+          <v-text-field
+            label="Characteristic"
+            v-model="pokemon.characteristic"
+            type="text"
+          ></v-text-field>
+          <v-checkbox
+            label="Shiny"
+            v-model="pokemon.shiny"
+          ></v-checkbox>
         </div>
-        <div class="field">
-          <p class="control select">
-            <select placeholder="Nature" v-model="pokemon.nature">
-              <option v-for="nature in natures" :key="nature" :value="nature">{{ nature }}</option>
-            </select>
-          </p>
+        <div v-else>
+          <p>This Pokémon has not been caught yet.</p>
         </div>
-        <div class="field">
-          <p class="control has-icons-left has-icons">
-            <input class="input" type="text" placeholder="Characteristic" v-model="pokemon.characteristic">
-            <span class="icon is-small is-left">
-              <i class="mdi mdi-account"></i>
-            </span>
-          </p>
-        </div>
-        <div class="field">
-          <p class="control has-icons-left has-icons">
-            <label class="checkbox">
-              <input type="checkbox" v-model="pokemon.shiny" />
-              Shiny
-            </label>
-          </p>
-        </div>
-
-        <div class="field">
-          <p class="control">
-            <button class="button is-success" @click="updatePokemon(pokemon)" :class="{ 'is-loading': updatingPokemon.get(pokemon.pokemon) }">
-              Update
-            </button>
-          </p>
-        </div>
-      </div>
-      <div v-else>
-        <p>This Pokémon has not been caught yet.</p>
-        <div class="field">
-          <p class="control">
-            <button class="button is-success" @click="catchPokemon(pokemon)" :class="{ 'is-loading': updatingPokemon.get(pokemon.pokemon) }">
-              Catch
-            </button>
-          </p>
-        </div>
-      </div>
+        <v-card-actions>
+          <v-btn
+            v-if="pokemon.caughtAt"
+            color="orange"
+            variant="flat"
+            :loading="updatingPokemon.get(pokemon.pokemon)"
+            @click="updatePokemon(pokemon)"
+          >
+            Update
+          </v-btn>
+          <v-btn
+            v-if="!pokemon.caughtAt"
+            color="orange"
+            variant="flat"
+            :loading="updatingPokemon.get(pokemon.pokemon)"
+            @click="catchPokemon(pokemon)"
+          >
+            Catch
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </div>
   </div>
 </template>
