@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Pokemon, PokemonRibbon, Response } from '@/types/api';
 import { useApi } from '@/composables/useApi';
+import API from '@/composables/endpoints';
 import PokemonInfo from '@/components/PokemonInfo.vue';
 import GameInfo from '@/components/GameInfo.vue';
 const route = useRoute();
@@ -14,7 +15,7 @@ const pokemon = ref<Pokemon | null>(null);
 const ribbonMap = ref<Map<string, PokemonRibbon>>(new Map<string, PokemonRibbon>())
 async function fetchPokemon() {
   try {
-    const response = await apiFetch(`/api/pokemon/v1/${route.params.pokemon}`);
+    const response = await apiFetch(API.Ribbons.GetPokemon(route.params.pokemon as string));
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

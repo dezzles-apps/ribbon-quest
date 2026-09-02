@@ -28,7 +28,7 @@ func NewPokemonController(
 }
 
 func (pc *PokemonController) registerRoutes(router *gin.Engine, authMiddleware *middleware.AuthMiddleware) {
-	pokemonGroup := router.Group("/api/pokemon/v1")
+	pokemonGroup := router.Group("/api/ribbons/v1/pokemon")
 	{
 		pokemonGroup.GET("/", pc.getAllPokemon)
 		pokemonGroup.GET("/:pokemon", pc.getPokemon)

@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { useApi } from '@/composables/useApi';
 import { useAuthStore } from '@/stores/authStore';
 import { useRouter } from 'vue-router';
+import { Auth } from '@/composables/endpoints';
 
 const { apiFetch } = useApi();
 const router = useRouter();
@@ -25,7 +26,7 @@ async function handleLogin() {
   viewError.value = null;
   loading.value = true;
   try {
-    const response = await apiFetch('/api/auth/v1/login', {
+    const response = await apiFetch(Auth.Login, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

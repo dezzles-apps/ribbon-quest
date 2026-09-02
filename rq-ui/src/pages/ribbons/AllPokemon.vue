@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { PokemonStats, Response } from '@/types/api';
 import { useApi } from '@/composables/useApi';
+import { Ribbons } from '@/composables/endpoints';
 import PokemonInfo from '@/components/PokemonInfo.vue';
 const route = useRoute();
 const loading = ref(true);
@@ -12,7 +13,7 @@ const { apiFetch } = useApi();
 const stats = ref<PokemonStats[] | null>(null);
 async function fetchPokemonStats() {
   try {
-    const response = await apiFetch(`/api/pokemon/v1/`);
+    const response = await apiFetch(Ribbons.GetAllPokemon);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

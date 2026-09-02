@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { PokemonStats, Response } from '@/types/api';
 import { useApi } from '@/composables/useApi';
+import API from '@/composables/endpoints';
 const route = useRoute();
 const loading = ref(true);
 const { apiFetch } = useApi();
@@ -11,7 +12,7 @@ const { apiFetch } = useApi();
 const stats = ref<PokemonStats[] | null>(null);
 async function fetchPokemonStats() {
   try {
-    const response = await apiFetch(`/api/pokemon/v1/`);
+    const response = await apiFetch(API.Ribbons.GetAllPokemon);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -33,7 +34,7 @@ const updatingPokemon = ref<Map<String, boolean>>(new Map());
 
 function catchPokemon(pokemon: PokemonStats) {
   updatingPokemon.value.set(pokemon.pokemon, true);
-  apiFetch(`/api/pokemon/v1/${pokemon.pokemon}/catch`, {
+  apiFetch(API.Ribbons.CatchPokemon(pokemon.pokemon), {
     method: 'POST'
   }).then(async response => {
     if (!response.ok) {
@@ -54,7 +55,7 @@ function catchPokemon(pokemon: PokemonStats) {
 
 function updatePokemon(pokemon: PokemonStats) {
   updatingPokemon.value.set(pokemon.pokemon, true);
-  apiFetch(`/api/pokemon/v1/${pokemon.pokemon}`, {
+  apiFetch(API.Ribbons.UpdatePokemon(pokemon.pokemon), {
     method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

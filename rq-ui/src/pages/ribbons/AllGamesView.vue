@@ -3,6 +3,7 @@
 import { onMounted, ref } from 'vue';
 import type { Response, GameWithStats } from '@/types/api';
 import { useApi } from '@/composables/useApi';
+import { Ribbons } from '@/composables/endpoints';
 import GameInfo from '@/components/GameInfo.vue';
 
 const loading = ref(true);
@@ -11,7 +12,7 @@ const { apiFetch } = useApi();
 const stats = ref<GameWithStats[] | null>(null);
 async function fetchGameStats() {
   try {
-    const response = await apiFetch(`/api/games/v1/`);
+    const response = await apiFetch(Ribbons.GetAllGames);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }

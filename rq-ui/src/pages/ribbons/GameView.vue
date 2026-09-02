@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import Ribbons from '@/components/Ribbons.vue';
+import { Ribbons as apiRibbons } from '@/composables/endpoints';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import type { Response, Game, GamePokemon, PokemonRibbon } from '@/types/api';
+import type { Response, Game } from '@/types/api';
 import PokemonInfo from '@/components/PokemonInfo.vue';
 import GameInfo from '@/components/GameInfo.vue';
 import { useApi } from '@/composables/useApi';
@@ -13,7 +14,7 @@ const { apiFetch } = useApi();
 const game = ref<Game | null>(null);
 async function fetchGame() {
   try {
-    const response = await apiFetch(`/api/games/v1/${route.params.game}`);
+    const response = await apiFetch(apiRibbons.GetGame(route.params.game as string));
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
