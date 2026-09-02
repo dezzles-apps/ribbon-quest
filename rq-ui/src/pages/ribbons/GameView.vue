@@ -41,20 +41,22 @@ onMounted(fetchGame);
         :includeLink="false"
       />
     </section>
-    <Ribbons
+    <PokemonInfo
       v-for="pokemon in game.pokemon"
-      :key="pokemon.pokemon"
-      :ribbons="pokemon.ribbons"
-      :pokemon="pokemon.pokemon"
+      :details="pokemon"
+      :includeDescription="false"
+      :includeLink="true"
     >
-      <template v-slot:title>
-        <PokemonInfo
-          :details="pokemon"
-          :includeDescription="false"
-          :includeLink="true"
+      <template v-slot:content>
+        <Ribbons
+          :key="pokemon.pokemon"
+          :ribbons="pokemon.ribbons"
+          :pokemon="pokemon.pokemon"
         />
       </template>
-    </Ribbons>
+    </PokemonInfo>
+
+
   </div>
   <div v-else>
     <p>Pokemon not found.</p>

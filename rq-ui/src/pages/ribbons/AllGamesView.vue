@@ -1,11 +1,10 @@
 <script setup lang="ts">
 
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
 import type { Response, GameWithStats } from '@/types/api';
 import { useApi } from '@/composables/useApi';
 import GameInfo from '@/components/GameInfo.vue';
-const route = useRoute();
+
 const loading = ref(true);
 const { apiFetch } = useApi();
 

@@ -13,7 +13,7 @@ const username = ref<string>('');
 const password = ref<string>('');
 const loading = ref<boolean>(false);
 const viewError = ref<string | null>(null);
-const apiResponse = ref<any>(null);
+
 async function handleLogin() {
   if (loading.value) {
     return;

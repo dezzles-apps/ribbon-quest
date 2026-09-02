@@ -1,0 +1,12 @@
+server:
+  port: $SERVER_PORT
+firebase:
+  enabled: false
+database:
+  host: localhost
+  port: 3306
+  username: testuser
+  password: testuser
+  database: ribbon-quest
+app:
+  jwtSecret: SOME_SECRET

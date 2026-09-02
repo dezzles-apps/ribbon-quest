@@ -38,7 +38,6 @@ Scaffolded with Vuetify CLI.
 - Vuetify MCP
 - Pinia
 - Vue Router
-- Tailwind CSS
 
 ## 💿 Install
 

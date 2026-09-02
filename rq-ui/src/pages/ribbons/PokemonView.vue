@@ -53,21 +53,20 @@ onMounted(fetchPokemon);
       :ribbons="pokemon.ribbons"
       :pokemon="pokemon.pokemon"
     />
-    <Ribbons
+    <GameInfo
       v-for="game in pokemon.games"
-      :key="game.gameKey"
-      :title="game.name"
-      :ribbons="game.ribbons.map(ribbonKey => ribbonMap.get(ribbonKey)!).filter(ribbon => ribbon !== undefined)"
-      :pokemon="pokemon.pokemon"
+      :gameKey="game.gameKey"
+      :name="game.name"
+      :includeLink="true"
     >
-      <template v-slot:title>
-        <GameInfo
-          :gameKey="game.gameKey"
-          :name="game.name"
-          :includeLink="true"
+      <template v-slot:content>
+        <Ribbons
+          :key="game.gameKey"
+          :ribbons="game.ribbons.map(ribbonKey => ribbonMap.get(ribbonKey)!).filter(ribbon => ribbon !== undefined)"
+          :pokemon="pokemon.pokemon"
         />
       </template>
-    </Ribbons>
+    </GameInfo>
   </div>
   <div v-else>
     <p>Pokemon not found.</p>

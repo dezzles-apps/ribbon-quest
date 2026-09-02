@@ -182,7 +182,7 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 			if achieved.Bool {
 				p.Current += count
 			}
-			p.Target += count
+			p.Total += count
 		} else {
 			p := &dto.AllPokemon{
 				Pokemon:        pokemon,
@@ -192,7 +192,7 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 				Characteristic: characteristic.String,
 				Shiny:          shiny.Bool,
 				Current:        0,
-				Target:         0,
+				Total:          0,
 			}
 			if caughtAt.Valid {
 				p.CaughtAt = &caughtAt.Time
@@ -200,7 +200,7 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 			if achieved.Bool {
 				p.Current = count
 			}
-			p.Target = count
+			p.Total = count
 			pokemonMap[pokemon] = p
 			pokemonList = append(pokemonList, p)
 		}

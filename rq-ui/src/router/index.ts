@@ -6,42 +6,68 @@
 
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
-import Index from '@/pages/index.vue'
+import Index from '@/pages/HomeView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
+      name: 'home',
       component: Index,
-    },
-    {
-      path: '/ribbons/pokemon',
-      name: 'all-pokemon',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('@/pages/ribbon-quest/AllPokemon.vue'),
+      meta: {
+        crumbs: {
+          parent: null,
+          title: 'Home',
+          href: '/'
+        }
+      }
     },
     {
       path: '/ribbons',
-      name: 'ribbons-home',
-      component: () => import('@/pages/ribbon-quest/HomeView.vue'),
+      name: 'ribbons',
+      component: () => import('@/pages/ribbons/RibbonsView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'home',
+          title: 'Ribbon Quest',
+          href: '/ribbons'
+        }
+      }
+    },
+    {
+      path: '/ribbons/pokemon',
+      name: 'ribbons-all-pokemon',
+      component: () => import('@/pages/ribbons/AllPokemon.vue'),
+      meta: {
+        crumbs: {
+          parent: 'ribbons',
+          title: 'Pokemon',
+          href: '/ribbons/pokemon'
+        }
+      }
     },
     {
       path: '/ribbons/pokemon/:pokemon',
-      name: 'pokemon',
-      component: () => import('@/pages/ribbon-quest/PokemonView.vue'),
+      name: 'ribbons-pokemon',
+      component: () => import('@/pages/ribbons/PokemonView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'ribbons-all-pokemon',
+          title: i => i.pokemon,
+          href: i => (`/ribbons/pokemon/${i.pokemon}`)
+        }
+      }
     },
     {
       path: '/ribbons/games',
-      name: 'all-games',
-      component: () => import('@/pages/ribbon-quest/AllGamesView.vue'),
+      name: 'ribbons-all-games',
+      component: () => import('@/pages/ribbons/AllGamesView.vue'),
     },
     {
       path: '/ribbons/games/:game',
-      name: 'game',
-      component: () => import('@/pages/ribbon-quest/GameView.vue'),
+      name: 'ribbons-game',
+      component: () => import('@/pages/ribbons/GameView.vue'),
     },
     {
       path: '/login',
@@ -52,7 +78,7 @@ const router = createRouter({
       path: '/admin/pokemon',
       name: 'admin-pokemon',
       component: () => import('@/pages/admin/PokemonView.vue'),
-    },
+    }
   ],
 })
 

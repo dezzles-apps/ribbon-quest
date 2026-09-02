@@ -35,7 +35,7 @@ onMounted(fetchPokemonStats);
       <PokemonInfo
         :details="pokemon"
         :current="pokemon.current"
-        :target="pokemon.target"
+        :total="pokemon.total"
         :includeLink="true"
       />
     </div>
