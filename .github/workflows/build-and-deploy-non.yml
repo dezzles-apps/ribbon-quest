@@ -1,4 +1,4 @@
-name: Build And Deploy
+name: Build And Deploy Non
 on:
   push:
     branches-ignore:
