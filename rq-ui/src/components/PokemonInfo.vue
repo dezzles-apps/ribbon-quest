@@ -56,6 +56,9 @@ function getPokemonImage(): string {
               {{ props.details.nickname }} is representing the {{ props.details.region }} region.
             </td>
           </tr>
+          <tr v-if="props.details.notes">
+            <td>{{ props.details.notes }}</td>
+          </tr>
           <tr v-if="props.details.nature">
             <td>{{props.details.nickname }} is {{ props.details.nature ?? 'Unknown' }}</td>
           </tr>
@@ -65,12 +68,6 @@ function getPokemonImage(): string {
           <tr v-if="props.details.caughtAt">
             <td>Caught at:</td>
             <td>{{ dates.toLocal(props.details.caughtAt) }}</td>
-          </tr>
-          <tr v-if="props.details.notes">
-            <td><b>Notes:</b></td>
-          </tr>
-          <tr v-if="props.details.notes">
-            <td>{{ props.details.notes }}</td>
           </tr>
         </tbody>
       </table>
