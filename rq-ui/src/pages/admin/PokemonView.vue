@@ -1,13 +1,30 @@
 <script setup lang="ts">
 
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
 import type { PokemonStats, Response } from '@/types/api';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
-const route = useRoute();
+import Loading from '@/components/Loading.vue';
 const loading = ref(true);
 const { apiFetch } = useApi();
+
+class SnackbarDetails {
+  message: string
+  show: boolean
+  isError: boolean
+
+  constructor(message: string, show: boolean, isError: boolean) {
+    this.message = message;
+    this.show = show;
+    this.isError = isError;
+  }
+
+  update(message : string, isError : boolean) {
+    this.message = message;
+    this.isError = isError;
+    this.show = true;
+  }
+}
 
 const stats = ref<PokemonStats[] | null>(null);
 async function fetchPokemonStats() {
@@ -18,6 +35,9 @@ async function fetchPokemonStats() {
     }
     const data = await response.json() as Response<PokemonStats[]>;
     stats.value = data.data;
+    data.data.forEach(pokemon => {
+      showSnackbar.value.set(pokemon.pokemon, new SnackbarDetails('', false, false));
+    })
   } catch (error) {
     console.error('Error fetching Pokemon stats:', error);
   } finally {
@@ -31,6 +51,7 @@ const natures = ref<string[]>([
 ]);
 
 const updatingPokemon = ref<Map<String, boolean>>(new Map());
+const showSnackbar = ref<Map<string, SnackbarDetails>>(new Map());
 
 function catchPokemon(pokemon: PokemonStats) {
   updatingPokemon.value.set(pokemon.pokemon, true);
@@ -44,13 +65,24 @@ function catchPokemon(pokemon: PokemonStats) {
     pokemon.caughtAt = data.caughtAt;
     pokemon.nickname = data.nickname ?? '';
     pokemon.nature = data.nature ?? '';
+    getSnackInfo(pokemon).update(`${pokemon.pokemon} caught`, false);
   })
   .catch(error => {
+    getSnackInfo(pokemon).update(`Error catching ${pokemon.pokemon}`, true);
     console.error('Error catching Pokemon:', error);
   })
   .finally(() => {
     updatingPokemon.value.set(pokemon.pokemon, false);
   });
+}
+
+function getSnackInfo(details: PokemonStats) : SnackbarDetails {
+  const pokemon = details.pokemon;
+  const snack = showSnackbar.value.get(pokemon)
+  if (!snack) {
+    return new SnackbarDetails("", false, false);
+  }
+  return snack;
 }
 
 function updatePokemon(pokemon: PokemonStats) {
@@ -78,9 +110,11 @@ function updatePokemon(pokemon: PokemonStats) {
     pokemon.shiny = data.shiny?? false;
     pokemon.characteristic = data.characteristic?? '';
     pokemon.notes = data.notes?? '';
+    getSnackInfo(pokemon).update(`Updated ${pokemon.nickname}`, false);
   })
   .catch(error => {
-    console.error('Error catching Pokemon:', error);
+    getSnackInfo(pokemon).update(`Error updating ${pokemon.nickname}`, true);
+    console.error('Error updating Pokemon:', error);
   })
   .finally(() => {
     updatingPokemon.value.set(pokemon.pokemon, false);
@@ -91,6 +125,7 @@ onMounted(fetchPokemonStats);
 </script>
 
 <template>
+  <Loading v-if="loading"/>
   <div class="about" v-for="(pokemon, idx) in stats" :key="pokemon.pokemon" v-if="stats">
     <div class="box mb-5">
       <v-card
@@ -128,6 +163,13 @@ onMounted(fetchPokemonStats);
         <div v-else>
           <p>This Pokémon has not been caught yet.</p>
         </div>
+        <v-snackbar
+          v-model="getSnackInfo(pokemon).show"
+          :timeout="2000"
+          :color="getSnackInfo(pokemon).isError ? 'warning': 'success'"
+        >
+          {{ getSnackInfo(pokemon).message }}
+        </v-snackbar>
         <v-card-actions>
           <v-btn
             v-if="pokemon.caughtAt"
