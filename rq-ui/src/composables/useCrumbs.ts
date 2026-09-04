@@ -2,8 +2,8 @@ import { useRoute, useRouter } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router';
 
 interface CrumbData {
-  title: string | null | ((input: string) => string)
-  href: string | null | ((input: string) => string)
+  title: string | null | ((params: Record<string, any>) => string)
+  href: string | null | ((params: Record<string, any>) => string)
   parent: string | null
 }
 
