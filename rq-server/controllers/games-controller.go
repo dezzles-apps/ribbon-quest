@@ -22,7 +22,7 @@ func NewGamesController(
 }
 
 func (gc *GamesController) registerRoutes(router *gin.Engine) {
-	gameGroup := router.Group("/api/games/v1")
+	gameGroup := router.Group("/api/ribbons/v1/games")
 	{
 		gameGroup.GET("/:game", gc.getGame)
 		gameGroup.GET("/", gc.getAllGames)

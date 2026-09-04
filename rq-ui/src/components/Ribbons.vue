@@ -97,11 +97,9 @@ function toggleRibbon(ribbon: PokemonRibbon) {
 <style scoped>
 .ribbon {
   margin: 10px;
-  
-  padding-top: 15px;
   align-items: center;
   text-align: center;
-  width: 115px;
+  width: 110px;
   height: 100px;
   outline-width: 5px;
   outline-style: solid;

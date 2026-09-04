@@ -1,5 +1,13 @@
+/**
+ * router/index.ts
+ *
+ * Manual routes for ./src/pages/*.vue
+ */
+
+// Composables
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Index from '@/pages/HomeView.vue'
+import { Games } from '@/data/games';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -7,40 +15,98 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: Index,
+      meta: {
+        crumbs: {
+          parent: null,
+          title: 'Home',
+          href: '/'
+        }
+      }
     },
     {
-      path: '/pokemon',
-      name: 'all-pokemon',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AllPokemon.vue'),
+      path: '/ribbons',
+      name: 'ribbons',
+      component: () => import('@/pages/ribbons/RibbonsView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'home',
+          title: 'Ribbon Quest',
+          href: '/ribbons'
+        }
+      }
     },
     {
-      path: '/pokemon/:pokemon',
-      name: 'pokemon',
-      component: () => import('../views/PokemonView.vue'),
+      path: '/ribbons/pokemon',
+      name: 'ribbons-all-pokemon',
+      component: () => import('@/pages/ribbons/AllPokemon.vue'),
+      meta: {
+        crumbs: {
+          parent: 'ribbons',
+          title: 'Pokemon',
+          href: '/ribbons/pokemon'
+        }
+      }
     },
     {
-      path: '/games',
-      name: 'all-games',
-      component: () => import('../views/AllGamesView.vue'),
+      path: '/ribbons/pokemon/:pokemon',
+      name: 'ribbons-pokemon',
+      component: () => import('@/pages/ribbons/PokemonView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'ribbons-all-pokemon',
+          title: (i: any) => i.pokemon,
+          href: (i: any) => (`/ribbons/pokemon/${i.pokemon}`)
+        }
+      }
     },
     {
-      path: '/games/:game',
-      name: 'game',
-      component: () => import('../views/GameView.vue'),
+      path: '/ribbons/games',
+      name: 'ribbons-all-games',
+      component: () => import('@/pages/ribbons/AllGamesView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'ribbons',
+          title: 'Games',
+          href: '/ribbons/games'
+        }
+      }
+    },
+    {
+      path: '/ribbons/games/:game',
+      name: 'ribbons-game',
+      component: () => import('@/pages/ribbons/GameView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'ribbons-all-games',
+          title: (i: any) => Games[i.game] || i.game,
+          href: (i: any) => (`/ribbons/games/${i.game}`)
+        }
+      }
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('../views/LoginView.vue'),
+      component: () => import('@/pages/LoginView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'home',
+          title: 'Login',
+          href: '/login'
+        }
+      }
     },
     {
       path: '/admin/pokemon',
       name: 'admin-pokemon',
-      component: () => import('../views/admin/PokemonView.vue'),
+      component: () => import('@/pages/admin/PokemonView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'home',
+          title: 'Ribbon Pokemon',
+          href: '/admin/pokemon'
+        }
+      }
     }
   ],
 })

@@ -30,41 +30,27 @@ function getCounterClass(): string[] {
 
 
 <template>
-  <div>
-    <div class="columns">
-      <div class="column">
-        <div class="level">
-          <div class="level-left">
-            <div class="level-item">
-              <h1 class="title is-3">{{ props.name }}</h1>
-            </div>
-          </div>
-        </div>
-        <div class="level" v-if="props.includeLink">
-          <div class="level-left">
-            <div class="level-item">
-              <router-link :to="`/games/${props.gameKey}`" class="button is-primary">View</router-link>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="column is-narrow">
-        <div class="level-right" v-if="props.current !== undefined && props.total !== undefined">
-          <div class="level-item">
-            <span class="tag" :class="getCounterClass()">{{ props.current }} / {{ props.total }}</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
+  <v-card
+    :title="props.name"
+  >
+    <template v-slot:append>
+      <v-chip
+        v-if="props.current !== undefined && props.total !== undefined"
+        variant="flat"
+        :color="props.current == props.total ? 'primary' : 'secondary'"
+      >
+        {{ props.current }} / {{ props.total }}
+      </v-chip>
+      <v-btn
+        v-if="props.includeLink"
+        variant="tonal"
+        :to="{ name: 'ribbons-game', params: { game: props.gameKey }}"
+      >
+        More Details
+      </v-btn>
+    </template>
+    <v-card-text>
+      <slot name="content" />
+    </v-card-text>
+  </v-card>
 </template>
-
-<style lang="css" scoped>
-.pokemon-image {
-  max-height: 150px;
-  display: block;
-  margin: auto;
-}
-</style>

@@ -30,13 +30,13 @@ interface PokemonGame {
 
 interface PokemonStats extends PokemonDetails {
   current: number
-  target: number
+  total: number
 }
 
 interface Game {
   gameKey: string
   name: string
-  pokemon: GamePokemon[]
+  pokemon: GamePokemon[]  
 }
 
 interface GamePokemon extends PokemonDetails {
