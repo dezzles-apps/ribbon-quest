@@ -3,6 +3,8 @@ import type { PokemonRibbon } from '@/types/api';
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useApi } from '@/composables/useApi';
+import API from '@/composables/endpoints';
+
 const authStore = useAuthStore();
 const api = useApi();
 
@@ -45,7 +47,7 @@ function toggleRibbon(ribbon: PokemonRibbon) {
 
   loadingRibbons.value.set(ribbon.ribbonKey, true);
   let method = ribbon.achieved ? 'DELETE' : 'POST';
-  api.apiFetch(`/api/pokemon/v1/${props.pokemon}/ribbons/${ribbon.ribbonKey}`, {
+  api.apiFetch(API.Ribbons.UpdateRibbon(props.pokemon, ribbon.ribbonKey), {
     method: method,
     headers: {
       'Content-Type': 'application/json'

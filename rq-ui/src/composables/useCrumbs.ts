@@ -3,12 +3,15 @@ import type { RouteRecordRaw } from 'vue-router';
 
 interface CrumbData {
   title: string | null | ((input: string) => string)
-  href: string | null
+  href: string | null | ((input: string) => string)
   parent: string | null
 }
 
 
-function process(value : string | null | ((input: string) => string), params: any) : string {
+function process(
+  value : string | null | ((params: Record<string, any>) => string),
+  params: Record<string, any>
+) : string {
   if (typeof value === 'string') {
     return value as string;
   } else if (typeof value === 'function') {

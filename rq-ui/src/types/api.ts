@@ -36,7 +36,7 @@ interface PokemonStats extends PokemonDetails {
 interface Game {
   gameKey: string
   name: string
-  pokemon: GamePokemon[]  
+  pokemon: GamePokemon[]
 }
 
 interface GamePokemon extends PokemonDetails {
