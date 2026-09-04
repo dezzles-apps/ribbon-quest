@@ -5,6 +5,7 @@ interface PokemonDetails {
   caughtAt: string
   caught: boolean
   nature: string
+  notes: string
   characteristic: string
   shiny: boolean
 }

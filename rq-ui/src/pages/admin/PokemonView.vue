@@ -64,7 +64,8 @@ function updatePokemon(pokemon: PokemonStats) {
         shiny: pokemon.shiny,
         nature: pokemon.nature,
         characteristic: pokemon.characteristic,
-        nickname: pokemon.nickname
+        nickname: pokemon.nickname,
+        notes: pokemon.notes
       })
   }).then(async response => {
     if (!response.ok) {
@@ -76,6 +77,7 @@ function updatePokemon(pokemon: PokemonStats) {
     pokemon.nature = data.nature ?? '';
     pokemon.shiny = data.shiny?? false;
     pokemon.characteristic = data.characteristic?? '';
+    pokemon.notes = data.notes?? '';
   })
   .catch(error => {
     console.error('Error catching Pokemon:', error);
@@ -113,6 +115,11 @@ onMounted(fetchPokemonStats);
             v-model="pokemon.characteristic"
             type="text"
           ></v-text-field>
+          <v-textarea
+            label="Notes"
+            v-model="pokemon.notes"
+            type="text"
+          ></v-textarea>
           <v-checkbox
             label="Shiny"
             v-model="pokemon.shiny"

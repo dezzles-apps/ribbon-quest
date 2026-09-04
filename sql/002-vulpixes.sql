@@ -23,3 +23,5 @@ UPDATE games SET view_order = 12 WHERE game_key = 'SHIELD';
 UPDATE games SET view_order = 13 WHERE game_key = 'LEGENDS_ARCEUS';
 UPDATE games SET view_order = 14 WHERE game_key = 'BRILLIANT_DIAMOND';
 UPDATE games SET view_order = 16 WHERE game_key = 'SCARLET';
+
+ALTER TABLE pokemon ADD COLUMN notes TEXT NULL;
