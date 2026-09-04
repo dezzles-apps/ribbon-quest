@@ -4,7 +4,6 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 
 const drawer = ref(false);
-const open = ref(['Ribbon Quest'])
 
 const authStore = useAuthStore();
 

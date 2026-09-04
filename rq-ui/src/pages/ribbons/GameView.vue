@@ -4,6 +4,7 @@ import { Ribbons as apiRibbons } from '@/composables/endpoints';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Response, Game } from '@/types/api';
+import Loading from '@/components/Loading.vue';
 import PokemonInfo from '@/components/PokemonInfo.vue';
 import GameInfo from '@/components/GameInfo.vue';
 import { useApi } from '@/composables/useApi';
@@ -31,9 +32,7 @@ onMounted(fetchGame);
 </script>
 
 <template>
-  <div v-if="loading">
-    <progress class="progress is-large is-info" max="100">60%</progress>
-  </div>
+  <Loading v-if="loading"/>
   <div v-else-if="game">
     <section>
       <GameInfo
