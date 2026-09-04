@@ -17,6 +17,7 @@ type GamePokemon struct {
 	CaughtAt       *time.Time      `json:"caughtAt"`
 	Nature         string          `json:"nature"`
 	Characteristic string          `json:"characteristic"`
+	Notes          string          `json:"notes"`
 	Shiny          bool            `json:"shiny"`
 	Ribbons        []PokemonRibbon `json:"ribbons"`
 }

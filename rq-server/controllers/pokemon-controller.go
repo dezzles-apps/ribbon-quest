@@ -100,7 +100,6 @@ func (pc *PokemonController) catchPokemon(c *gin.Context) {
 
 func (pc *PokemonController) updatePokemon(c *gin.Context) {
 	pokemon := c.Param("pokemon")
-
 	var updateData dto.UpdatePokemon
 	if err := c.ShouldBindJSON(&updateData); err != nil {
 		c.JSON(400, gin.H{"error": "Invalid request body"})

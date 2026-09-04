@@ -5,6 +5,7 @@ SELECT
   pokemon.caught_at,
   pokemon.nature,
   pokemon.characteristic,
+  pokemon.notes,
   pokemon.shiny
 FROM pokemon, pokemon_games
 WHERE

@@ -72,6 +72,7 @@ func (gs *GameService) getPokemonByGame(gameName string) ([]*dto.GamePokemon, er
 	var caughtAt sql.NullTime
 	var nature sql.NullString
 	var characteristic sql.NullString
+	var notes sql.NullString
 	var shiny sql.NullBool
 	for rows.Next() {
 		pokemon := &dto.GamePokemon{}
@@ -82,6 +83,7 @@ func (gs *GameService) getPokemonByGame(gameName string) ([]*dto.GamePokemon, er
 			&caughtAt,
 			&nature,
 			&characteristic,
+			&notes,
 			&shiny,
 		)
 		if err != nil {
@@ -98,6 +100,9 @@ func (gs *GameService) getPokemonByGame(gameName string) ([]*dto.GamePokemon, er
 		}
 		if shiny.Valid {
 			pokemon.Shiny = shiny.Bool
+		}
+		if notes.Valid {
+			pokemon.Notes = notes.String
 		}
 		pokemonList = append(pokemonList, pokemon)
 	}

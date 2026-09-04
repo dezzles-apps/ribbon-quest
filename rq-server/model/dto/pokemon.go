@@ -11,6 +11,7 @@ type Pokemon struct {
 	CaughtAt       *time.Time      `json:"caughtAt"`
 	Nature         string          `json:"nature"`
 	Characteristic string          `json:"characteristic"`
+	Notes          string          `json:"notes"`
 	Shiny          bool            `json:"shiny"`
 	Ribbons        []PokemonRibbon `json:"ribbons"`
 	Games          []PokemonGame   `json:"games"`
@@ -38,6 +39,7 @@ type AllPokemon struct {
 	CaughtAt       *time.Time `json:"caughtAt"`
 	Nature         string     `json:"nature"`
 	Characteristic string     `json:"characteristic"`
+	Notes          string     `json:"notes"`
 	Shiny          bool       `json:"shiny"`
 	Current        int        `json:"current"`
 	Total          int        `json:"total"`

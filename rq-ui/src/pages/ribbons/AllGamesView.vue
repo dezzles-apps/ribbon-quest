@@ -5,7 +5,7 @@ import type { Response, GameWithStats } from '@/types/api';
 import { useApi } from '@/composables/useApi';
 import { Ribbons } from '@/composables/endpoints';
 import GameInfo from '@/components/GameInfo.vue';
-
+import Loading from '@/components/Loading.vue';
 const loading = ref(true);
 const { apiFetch } = useApi();
 
@@ -30,6 +30,7 @@ onMounted(fetchGameStats);
 </script>
 
 <template>
+  <Loading v-if="loading"/>
   <div class="about" v-for="game in stats" :key="game.gameKey" v-if="stats">
     <div class="box mb-5">
       <GameInfo

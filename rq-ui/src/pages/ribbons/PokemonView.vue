@@ -5,6 +5,7 @@ import { useRoute } from 'vue-router';
 import type { Pokemon, PokemonRibbon, Response } from '@/types/api';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
+import Loading from '@/components/Loading.vue';
 import PokemonInfo from '@/components/PokemonInfo.vue';
 import GameInfo from '@/components/GameInfo.vue';
 const route = useRoute();
@@ -39,9 +40,7 @@ onMounted(fetchPokemon);
 
 
 <template>
-  <div v-if="loading">
-    <progress class="progress is-large is-info" max="100">60%</progress>
-  </div>
+  <Loading v-if="loading" />
   <div v-else-if="pokemon">
     <section>
       <PokemonInfo

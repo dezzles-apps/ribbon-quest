@@ -55,7 +55,6 @@ jobs:
   deploy-prod:
     uses: dezzles-apps/actions/.github/workflows/cloud-run-spec-deploy.yml@main
     needs: [ deploy-non ]
-    if: 
     with:
       environment: prod
       app-name: ribbon-quest

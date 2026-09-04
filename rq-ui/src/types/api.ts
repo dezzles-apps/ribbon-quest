@@ -5,6 +5,7 @@ interface PokemonDetails {
   caughtAt: string
   caught: boolean
   nature: string
+  notes: string
   characteristic: string
   shiny: boolean
 }
@@ -36,7 +37,7 @@ interface PokemonStats extends PokemonDetails {
 interface Game {
   gameKey: string
   name: string
-  pokemon: GamePokemon[]  
+  pokemon: GamePokemon[]
 }
 
 interface GamePokemon extends PokemonDetails {
