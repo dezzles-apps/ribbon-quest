@@ -40,5 +40,5 @@ type AllPokemon struct {
 	Characteristic string     `json:"characteristic"`
 	Shiny          bool       `json:"shiny"`
 	Current        int        `json:"current"`
-	Target         int        `json:"target"`
+	Total          int        `json:"total"`
 }

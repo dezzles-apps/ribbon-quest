@@ -1,19 +1,6 @@
-<svg
-  version="1.1"
-  baseProfile="full"
-  width="200"
-  height="200"
-  xmlns="http://www.w3.org/2000/svg">
-
-  <circle cx="100" cy="100" r="95" fill="white" stroke="#000000" stroke-width="2.5" id="svg_1"/>
-  <rect x="38" y="50" width="13" height="100" fill="#000000" rx="3" id="svg_2"/>
-  <path fill="#ff0000" stroke="#000000" stroke-width="3" d="M 50 0 A 60 50 0 0 1 50 96 Z" transform="translate(0, 52)"/>
-
-
-  <circle cx="160" cy="100" r="15" fill="#ffffff" stroke="#000000" stroke-width="6" id="svg_5"/>
-  <rect x="105" y="30" width="30" height="30" fill="white" stroke="#000000" stroke-width="6" rx="5" id="svg_4"/>
-  <rect x="105" y="140" width="30" height="30" fill="white" stroke="#000000" stroke-width="6" rx="5" id="svg_4"/>
-
-  <line x1="130" y1="59" x2="150" y2="90" stroke="#000000" stroke-width="6" id="svg_6"/>
-  <line x1="130" y1="141" x2="150" y2="110" stroke="#000000" stroke-width="6" id="svg_6"/>
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M261.126 140.65L164.624 307.732L256.001 466L377.028 256.5L498.001 47H315.192L261.126 140.65Z" fill="#1697F6"/>
+<path d="M135.027 256.5L141.365 267.518L231.64 111.178L268.731 47H256H14L135.027 256.5Z" fill="#AEDDFF"/>
+<path d="M315.191 47C360.935 197.446 256 466 256 466L164.624 307.732L315.191 47Z" fill="#1867C0"/>
+<path d="M268.731 47C76.0026 47 141.366 267.518 141.366 267.518L268.731 47Z" fill="#7BC6FF"/>
 </svg>

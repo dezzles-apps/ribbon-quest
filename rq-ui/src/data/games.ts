@@ -1,0 +1,17 @@
+export const Games = {
+  'X': 'X',
+  'Y': 'Y',
+  'OMEGA_RUBY': 'Omega Ruby',
+  'ALPHA_SAPPHIRE': 'Alpha Sapphire',
+  'SUN': 'Sun',
+  'MOON': 'Moon',
+  'ULTRA_SUN': 'Ultra Sun',
+  'ULTRA_MOON': 'Ultra Moon',
+  'BRILLIANT_DIAMOND': 'Brilliant Diamond',
+  'SHINING_PEARL': 'Shining Pearl',
+  'LEGENDS_ARCEUS': 'Legends: Arceus',
+  'SWORD': 'Sword',
+  'SHIELD': 'Shield',
+  'SCARLET': 'Scarlet',
+  'VIOLET': 'Violet',
+} as Record<string, string>;

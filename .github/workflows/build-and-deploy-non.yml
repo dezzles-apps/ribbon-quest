@@ -1,6 +1,8 @@
-name: Build And Deploy
+name: Build And Deploy Non
 on:
   push:
+    branches-ignore:
+      - main
   workflow_dispatch:
  
 jobs:
@@ -42,17 +44,17 @@ jobs:
       spec: project.yml
     secrets: inherit
 
-  deploy-prod:
+  deploy-non:
     uses: dezzles-apps/actions/.github/workflows/cloud-run-spec-deploy.yml@main
     needs: [ generate-specs, build-ui, build-api]
     with:
-      environment: prod
+      environment: non
       app-name: ribbon-quest
     secrets: inherit
 
   publish:
     uses: dezzles-apps/actions/.github/workflows/publish-to-portfolio.yml@main
-    needs: [ deploy-prod, configuration ]
+    needs: [ deploy-non, configuration ]
     with:
       version: '${{ needs.configuration.outputs.version }}'
     secrets: inherit
