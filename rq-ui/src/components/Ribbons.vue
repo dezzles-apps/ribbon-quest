@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PokemonRibbon } from '@/types/api';
+import type { PokemonRibbon } from '@/types/ribbons';
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useApi } from '@/composables/useApi';

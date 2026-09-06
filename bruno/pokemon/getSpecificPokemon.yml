@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:5173/api/pokemon/v1/Vulpix
+  url: http://localhost:3000/api/ribbons/v1/pokemon/
   auth: inherit
 
 settings:
