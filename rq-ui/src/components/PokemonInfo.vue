@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import type { PropType } from 'vue';
-import type { PokemonDetails } from '@/types/api.ts';
+import type { PokemonDetails } from '@/types/ribbons.ts';
 import { useDates } from '@/composables/useDates';
 
 const dates = useDates();
