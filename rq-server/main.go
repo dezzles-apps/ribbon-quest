@@ -19,6 +19,7 @@ var userService *services.UserService = services.NewUserService(database, config
 var pokemonService *services.PokemonService = services.NewPokemonService(database)
 var ribbonService *services.RibbonService = services.NewRibbonService(database)
 var gameService *services.GameService = services.NewGameService(database)
+var eventService *services.EventService = services.NewEventService(database)
 
 func main() {
 	config, err := cmodel.LoadConfig[model.AppConfig]()
@@ -36,6 +37,7 @@ func main() {
 	controllers.NewAuthController(router, &config.App, userService)
 	controllers.NewPokemonController(router, pokemonService, ribbonService, authMiddleware)
 	controllers.NewGamesController(router, gameService)
+	controllers.NewEventsController(router, *eventService)
 	router.Run(":8083")
 }
 

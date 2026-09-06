@@ -3,7 +3,7 @@ import Ribbons from '@/components/Ribbons.vue';
 import { Ribbons as apiRibbons } from '@/composables/endpoints';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import type { Response, Game } from '@/types/api';
+import type { Response, Game } from '@/types/ribbons';
 import Loading from '@/components/Loading.vue';
 import PokemonInfo from '@/components/PokemonInfo.vue';
 import GameInfo from '@/components/GameInfo.vue';

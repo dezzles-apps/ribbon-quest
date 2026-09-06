@@ -12,7 +12,12 @@ export const Ribbons = {
   UpdateRibbon: (pokemon: string, ribbonKey: string) => `/api/ribbons/v1/pokemon/${pokemon}/ribbons/${ribbonKey}`,
 };
 
+export const Events = {
+  GetAllEvents: '/api/events/v1'
+}
+
 export default {
   Auth,
   Ribbons,
+  Events,
 }

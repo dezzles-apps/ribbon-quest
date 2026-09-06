@@ -2,7 +2,7 @@
 
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import type { PokemonStats, Response } from '@/types/api';
+import type { PokemonStats, Response } from '@/types/ribbons';
 import { useApi } from '@/composables/useApi';
 import { Ribbons } from '@/composables/endpoints';
 import PokemonInfo from '@/components/PokemonInfo.vue';
