@@ -3,8 +3,8 @@ import Events from '@/components/Events.vue'
 </script>
 
 <template>
-      <v-sheet>
-        <div class="box ma-4">
+      <v-sheet rounded>
+        <div class="box ma-4 pa-4">
           <h1 class="title is-4 text-center">Dezzles' Pokemon Challenges</h1>
           <div class="w-50 ma-auto">
             2025 was all about catching shiny Pokemon and if you want to see what I caught, check out the 

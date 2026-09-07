@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
 import { onMounted, ref } from 'vue';
-import type { PokemonStats, Response } from '@/types/ribbons';
+import type { PokemonStats } from '@/types/ribbons';
+import type { Response } from '@/types/responses';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
 import Loading from '@/components/Loading.vue';
