@@ -5,7 +5,11 @@ info:
 
 http:
   method: GET
-  url: http://localhost:3000/api/events/v1
+  url: http://localhost:3000/api/events/v1?key=2026-09-04T13:00:42Z
+  params:
+    - name: key
+      value: 2026-09-04T13:00:42Z
+      type: query
   auth: inherit
 
 settings:

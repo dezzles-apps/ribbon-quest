@@ -1,9 +1,11 @@
 package services
 
 import (
-	"dezzles-apps/rq-server/model/dto"
-
 	"database/sql"
+	"dezzles-apps/rq-server/model/dto"
+	"errors"
+	"log"
+	"time"
 
 	_ "embed"
 
@@ -23,14 +25,8 @@ func NewEventService(db *cdb.Database) *EventService {
 	}
 }
 
-func (es *EventService) GetLatestEvents() ([]dto.Event, error) {
+func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 	eventList := []dto.Event{}
-	rows, err := es.connection.GetDB().Query(getAllEvents)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
 	var ribbonKey sql.NullString
 	var pokemon sql.NullString
 	var nickname sql.NullString
@@ -74,4 +70,26 @@ func (es *EventService) GetLatestEvents() ([]dto.Event, error) {
 		eventList = append(eventList, event)
 	}
 	return eventList, nil
+}
+
+func (es *EventService) GetLatestEvents(date string) ([]dto.Event, error) {
+	var rows *sql.Rows
+	var err error
+
+	if date != "" {
+		parsedDate, err := time.Parse(time.RFC3339, date)
+		if err != nil {
+			log.Printf("Date issue: %s", err.Error())
+			return nil, errors.New("Invalid key")
+		}
+		log.Printf("Key: %s", parsedDate)
+		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v1 WHERE timestamp < ? LIMIT 10", parsedDate)
+	} else {
+		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v1 LIMIT 10")
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	return es.readEvents(rows)
 }
