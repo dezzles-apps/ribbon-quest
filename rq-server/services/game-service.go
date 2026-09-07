@@ -167,7 +167,9 @@ func (gs *GameService) GetAllGames() ([]*dto.GameWithStats, error) {
 			games = append(games, game)
 		} else {
 			existingGame := allGames[game.GameKey]
-			existingGame.Achieved += game.Achieved
+			if game.Achieved == 1 {
+				existingGame.Achieved += game.Total
+			}
 			existingGame.Total += game.Total
 		}
 	}
