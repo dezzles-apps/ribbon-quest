@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
 import { onMounted, ref } from 'vue';
-import type { Response, GameWithStats } from '@/types/ribbons';
+import type { GameWithStats } from '@/types/ribbons';
+import type { Response } from '@/types/responses';
 import { useApi } from '@/composables/useApi';
 import { Ribbons } from '@/composables/endpoints';
 import GameInfo from '@/components/GameInfo.vue';

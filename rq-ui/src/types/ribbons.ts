@@ -54,11 +54,6 @@ interface GameWithStats {
   total: number
 }
 
-interface Response<T> {
-  data: T
-  error: string | null
-}
-
 export type {
   Game,
   GamePokemon,
@@ -67,6 +62,5 @@ export type {
   PokemonDetails,
   PokemonRibbon,
   PokemonGame,
-  PokemonStats,
-  Response
+  PokemonStats
 }

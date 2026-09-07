@@ -2,7 +2,8 @@
 import Ribbons from '@/components/Ribbons.vue';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import type { Pokemon, PokemonRibbon, Response } from '@/types/ribbons';
+import type { Response } from '@/types/responses';
+import type { Pokemon, PokemonRibbon } from '@/types/ribbons';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
 import Loading from '@/components/Loading.vue';
