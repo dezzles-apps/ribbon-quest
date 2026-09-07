@@ -158,18 +158,22 @@ func (gs *GameService) GetAllGames() ([]*dto.GameWithStats, error) {
 
 	for rows.Next() {
 		game := &dto.GameWithStats{}
-		err := rows.Scan(&game.GameKey, &game.Name, &game.Achieved, &game.Total)
+		var achievedRow bool
+		var total int
+		err := rows.Scan(&game.GameKey, &game.Name, &achievedRow, &total)
 		if err != nil {
 			return nil, err
 		}
 		if _, exists := allGames[game.GameKey]; !exists {
 			allGames[game.GameKey] = game
 			games = append(games, game)
-		} else {
-			existingGame := allGames[game.GameKey]
-			existingGame.Achieved += game.Achieved
-			existingGame.Total += game.Total
 		}
+		existingGame := allGames[game.GameKey]
+		if achievedRow {
+			existingGame.Achieved += total
+		}
+		existingGame.Total += total
+
 	}
 	if err = rows.Err(); err != nil {
 		return nil, err
