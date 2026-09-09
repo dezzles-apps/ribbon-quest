@@ -2,6 +2,7 @@ package main
 
 import (
 	"dezzles-apps/rq-server/controllers"
+	"dezzles-apps/rq-server/initialisers"
 	"dezzles-apps/rq-server/middleware"
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/services"
@@ -16,9 +17,6 @@ import (
 var database *db.Database = &db.Database{}
 var configService *services.ConfigService = services.NewConfigService(database)
 var userService *services.UserService = services.NewUserService(database, configService)
-var pokemonService *services.PokemonService = services.NewPokemonService(database)
-var ribbonService *services.RibbonService = services.NewRibbonService(database)
-var gameService *services.GameService = services.NewGameService(database)
 var eventService *services.EventService = services.NewEventService(database)
 
 func main() {
@@ -34,9 +32,10 @@ func main() {
 
 	router := gin.Default()
 	router.Use(ErrorHandler())
+
+	initialisers.InitialiseRibbons(router, authMiddleware, database)
+
 	controllers.NewAuthController(router, &config.App, userService)
-	controllers.NewPokemonController(router, pokemonService, ribbonService, authMiddleware)
-	controllers.NewGamesController(router, gameService)
 	controllers.NewEventsController(router, *eventService)
 	router.Run(":8083")
 }

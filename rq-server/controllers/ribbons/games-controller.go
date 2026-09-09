@@ -1,7 +1,7 @@
-package controllers
+package ribbons
 
 import (
-	"dezzles-apps/rq-server/services"
+	services "dezzles-apps/rq-server/services/ribbons"
 
 	"github.com/gin-gonic/gin"
 )

@@ -1,4 +1,26 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import type { RibbonStats } from '@/types/ribbons';
+import type { Response } from '@/types/responses';
+import { useApi } from '@/composables/useApi';
+import API from '@/composables/endpoints';
+import Loading from '@/components/Loading.vue';
+const loading = ref(true);
+const stats = ref({} as RibbonStats);
+const { apiFetch } = useApi();
+
+function loadStats() {
+  return apiFetch(API.Ribbons.GetStats).then(async resp => {
+    if (!resp.ok) {
+      throw new Error("An error occurred");
+    }
+    loading.value = false;
+    const responseBody = await resp.json() as Response<RibbonStats>;
+    stats.value = responseBody.data;
+  })
+}
+
+onMounted(loadStats);
 
 </script>
 
@@ -10,6 +32,29 @@
   >
     <div class="box mb-4">
       <h1 class="title is-4">Dezzles' Ribbon Quest</h1>
+      <div class="d-flex align-center ma-auto justify-space-between" style="max-width: 300px;">
+        <div class="mt-n2">
+          <v-card-title>Progress</v-card-title>
+        </div>
+        <Loading v-if="loading" />
+        <div
+          class="text-center"
+          v-else
+        >
+          <v-progress-circular
+            :model-value="100 * stats.current / stats.total"
+            :size="100"
+            :width="12"
+            bg-color="surface-light"
+            class="ma-3"
+            color="orange-accent-2"
+            reveal
+            rounded
+          >
+            <v-avatar color="surface-light" size="70">{{stats.current}} / {{stats.total}}</v-avatar>
+          </v-progress-circular>
+        </div>
+      </div>
       <div>
         2025 was all about catching shiny Pokemon and if you want to see what I caught, check out the
         <a href="http://shiny-hunt.dezzles-apps.com" target="_blank">shiny hunt mini-site</a>!

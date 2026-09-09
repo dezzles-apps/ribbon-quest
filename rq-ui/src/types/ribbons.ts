@@ -54,6 +54,12 @@ interface GameWithStats {
   total: number
 }
 
+interface RibbonStats {
+  current: number
+  total: number
+  pokemon: PokemonDetails[]
+}
+
 export type {
   Game,
   GamePokemon,
@@ -62,5 +68,6 @@ export type {
   PokemonDetails,
   PokemonRibbon,
   PokemonGame,
-  PokemonStats
+  PokemonStats,
+  RibbonStats
 }
