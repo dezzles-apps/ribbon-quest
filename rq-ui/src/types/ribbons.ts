@@ -1,13 +1,25 @@
 interface PokemonDetails {
   pokemon: string
+  species: PokemonSpecies
+  details: CatchDetails
+}
+
+interface PokemonSpecies {
+  pokedexId: number
+  name: string
+  form: string
+  imageRef: string
+}
+
+interface CatchDetails {
   nickname: string
-  region: string
   caughtAt: string
   caught: boolean
   nature: string
   notes: string
   characteristic: string
   shiny: boolean
+
 }
 
 interface Pokemon extends PokemonDetails {
