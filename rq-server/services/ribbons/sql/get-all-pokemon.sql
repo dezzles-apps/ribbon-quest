@@ -1,8 +1,11 @@
-SELECT pokemon, nickname, region, caught_at, nature, characteristic, notes, shiny, achieved, COUNT(*) FROM (
+SELECT pokemon, pokedex_id, species, form_name, sprite_ref, nickname, caught_at, nature, characteristic, notes, shiny, achieved, COUNT(*) FROM (
   SELECT DISTINCT
     pokemon.pokemon,
+    species.pokedex_id,
+    species.species,
+    form.form_name,
+    form.sprite_ref,
     pokemon.nickname,
-    pokemon.region,
     pokemon.caught_at,
     pokemon.nature,
     pokemon.characteristic,
@@ -13,6 +16,8 @@ SELECT pokemon, nickname, region, caught_at, nature, characteristic, notes, shin
     ribbons.name as ribbon_name,
     pokemon_ribbons.achieved as achieved
   FROM pokemon
+  	LEFT JOIN pokemon_data species ON pokemon.pokedex_id = species.pokedex_id
+  	LEFT JOIN pokemon_forms form ON pokemon.form_id = form.form_id
     LEFT JOIN pokemon_games ON pokemon.pokemon = pokemon_games.pokemon
     LEFT JOIN games ON pokemon_games.game_key = games.game_key
     LEFT JOIN game_ribbons ON games.game_key = game_ribbons.game_key

@@ -1,4 +1,4 @@
-package services
+package ribbons
 
 import (
 	"database/sql"
@@ -78,8 +78,11 @@ func (gs *GameService) getPokemonByGame(gameName string) ([]*dto.GamePokemon, er
 		pokemon := &dto.GamePokemon{}
 		err := rows.Scan(
 			&pokemon.Pokemon,
-			&pokemon.Nickname,
-			&pokemon.Region,
+			&pokemon.Species.PokedexId,
+			&pokemon.Species.Name,
+			&pokemon.Species.Form,
+			&pokemon.Species.ImageRef,
+			&pokemon.Details.Nickname,
 			&caughtAt,
 			&nature,
 			&characteristic,
@@ -90,19 +93,19 @@ func (gs *GameService) getPokemonByGame(gameName string) ([]*dto.GamePokemon, er
 			return nil, err
 		}
 		if caughtAt.Valid {
-			pokemon.CaughtAt = &caughtAt.Time
+			pokemon.Details.CaughtAt = &caughtAt.Time
 		}
 		if nature.Valid {
-			pokemon.Nature = nature.String
+			pokemon.Details.Nature = nature.String
 		}
 		if characteristic.Valid {
-			pokemon.Characteristic = characteristic.String
+			pokemon.Details.Characteristic = characteristic.String
 		}
 		if shiny.Valid {
-			pokemon.Shiny = shiny.Bool
+			pokemon.Details.Shiny = shiny.Bool
 		}
 		if notes.Valid {
-			pokemon.Notes = notes.String
+			pokemon.Details.Notes = notes.String
 		}
 		pokemonList = append(pokemonList, pokemon)
 	}

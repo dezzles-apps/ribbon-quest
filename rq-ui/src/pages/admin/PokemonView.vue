@@ -1,7 +1,7 @@
 <script setup lang="ts">
 
 import { onMounted, ref } from 'vue';
-import type { PokemonStats } from '@/types/ribbons';
+import type { PokemonStats, PokemonDetails } from '@/types/ribbons';
 import type { Response } from '@/types/responses';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
@@ -63,9 +63,9 @@ function catchPokemon(pokemon: PokemonStats) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const { data } = await response.json();
-    pokemon.caughtAt = data.caughtAt;
-    pokemon.nickname = data.nickname ?? '';
-    pokemon.nature = data.nature ?? '';
+    pokemon.details.caughtAt = data.caughtAt;
+    pokemon.details.nickname = data.nickname ?? '';
+    pokemon.details.nature = data.nature ?? '';
     getSnackInfo(pokemon).update(`${pokemon.pokemon} caught`, false);
   })
   .catch(error => {
@@ -94,27 +94,27 @@ function updatePokemon(pokemon: PokemonStats) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        shiny: pokemon.shiny,
-        nature: pokemon.nature,
-        characteristic: pokemon.characteristic,
-        nickname: pokemon.nickname,
-        notes: pokemon.notes
+        shiny: pokemon.details.shiny,
+        nature: pokemon.details.nature,
+        characteristic: pokemon.details.characteristic,
+        nickname: pokemon.details.nickname,
+        notes: pokemon.details.notes
       })
   }).then(async response => {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const { data } = await response.json();
-    pokemon.caughtAt = data.caughtAt;
-    pokemon.nickname = data.nickname ?? '';
-    pokemon.nature = data.nature ?? '';
-    pokemon.shiny = data.shiny?? false;
-    pokemon.characteristic = data.characteristic?? '';
-    pokemon.notes = data.notes?? '';
-    getSnackInfo(pokemon).update(`Updated ${pokemon.nickname}`, false);
+    const { data } = await response.json() as Response<PokemonDetails>
+    pokemon.details.caughtAt = data.details.caughtAt;
+    pokemon.details.nickname = data.details.nickname ?? '';
+    pokemon.details.nature = data.details.nature ?? '';
+    pokemon.details.shiny = data.details.shiny?? false;
+    pokemon.details.characteristic = data.details.characteristic?? '';
+    pokemon.details.notes = data.details.notes?? '';
+    getSnackInfo(pokemon).update(`Updated ${pokemon.details.nickname}`, false);
   })
   .catch(error => {
-    getSnackInfo(pokemon).update(`Error updating ${pokemon.nickname}`, true);
+    getSnackInfo(pokemon).update(`Error updating ${pokemon.details.nickname}`, true);
     console.error('Error updating Pokemon:', error);
   })
   .finally(() => {
@@ -135,30 +135,30 @@ onMounted(fetchPokemonStats);
         style="padding: 10px;"
         :title="pokemon.pokemon"
       >
-        <div v-if="pokemon.caughtAt">
+        <div v-if="pokemon.details.caughtAt">
           <v-text-field
             label="Nickname"
-            v-model="pokemon.nickname"
+            v-model="pokemon.details.nickname"
             type="text"
           ></v-text-field>
           <v-select
             label="Nature"
-            v-model="pokemon.nature"
+            v-model="pokemon.details.nature"
             :items="natures"
           ></v-select>
           <v-text-field
             label="Characteristic"
-            v-model="pokemon.characteristic"
+            v-model="pokemon.details.characteristic"
             type="text"
           ></v-text-field>
           <v-textarea
             label="Notes"
-            v-model="pokemon.notes"
+            v-model="pokemon.details.notes"
             type="text"
           ></v-textarea>
           <v-checkbox
             label="Shiny"
-            v-model="pokemon.shiny"
+            v-model="pokemon.details.shiny"
           ></v-checkbox>
         </div>
         <div v-else>
@@ -173,7 +173,7 @@ onMounted(fetchPokemonStats);
         </v-snackbar>
         <v-card-actions>
           <v-btn
-            v-if="pokemon.caughtAt"
+            v-if="pokemon.details.caughtAt"
             color="orange"
             variant="flat"
             :loading="updatingPokemon.get(pokemon.pokemon)"
@@ -182,7 +182,7 @@ onMounted(fetchPokemonStats);
             Update
           </v-btn>
           <v-btn
-            v-if="!pokemon.caughtAt"
+            v-if="!pokemon.details.caughtAt"
             color="orange"
             variant="flat"
             :loading="updatingPokemon.get(pokemon.pokemon)"

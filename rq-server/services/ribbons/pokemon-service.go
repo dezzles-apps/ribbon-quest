@@ -1,4 +1,4 @@
-package services
+package ribbons
 
 import (
 	"database/sql"
@@ -61,7 +61,19 @@ func (ps *PokemonService) getPokemon(pokemonName string) (*dto.Pokemon, error) {
 	var notes sql.NullString
 	var characteristic sql.NullString
 	log.Println("Reading getPokemon")
-	err := row.Scan(&Pokemon.Pokemon, &Pokemon.Nickname, &Pokemon.Region, &caughtAt, &nature, &characteristic, &notes, &Pokemon.Shiny)
+	err := row.Scan(
+		&Pokemon.Pokemon,
+		&Pokemon.Species.PokedexId,
+		&Pokemon.Species.Name,
+		&Pokemon.Species.Form,
+		&Pokemon.Species.ImageRef,
+		&Pokemon.Details.Nickname,
+		&caughtAt,
+		&nature,
+		&characteristic,
+		&notes,
+		&Pokemon.Details.Shiny,
+	)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, errors.New("No pokemon found")
@@ -71,16 +83,16 @@ func (ps *PokemonService) getPokemon(pokemonName string) (*dto.Pokemon, error) {
 	}
 	log.Println("Read getPokemon")
 	if caughtAt.Valid {
-		Pokemon.CaughtAt = &caughtAt.Time
+		Pokemon.Details.CaughtAt = &caughtAt.Time
 	}
 	if nature.Valid {
-		Pokemon.Nature = nature.String
+		Pokemon.Details.Nature = nature.String
 	}
 	if characteristic.Valid {
-		Pokemon.Characteristic = characteristic.String
+		Pokemon.Details.Characteristic = characteristic.String
 	}
 	if notes.Valid {
-		Pokemon.Notes = notes.String
+		Pokemon.Details.Notes = notes.String
 	}
 	return Pokemon, nil
 }
@@ -157,6 +169,7 @@ func (ps *PokemonService) getPokemonRibbons(pokemonName string) ([]dto.PokemonRi
 }
 
 func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
+	log.Println("Retrieving all pokemon")
 	var allPokemon []dto.AllPokemon
 	rows, err := ps.connection.GetDB().Query(getAllPokemon)
 	if err != nil {
@@ -168,7 +181,10 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 	for rows.Next() {
 		var pokemon string
 		var nickname string
-		var region string
+		var pokedexId int
+		var species string
+		var form string
+		var spriteRef string
 		var caughtAt sql.NullTime
 		var nature sql.NullString
 		var characteristic sql.NullString
@@ -176,7 +192,7 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 		var shiny sql.NullBool
 		var achieved sql.NullBool
 		var count int
-		err := rows.Scan(&pokemon, &nickname, &region, &caughtAt, &nature, &characteristic, &notes, &shiny, &achieved, &count)
+		err := rows.Scan(&pokemon, &pokedexId, &species, &form, &spriteRef, &nickname, &caughtAt, &nature, &characteristic, &notes, &shiny, &achieved, &count)
 		if err != nil {
 			return nil, err
 		}
@@ -190,18 +206,25 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 			p.Total += count
 		} else {
 			p := &dto.AllPokemon{
-				Pokemon:        pokemon,
-				Nickname:       nickname,
-				Region:         region,
-				Nature:         nature.String,
-				Characteristic: characteristic.String,
-				Notes:          notes.String,
-				Shiny:          shiny.Bool,
-				Current:        0,
-				Total:          0,
+				Pokemon: pokemon,
+				Current: 0,
+				Total:   0,
 			}
+			p.Species.PokedexId = pokedexId
+			p.Species.Name = species
+			p.Species.Form = form
+			p.Species.ImageRef = spriteRef
+
+			p.Details.Nickname = nickname
+			p.Details.Nature = nature.String
+			p.Details.Characteristic = characteristic.String
+			p.Details.Notes = notes.String
+			p.Details.Shiny = shiny.Bool
+
+			p.Species.Form = form
+
 			if caughtAt.Valid {
-				p.CaughtAt = &caughtAt.Time
+				p.Details.CaughtAt = &caughtAt.Time
 			}
 			if achieved.Bool {
 				p.Current = count
@@ -223,7 +246,7 @@ func (ps *PokemonService) CatchPokemon(pokemon string) (*dto.Pokemon, error) {
 	if err != nil {
 		return nil, err
 	}
-	if details.CaughtAt != nil {
+	if details.Details.CaughtAt != nil {
 		return nil, errors.New("Pokemon already caught")
 	}
 	_, err = ps.connection.GetDB().Exec("UPDATE pokemon SET caught_at = CURRENT_TIMESTAMP WHERE pokemon = ?", pokemon)
@@ -239,29 +262,29 @@ func (ps *PokemonService) UpdatePokemon(pokemon string, updateData dto.UpdatePok
 		return nil, err
 	}
 	if updateData.Nickname != "" {
-		details.Nickname = updateData.Nickname
+		details.Details.Nickname = updateData.Nickname
 	}
 	if updateData.Nature != "" {
-		details.Nature = updateData.Nature
+		details.Details.Nature = updateData.Nature
 	}
 	if updateData.Characteristic != "" {
-		details.Characteristic = updateData.Characteristic
+		details.Details.Characteristic = updateData.Characteristic
 	}
 	if updateData.Shiny != nil {
-		details.Shiny = *updateData.Shiny
+		details.Details.Shiny = *updateData.Shiny
 	}
 
 	if updateData.Notes != "" {
-		details.Notes = updateData.Notes
+		details.Details.Notes = updateData.Notes
 	}
 
 	_, err = ps.connection.GetDB().Exec(
 		"UPDATE pokemon SET nickname = ?, nature = ?, characteristic = ?, notes = ?, shiny = ? WHERE pokemon = ?",
-		details.Nickname,
-		details.Nature,
-		details.Characteristic,
-		details.Notes,
-		details.Shiny,
+		details.Details.Nickname,
+		details.Details.Nature,
+		details.Details.Characteristic,
+		details.Details.Notes,
+		details.Details.Shiny,
 		pokemon,
 	)
 	if err != nil {
