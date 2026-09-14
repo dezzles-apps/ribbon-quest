@@ -127,14 +127,9 @@ onMounted(fetchPokemonStats);
 
 <template>
   <Loading v-if="loading"/>
-  <div class="about" v-for="(pokemon, idx) in stats" :key="pokemon.pokemon" v-if="stats">
-    <div class="box mb-5">
-      <v-card
-        elevation="2"
-        rounded
-        style="padding: 10px;"
-        :title="pokemon.pokemon"
-      >
+  <v-expansion-panels>
+    <v-expansion-panel v-for="(pokemon, idx) in stats" :key="pokemon.pokemon" :title="pokemon.pokemon" v-if="stats">
+      <v-expansion-panel-text>
         <div v-if="pokemon.details.caughtAt">
           <v-text-field
             label="Nickname"
@@ -191,9 +186,9 @@ onMounted(fetchPokemonStats);
             Catch
           </v-btn>
         </v-card-actions>
-      </v-card>
-    </div>
-  </div>
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 <style>
