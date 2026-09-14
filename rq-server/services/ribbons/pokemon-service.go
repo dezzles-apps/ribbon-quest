@@ -2,13 +2,16 @@ package ribbons
 
 import (
 	"database/sql"
+	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
+	dataservices "dezzles-apps/rq-server/services/data"
+	_ "embed"
 	"errors"
 	"log"
-
-	_ "embed"
+	"strings"
 
 	cdb "github.com/dezzles-apps/go-common/db"
+	"github.com/dezzles-apps/go-common/model/responses"
 )
 
 //go:embed sql/get-pokemon-ribbons.sql
@@ -24,14 +27,20 @@ var getPokemonInfo string
 var getAllPokemon string
 
 type PokemonService struct {
-	connection *cdb.Database
+	connection         *cdb.Database
+	gameService        *GameService
+	pokemonDataService *dataservices.PokemonDataService
 }
 
 func NewPokemonService(
 	connection *cdb.Database,
+	gameService *GameService,
+	pokemonDataService *dataservices.PokemonDataService,
 ) *PokemonService {
 	return &PokemonService{
-		connection: connection,
+		connection:         connection,
+		gameService:        gameService,
+		pokemonDataService: pokemonDataService,
 	}
 }
 
@@ -76,7 +85,7 @@ func (ps *PokemonService) getPokemon(pokemonName string) (*dto.Pokemon, error) {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return nil, errors.New("No pokemon found")
+			return nil, model.PokemonNotFound
 		}
 		log.Printf("Err getPokemon %s", err.Error())
 		return nil, err
@@ -291,4 +300,163 @@ func (ps *PokemonService) UpdatePokemon(pokemon string, updateData dto.UpdatePok
 		return nil, err
 	}
 	return ps.GetPokemon(pokemon)
+}
+
+func (ps *PokemonService) CreatePokemon(pokemon *dto.AddNewRibbonPokemon) (*dto.Pokemon, error) {
+	viewOrder, err := ps.getNextViewOrder()
+	if err != nil {
+		return nil, err
+	}
+	formId, err := ps.pokemonDataService.GetFormId(pokemon.PokedexId, pokemon.Form)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = ps.connection.GetDB().Exec(
+		"INSERT INTO pokemon (pokemon, nickname, pokedex_id, form_id, view_order) VALUES(?, ?, ?, ?, ?)",
+		pokemon.Pokemon, pokemon.Pokemon, pokemon.PokedexId, formId, viewOrder,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	err = ps.saveGames(pokemon)
+	if err != nil {
+		return nil, err
+	}
+
+	return ps.getPokemon(pokemon.Pokemon)
+}
+
+func (ps *PokemonService) ValidateCreate(pokemon *dto.AddNewRibbonPokemon) ([]responses.Error, error) {
+	var errors []responses.Error
+
+	// Trim everything
+	pokemon.Pokemon = strings.TrimSpace(pokemon.Pokemon)
+	pokemon.Form = strings.TrimSpace(pokemon.Form)
+	validation, err := ps.validatePokemonId(pokemon.Pokemon)
+	if err != nil {
+		return nil, err
+	}
+	if validation != nil {
+		errors = append(errors, *validation)
+	}
+	validation, err = ps.validatePokemon(pokemon.PokedexId, pokemon.Form)
+	if err != nil {
+		return nil, err
+	}
+	if validation != nil {
+		errors = append(errors, *validation)
+	}
+	validation, err = ps.validateGames(pokemon.Games)
+	if err != nil {
+		return nil, err
+	}
+	if validation != nil {
+		errors = append(errors, *validation)
+	}
+	if len(errors) > 0 {
+		return errors, nil
+	}
+	return nil, nil
+}
+
+func (ps *PokemonService) validatePokemonId(pokemonId string) (*responses.Error, error) {
+	if pokemonId == "" {
+		e := responses.CreateError("pokemon", "PokemonId cannot be empty")
+		return &e, nil
+	} else {
+		existing, err := ps.getPokemon(pokemonId)
+		if existing != nil {
+			e := responses.CreateError("pokemon", "PokemonId already in use")
+			return &e, nil
+		}
+		if err != nil && err != model.PokemonNotFound {
+			return nil, err
+		}
+	}
+	return nil, nil
+}
+
+func (ps *PokemonService) validatePokemon(pokedexNo int, form string) (*responses.Error, error) {
+	pokemon, err := ps.pokemonDataService.GetPokemon(pokedexNo)
+	log.Print(pokemon)
+	if err != nil {
+		return nil, err
+	}
+	if pokemon == nil {
+		e := responses.CreateError("pokedexId", "A pokemon must be selected")
+		return &e, nil
+	}
+
+	formFound := false
+
+	for _, f := range pokemon.Forms {
+		if form == f.FormName {
+			formFound = true
+		}
+	}
+
+	if !formFound {
+		e := responses.CreateError("form", "Invalid form")
+		return &e, nil
+	}
+
+	return nil, nil
+}
+
+func (ps *PokemonService) validateGames(games []string) (*responses.Error, error) {
+	log.Print("validateGames: getting games")
+	allGames, err := ps.gameService.GetAllGames()
+	if err != nil {
+		return nil, err
+	}
+	var gameMap = make(map[string]*dto.GameWithStats)
+	for _, game := range allGames {
+		gameMap[game.GameKey] = game
+	}
+	if len(games) == 0 {
+		var r = responses.CreateError("games", "At least one game must be selected")
+		return &r, nil
+	}
+	log.Print(gameMap)
+
+	for _, g := range games {
+		if _, exists := gameMap[g]; !exists {
+			var r = responses.CreateError("games", "Invalid game: "+g)
+			return &r, nil
+		}
+	}
+
+	log.Print("validateGames: games validated")
+	return nil, nil
+}
+
+func (ps *PokemonService) getNextViewOrder() (int, error) {
+	var number int
+	row := ps.connection.GetDB().QueryRow("SELECT view_order FROM pokemon ORDER BY view_order DESC LIMIT 1")
+	err := row.Scan(&number)
+	if err != nil {
+		return 0, err
+	}
+	return number + 1, nil
+}
+
+func (ps *PokemonService) saveGames(pokemon *dto.AddNewRibbonPokemon) error {
+	var query = "INSERT INTO pokemon_games (pokemon, game_key) VALUES "
+	var params []interface{}
+	var first = true
+	for _, game := range pokemon.Games {
+		if !first {
+			query += ", "
+		}
+		query += "(?, ?)"
+		params = append(params, pokemon.Pokemon)
+		params = append(params, game)
+
+		first = false
+	}
+	_, err := ps.connection.GetDB().Exec(query, params...)
+	return err
+
 }

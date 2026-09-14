@@ -1,7 +1,6 @@
 SELECT
   pokemon.pokemon AS pokemon,
   pokemon.nickname AS nickname,
-  pokemon.region AS region,
   games.game_key AS game_key,
   games.name AS game_name,
   games.view_order AS game_view_order,

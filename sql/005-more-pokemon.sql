@@ -2244,3 +2244,4 @@ UPDATE pokemon SET form_id = 378 WHERE pokemon = 'Swablu';
 
 
 ALTER TABLE pokemon MODIFY COLUMN form_id int NOT NULL;
+ALTER TABLE pokemon DROP COLUMN region;

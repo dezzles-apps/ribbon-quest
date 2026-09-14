@@ -6,6 +6,7 @@ import (
 
 	controllers "dezzles-apps/rq-server/controllers/ribbons"
 	"dezzles-apps/rq-server/middleware"
+	dataservices "dezzles-apps/rq-server/services/data"
 	services "dezzles-apps/rq-server/services/ribbons"
 )
 
@@ -14,9 +15,10 @@ func InitialiseRibbons(
 	authMiddleware *middleware.AuthMiddleware,
 	database *db.Database,
 ) {
-	pokemonService := services.NewPokemonService(database)
+	pokemonDataService := dataservices.NewPokemonDataService(database)
 	ribbonService := services.NewRibbonService(database)
 	gameService := services.NewGameService(database)
+	pokemonService := services.NewPokemonService(database, gameService, pokemonDataService)
 	ribbonStatsService := services.NewRibbonStatsService(
 		database,
 		pokemonService,

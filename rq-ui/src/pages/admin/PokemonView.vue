@@ -127,6 +127,12 @@ onMounted(fetchPokemonStats);
 
 <template>
   <Loading v-if="loading"/>
+  <v-btn
+    color="primary"
+    :to="{ name: 'admin-add-ribbon-pokemon' }"
+  >
+    Add New Pokemon
+  </v-btn>
   <v-expansion-panels>
     <v-expansion-panel v-for="(pokemon, idx) in stats" :key="pokemon.pokemon" :title="pokemon.pokemon" v-if="stats">
       <v-expansion-panel-text>

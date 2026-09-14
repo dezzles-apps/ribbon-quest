@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dezzles-apps/rq-server/model/dto"
 	"errors"
+	"log"
 
 	_ "embed"
 
@@ -154,6 +155,7 @@ func (gs *GameService) GetAllGames() ([]*dto.GameWithStats, error) {
 	games := []*dto.GameWithStats{}
 	rows, err := gs.connection.GetDB().Query(getAllGamesQuery)
 	if err != nil {
+		log.Printf("Error: GetAllGames: %s", err.Error())
 		return nil, err
 	}
 	defer rows.Close()
@@ -165,6 +167,7 @@ func (gs *GameService) GetAllGames() ([]*dto.GameWithStats, error) {
 		var total int
 		err := rows.Scan(&game.GameKey, &game.Name, &achievedRow, &total)
 		if err != nil {
+			log.Printf("Error: GetAllGames-Scan: %s", err.Error())
 			return nil, err
 		}
 		if _, exists := allGames[game.GameKey]; !exists {
