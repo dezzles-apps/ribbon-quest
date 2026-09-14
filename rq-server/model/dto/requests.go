@@ -7,3 +7,10 @@ type UpdatePokemon struct {
 	Notes          string `json:"notes,omitempty"`
 	Shiny          *bool  `json:"shiny,omitempty"`
 }
+
+type AddNewRibbonPokemon struct {
+	Pokemon   string   `json:"pokemon,omitempty"`
+	PokedexId int      `json:"pokedexId,omitempty"`
+	Form      string   `json:"form,omitempty"`
+	Games     []string `json:"games,omitempty"`
+}

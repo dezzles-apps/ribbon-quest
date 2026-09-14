@@ -34,6 +34,7 @@ func main() {
 	router.Use(ErrorHandler())
 
 	initialisers.InitialiseRibbons(router, authMiddleware, database)
+	initialisers.InitialiseData(router, database)
 
 	controllers.NewAuthController(router, &config.App, userService)
 	controllers.NewEventsController(router, *eventService)
