@@ -97,7 +97,7 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/pokemon',
+      path: '/admin/ribbons/pokemon',
       name: 'admin-pokemon',
       component: () => import('@/pages/admin/PokemonView.vue'),
       meta: {
