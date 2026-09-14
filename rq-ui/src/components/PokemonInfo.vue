@@ -38,36 +38,32 @@ function getCounterClass(): string[] {
 }
 
 function getPokemonImage(): string {
-  return `/sprites/${props.details.pokemon.toLowerCase()}${props.details.shiny ? '-s' : ''}.png`;
+  const folder = props.details.details.shiny ? 'shiny' : 'normal'
+  return `/sprites/${folder}/${props.details.species.imageRef}.png`;
 }
 </script>
 
 
 <template>
   <v-card
-    :title="props.details.nickname"
+    :title="props.details.details.nickname"
     :subtitle="props.details.pokemon"
   >
     <v-card-text>
       <table>
         <tbody>
-          <tr>
-            <td colspan="2">
-              {{ props.details.nickname }} is representing the {{ props.details.region }} region.
-            </td>
+          <tr v-if="props.details.details.notes">
+            <td colspan="2">{{ props.details.details.notes }}</td>
           </tr>
-          <tr v-if="props.details.notes">
-            <td colspan="2">{{ props.details.notes }}</td>
+          <tr v-if="props.details.details.nature">
+            <td>{{props.details.details.nickname }} is {{ props.details.details.nature ?? 'Unknown' }}</td>
           </tr>
-          <tr v-if="props.details.nature">
-            <td>{{props.details.nickname }} is {{ props.details.nature ?? 'Unknown' }}</td>
+          <tr v-if="props.details.details.characteristic">
+            <td colspan="2">{{ props.details.details.characteristic }}</td>
           </tr>
-          <tr v-if="props.details.characteristic">
-            <td colspan="2">{{ props.details.characteristic }}</td>
-          </tr>
-          <tr v-if="props.details.caughtAt">
+          <tr v-if="props.details.details.caughtAt">
             <td>Caught at:</td>
-            <td>{{ dates.toLocal(props.details.caughtAt) }}</td>
+            <td>{{ dates.toLocal(props.details.details.caughtAt) }}</td>
           </tr>
         </tbody>
       </table>
@@ -78,7 +74,7 @@ function getPokemonImage(): string {
         :src="getPokemonImage()"
         :alt="props.details.pokemon"
         class="pokemon-image"
-        :class="!props.details.caughtAt ? 'pokemon-image-not-caught': ''"
+        :class="!props.details.details.caughtAt ? 'pokemon-image-not-caught': ''"
       />
     </template>
     <template v-slot:append>

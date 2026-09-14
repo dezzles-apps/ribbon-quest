@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: http://localhost:3000/api/events/v1?key=2026-09-04T13:00:42Z
+  url: http://localhost:3000/api/events/v1?key=2026-08-27T12:59:23Z
   params:
     - name: key
-      value: 2026-09-04T13:00:42Z
+      value: 2026-08-27T12:59:23Z
       type: query
   auth: inherit
 
