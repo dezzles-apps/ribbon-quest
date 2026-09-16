@@ -97,14 +97,26 @@ const router = createRouter({
       }
     },
     {
-      path: '/admin/pokemon',
+      path: '/admin/ribbons/pokemon',
       name: 'admin-pokemon',
       component: () => import('@/pages/admin/PokemonView.vue'),
       meta: {
         crumbs: {
           parent: 'home',
           title: 'Ribbon Pokemon',
-          href: '/admin/pokemon'
+          href: '/admin/ribbons/pokemon'
+        }
+      }
+    },
+    {
+      path: '/admin/ribbons/pokemon/new',
+      name: 'admin-add-ribbon-pokemon',
+      component: () => import('@/pages/admin/AddRibbonPokemonView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'admin-pokemon',
+          title: 'New Ribbon Pokemon',
+          href: '/admin/ribbons/pokemon/new'
         }
       }
     }

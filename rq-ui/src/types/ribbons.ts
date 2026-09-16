@@ -55,7 +55,6 @@ interface Game {
 interface GamePokemon extends PokemonDetails {
   pokemon: string
   nickname: string
-  region: string
   ribbons: PokemonRibbon[]
 }
 
@@ -72,10 +71,18 @@ interface RibbonStats {
   pokemon: PokemonDetails[]
 }
 
+interface NewRibbonPokemonRequest {
+  pokemon: string
+  pokedexId: number,
+  form: string,
+  games: string[]
+}
+
 export type {
   Game,
   GamePokemon,
   GameWithStats,
+  NewRibbonPokemonRequest,
   Pokemon,
   PokemonDetails,
   PokemonRibbon,

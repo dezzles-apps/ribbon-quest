@@ -63,7 +63,7 @@ function logout() {
           ></v-list-item>
         </template>
 
-        <v-list-item href="/admin/pokemon">Ribbon Pokemon</v-list-item>
+        <v-list-item href="/admin/ribbons/pokemon">Ribbon Pokemon</v-list-item>
         <v-list-item link @click="logout">Logout</v-list-item>
       </v-list-group>
     </v-list>

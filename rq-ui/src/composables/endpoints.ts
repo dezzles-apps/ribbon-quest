@@ -13,12 +13,17 @@ export const Ribbons = {
   GetStats: '/api/ribbons/v1/stats'
 };
 
+export const Data = {
+  GetPokemonData: '/api/data/v1/pokemon'
+}
+
 export const Events = {
   GetAllEvents: '/api/events/v1'
 }
 
 export default {
   Auth,
+  Data,
   Ribbons,
   Events,
 }
