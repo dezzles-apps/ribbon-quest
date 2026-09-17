@@ -83,9 +83,9 @@ func (es *EventService) GetLatestEvents(date string) ([]dto.Event, error) {
 			return nil, errors.New("Invalid key")
 		}
 		log.Printf("Key: %s", parsedDate)
-		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v1 WHERE timestamp < ? LIMIT 10", parsedDate)
+		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v2 WHERE timestamp < ? LIMIT 10", parsedDate)
 	} else {
-		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v1 LIMIT 10")
+		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v2 LIMIT 10")
 	}
 	if err != nil {
 		return nil, err

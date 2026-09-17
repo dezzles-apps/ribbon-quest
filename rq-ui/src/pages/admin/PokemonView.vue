@@ -63,9 +63,9 @@ function catchPokemon(pokemon: PokemonStats) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const { data } = await response.json();
-    pokemon.details.caughtAt = data.caughtAt;
-    pokemon.details.nickname = data.nickname ?? '';
-    pokemon.details.nature = data.nature ?? '';
+    pokemon.details.caughtAt = data.details.caughtAt;
+    pokemon.details.nickname = data.details.nickname ?? '';
+    pokemon.details.nature = data.details.nature ?? '';
     getSnackInfo(pokemon).update(`${pokemon.pokemon} caught`, false);
   })
   .catch(error => {
@@ -134,7 +134,14 @@ onMounted(fetchPokemonStats);
     Add New Pokemon
   </v-btn>
   <v-expansion-panels>
-    <v-expansion-panel v-for="(pokemon, idx) in stats" :key="pokemon.pokemon" :title="pokemon.pokemon" v-if="stats">
+    <v-expansion-panel v-for="(pokemon) in stats" :key="pokemon.pokemon"v-if="stats">
+      <v-expansion-panel-title>
+        <v-icon
+          class="mr-2"
+          icon="mdi-pokeball"
+          :color="pokemon.details.caughtAt ? 'white': 'grey'"
+        ></v-icon> {{  pokemon.pokemon }}
+      </v-expansion-panel-title>
       <v-expansion-panel-text>
         <div v-if="pokemon.details.caughtAt">
           <v-text-field

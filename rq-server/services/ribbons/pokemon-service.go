@@ -258,7 +258,7 @@ func (ps *PokemonService) CatchPokemon(pokemon string) (*dto.Pokemon, error) {
 	if details.Details.CaughtAt != nil {
 		return nil, errors.New("Pokemon already caught")
 	}
-	_, err = ps.connection.GetDB().Exec("UPDATE pokemon SET caught_at = CURRENT_TIMESTAMP WHERE pokemon = ?", pokemon)
+	_, err = ps.connection.GetDB().Exec("UPDATE ribbon_pokemon SET caught_at = CURRENT_TIMESTAMP WHERE pokemon = ?", pokemon)
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +288,7 @@ func (ps *PokemonService) UpdatePokemon(pokemon string, updateData dto.UpdatePok
 	}
 
 	_, err = ps.connection.GetDB().Exec(
-		"UPDATE pokemon SET nickname = ?, nature = ?, characteristic = ?, notes = ?, shiny = ? WHERE pokemon = ?",
+		"UPDATE ribbon_pokemon SET nickname = ?, nature = ?, characteristic = ?, notes = ?, shiny = ? WHERE pokemon = ?",
 		details.Details.Nickname,
 		details.Details.Nature,
 		details.Details.Characteristic,
@@ -313,7 +313,7 @@ func (ps *PokemonService) CreatePokemon(pokemon *dto.AddNewRibbonPokemon) (*dto.
 	}
 
 	_, err = ps.connection.GetDB().Exec(
-		"INSERT INTO pokemon (pokemon, nickname, pokedex_id, form_id, view_order) VALUES(?, ?, ?, ?, ?)",
+		"INSERT INTO ribbon_pokemon (pokemon, nickname, pokedex_id, form_id, view_order) VALUES(?, ?, ?, ?, ?)",
 		pokemon.Pokemon, pokemon.Pokemon, pokemon.PokedexId, formId, viewOrder,
 	)
 	if err != nil {
@@ -434,7 +434,7 @@ func (ps *PokemonService) validateGames(games []string) (*responses.Error, error
 
 func (ps *PokemonService) getNextViewOrder() (int, error) {
 	var number int
-	row := ps.connection.GetDB().QueryRow("SELECT view_order FROM pokemon ORDER BY view_order DESC LIMIT 1")
+	row := ps.connection.GetDB().QueryRow("SELECT view_order FROM ribbon_pokemon ORDER BY view_order DESC LIMIT 1")
 	err := row.Scan(&number)
 	if err != nil {
 		return 0, err
@@ -443,7 +443,12 @@ func (ps *PokemonService) getNextViewOrder() (int, error) {
 }
 
 func (ps *PokemonService) saveGames(pokemon *dto.AddNewRibbonPokemon) error {
-	var query = "INSERT INTO pokemon_games (pokemon, game_key) VALUES "
+	ribbonPokemonId, err := ps.GetPokemonId(pokemon.Pokemon)
+	if err != nil {
+		return err
+	}
+	log.Printf("saveGames: Adding %s to %d", pokemon.Games, ribbonPokemonId)
+	var query = "INSERT INTO ribbon_pokemon_games (ribbon_pokemon_id, game_key) VALUES "
 	var params []interface{}
 	var first = true
 	for _, game := range pokemon.Games {
@@ -451,12 +456,24 @@ func (ps *PokemonService) saveGames(pokemon *dto.AddNewRibbonPokemon) error {
 			query += ", "
 		}
 		query += "(?, ?)"
-		params = append(params, pokemon.Pokemon)
+		params = append(params, ribbonPokemonId)
 		params = append(params, game)
 
 		first = false
 	}
-	_, err := ps.connection.GetDB().Exec(query, params...)
+	_, err = ps.connection.GetDB().Exec(query, params...)
 	return err
+}
 
+func (ps *PokemonService) GetPokemonId(pokemon string) (int, error) {
+	log.Printf("GetPokemonId: Retrieving pokemon %s", pokemon)
+	var query = "SELECT ribbon_pokemon_id FROM ribbon_pokemon WHERE pokemon = ?"
+	var number int
+	row := ps.connection.GetDB().QueryRow(query, pokemon)
+	err := row.Scan(&number)
+	if err != nil {
+		log.Printf("GetPokemonId: Error while retrieving pokemon %s. %s", pokemon, err.Error())
+		return 0, model.InternalServerError
+	}
+	return number, nil
 }

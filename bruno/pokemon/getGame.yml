@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:5173/api/games/v1/OMEGA_RUBY
+  url: http://localhost:8083/api/ribbons/v1/games/Y
   auth: inherit
 
 settings:

@@ -13,7 +13,13 @@ http:
     type: json
     data: |-
       {
-        
+        "pokemon": "Valpixes",
+        "pokedexId": 372,
+        "form": "Aloslan",
+        "games": [
+          "OMEGA_RUBY",
+          "Y"
+        ]
       }
   auth: inherit
 
