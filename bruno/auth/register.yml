@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: https://ribbon-quest.dezzles-apps.com/api/auth/v1/register
+  url: http://localhost:8083/api/auth/v1/register
   body:
     type: json
     data: |-

@@ -16,9 +16,9 @@ func InitialiseRibbons(
 	database *db.Database,
 ) {
 	pokemonDataService := dataservices.NewPokemonDataService(database)
-	ribbonService := services.NewRibbonService(database)
 	gameService := services.NewGameService(database)
 	pokemonService := services.NewPokemonService(database, gameService, pokemonDataService)
+	ribbonService := services.NewRibbonService(database, pokemonService)
 	ribbonStatsService := services.NewRibbonStatsService(
 		database,
 		pokemonService,
