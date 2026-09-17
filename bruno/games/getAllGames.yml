@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:5173/api/games/v1
+  url: http://localhost:8083/api/ribbons/v1/games
   auth: inherit
 
 settings:
