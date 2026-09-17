@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:3000/api/data/v1/pokemon
+  url: http://localhost:8083/api/data/v1/pokemon
   auth: inherit
 
 settings:

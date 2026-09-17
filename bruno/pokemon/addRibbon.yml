@@ -5,10 +5,10 @@ info:
 
 http:
   method: DELETE
-  url: http://localhost:5173/api/pokemon/v1/Vulpix/ribbons/SHOCK
+  url: http://localhost:8083/api/ribbons/v1/pokemon/Vulpix/ribbons/SHOCK
   headers:
     - name: Authorization
-      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODc4NTYzMjIsImlkIjoiZGV6emxlcyJ9.LO1uRIWOBuMXTTVwwUGn6iA2ZzF07dYZ0y7JLvDWcig
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODk3Mjk0NTksImlkIjoiZGV6emxlcyJ9.hKsNVGWS01g5PtijKItfcA1Qc7AmejgOjKwRxRCKTA4
   auth: inherit
 
 settings:

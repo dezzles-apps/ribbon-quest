@@ -1,15 +1,15 @@
 SELECT DISTINCT
   ribbons.ribbon_key AS ribbon_key,
   ribbons.name AS ribbon_name,
-  IF (pokemon_ribbons.achieved_at IS NULL, false, true) AS achieved,
+  IF (ribbons_earned.achieved_at IS NULL, false, true) AS achieved,
   ribbons.category
-FROM pokemon
-  LEFT JOIN pokemon_games ON pokemon.pokemon = pokemon_games.pokemon
-  LEFT JOIN games ON pokemon_games.game_key = games.game_key
+FROM ribbon_pokemon
+  LEFT JOIN ribbon_pokemon_games ON ribbon_pokemon.ribbon_pokemon_id = ribbon_pokemon_games.ribbon_pokemon_id
+  LEFT JOIN games ON ribbon_pokemon_games.game_key = games.game_key
   LEFT JOIN game_ribbons ON games.game_key = game_ribbons.game_key
   LEFT JOIN ribbons on game_ribbons.ribbon_key = ribbons.ribbon_key
-  LEFT JOIN pokemon_ribbons on (
-    pokemon_ribbons.ribbon_key = ribbons.ribbon_key
-    AND pokemon.pokemon = pokemon_ribbons.pokemon
+  LEFT JOIN ribbons_earned on (
+    ribbons_earned.ribbon_key = ribbons.ribbon_key
+    AND ribbon_pokemon.ribbon_pokemon_id = ribbons_earned.ribbon_pokemon_id
   )
-WHERE pokemon.pokemon = ? and ribbons.ribbon_key = ?
+WHERE ribbon_pokemon.ribbon_pokemon_id = ? and ribbons.ribbon_key = ?
