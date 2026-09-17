@@ -28,4 +28,4 @@ SELECT pokemon, pokedex_id, species, form_name, sprite_ref, nickname, caught_at,
     )
   ORDER BY pokemon.view_order ASC
 ) as ribbon_types
-GROUP BY pokemon, pokedex_id, ribbon_types.achieved 
+GROUP BY pokemon, pokedex_id, species, form_name, sprite_ref, nickname, caught_at, nature, characteristic, notes, shiny, achieved, ribbon_types.achieved 
