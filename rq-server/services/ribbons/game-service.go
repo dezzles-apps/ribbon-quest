@@ -70,12 +70,12 @@ func (gs *GameService) getPokemonByGame(gameName string) ([]*dto.GamePokemon, er
 	}
 	defer rows.Close()
 
-	var caughtAt sql.NullTime
-	var nature sql.NullString
-	var characteristic sql.NullString
-	var notes sql.NullString
-	var shiny sql.NullBool
 	for rows.Next() {
+		var caughtAt sql.NullTime
+		var nature sql.NullString
+		var characteristic sql.NullString
+		var notes sql.NullString
+		var shiny sql.NullBool
 		pokemon := &dto.GamePokemon{}
 		err := rows.Scan(
 			&pokemon.Pokemon,
