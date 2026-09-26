@@ -6,12 +6,12 @@ import (
 	"dezzles-apps/rq-server/model/dto"
 	dataservices "dezzles-apps/rq-server/services/data"
 	_ "embed"
-	"errors"
 	"log"
 	"strings"
 
 	cdb "github.com/dezzles-apps/go-common/db"
 	"github.com/dezzles-apps/go-common/model/responses"
+	"go.uber.org/zap"
 )
 
 //go:embed sql/get-pokemon-ribbons.sql
@@ -44,17 +44,17 @@ func NewPokemonService(
 	}
 }
 
-func (ps *PokemonService) GetPokemon(pokemonName string) (*dto.Pokemon, error) {
-	Pokemon, err := ps.getPokemon(pokemonName)
+func (ps *PokemonService) GetPokemon(ctx *model.RQContext, pokemonName string) (*dto.Pokemon, error) {
+	Pokemon, err := ps.getPokemon(ctx, pokemonName)
 	if err != nil {
 		return nil, err
 	}
-	games, err := ps.getPokemonGames(pokemonName)
+	games, err := ps.getPokemonGames(ctx, pokemonName)
 	if err != nil {
 		return nil, err
 	}
 	Pokemon.Games = games
-	ribbons, err := ps.getPokemonRibbons(pokemonName)
+	ribbons, err := ps.getPokemonRibbons(ctx, pokemonName)
 	if err != nil {
 		return nil, err
 	}
@@ -62,14 +62,14 @@ func (ps *PokemonService) GetPokemon(pokemonName string) (*dto.Pokemon, error) {
 	return Pokemon, nil
 }
 
-func (ps *PokemonService) getPokemon(pokemonName string) (*dto.Pokemon, error) {
+func (ps *PokemonService) getPokemon(ctx *model.RQContext, pokemonName string) (*dto.Pokemon, error) {
 	Pokemon := &dto.Pokemon{}
+	ctx.Logger.Info("Getting ribbon pokemon", zap.String("pokemonId", pokemonName))
 	row := ps.connection.GetDB().QueryRow(getPokemonInfo, pokemonName)
 	var caughtAt sql.NullTime
 	var nature sql.NullString
 	var notes sql.NullString
 	var characteristic sql.NullString
-	log.Println("Reading getPokemon")
 	err := row.Scan(
 		&Pokemon.Pokemon,
 		&Pokemon.Species.PokedexId,
@@ -85,12 +85,12 @@ func (ps *PokemonService) getPokemon(pokemonName string) (*dto.Pokemon, error) {
 	)
 	if err != nil {
 		if err == sql.ErrNoRows {
+			ctx.Logger.Info("Ribbon pokemon not found", zap.String("pokemonId", pokemonName))
 			return nil, model.PokemonNotFound
 		}
-		log.Printf("Err getPokemon %s", err.Error())
+		ctx.Logger.Error("Error retrieving ribbon pokemon", zap.String("pokemonId", pokemonName), zap.Error(err))
 		return nil, err
 	}
-	log.Println("Read getPokemon")
 	if caughtAt.Valid {
 		Pokemon.Details.CaughtAt = &caughtAt.Time
 	}
@@ -103,14 +103,16 @@ func (ps *PokemonService) getPokemon(pokemonName string) (*dto.Pokemon, error) {
 	if notes.Valid {
 		Pokemon.Details.Notes = notes.String
 	}
+	ctx.Logger.Info("Retrieved ribbon pokemon", zap.String("pokemonId", pokemonName))
 	return Pokemon, nil
 }
 
-func (ps *PokemonService) getPokemonGames(pokemonName string) ([]dto.PokemonGame, error) {
+func (ps *PokemonService) getPokemonGames(ctx *model.RQContext, pokemonName string) ([]dto.PokemonGame, error) {
 	var gamesMap map[string]*dto.PokemonGame = make(map[string]*dto.PokemonGame)
 	rows, err := ps.connection.GetDB().Query(getPokemonGames, pokemonName)
 	if err != nil {
-		return nil, err
+		ctx.Logger.Error("Error getting games for ribbon pokemon", zap.String("pokemonId", pokemonName), zap.Error(err))
+		return nil, model.InternalServerError
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -120,7 +122,8 @@ func (ps *PokemonService) getPokemonGames(pokemonName string) ([]dto.PokemonGame
 		var ribbonKey string
 		err := rows.Scan(&gameKey, &gameName, &viewOrder, &ribbonKey)
 		if err != nil {
-			return nil, err
+			ctx.Logger.Error("Error scanning games for ribbon pokemon", zap.String("pokemonId", pokemonName), zap.Error(err))
+			return nil, model.InternalServerError
 		}
 		if game, exists := gamesMap[gameKey]; exists {
 			game.Ribbons = append(game.Ribbons, ribbonKey)
@@ -138,14 +141,16 @@ func (ps *PokemonService) getPokemonGames(pokemonName string) ([]dto.PokemonGame
 	for _, game := range gamesMap {
 		games = append(games, *game)
 	}
-
+	ctx.Logger.Info("Retrieved games for ribbon pokemon", zap.String("pokemonId", pokemonName))
 	return games, nil
 }
 
-func (ps *PokemonService) getPokemonRibbons(pokemonName string) ([]dto.PokemonRibbon, error) {
+func (ps *PokemonService) getPokemonRibbons(ctx *model.RQContext, pokemonName string) ([]dto.PokemonRibbon, error) {
 	var ribbons []dto.PokemonRibbon
+	ctx.Logger.Info("Getting ribbons for Pokemon", zap.String("pokemonId", pokemonName))
 	rows, err := ps.connection.GetDB().Query(getPokemonRibbons, pokemonName)
 	if err != nil {
+		ctx.Logger.Error("Error retrieving ribbons for ribbon pokemon", zap.String("pokemonId", pokemonName), zap.Error(err))
 		return nil, err
 	}
 	defer rows.Close()
@@ -158,6 +163,7 @@ func (ps *PokemonService) getPokemonRibbons(pokemonName string) ([]dto.PokemonRi
 		var order int
 		err := rows.Scan(&ribbonKey, &name, &achieved, &achieved_at, &category, &order)
 		if err != nil {
+			ctx.Logger.Error("Error scanning ribbons for ribbon pokemon", zap.String("pokemonId", pokemonName), zap.Error(err))
 			return nil, err
 		}
 		if !achieved.Valid {
@@ -174,15 +180,19 @@ func (ps *PokemonService) getPokemonRibbons(pokemonName string) ([]dto.PokemonRi
 		}
 		ribbons = append(ribbons, ribbon)
 	}
+	ctx.Logger.Info("Successfully retrieved ribbons for ribbon pokemon", zap.String("pokemonId", pokemonName))
+
 	return ribbons, nil
 }
 
-func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
-	log.Println("Retrieving all pokemon")
+func (ps *PokemonService) GetAllPokemon(ctx *model.RQContext) ([]dto.AllPokemon, error) {
+	ctx.Logger.Info("Retrieving all ribbon pokemon")
+
 	var allPokemon []dto.AllPokemon
 	rows, err := ps.connection.GetDB().Query(getAllPokemon)
 	if err != nil {
-		return nil, err
+		ctx.Logger.Error("Error Getting all ribbon pokemon", zap.Error(err))
+		return nil, model.InternalServerError
 	}
 	var pokemonMap map[string]*dto.AllPokemon = make(map[string]*dto.AllPokemon)
 	var pokemonList []*dto.AllPokemon = make([]*dto.AllPokemon, 0)
@@ -203,7 +213,8 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 		var count int
 		err := rows.Scan(&pokemon, &pokedexId, &species, &form, &spriteRef, &nickname, &caughtAt, &nature, &characteristic, &notes, &shiny, &achieved, &count)
 		if err != nil {
-			return nil, err
+			ctx.Logger.Error("Error scanning all ribbon pokemon", zap.Error(err))
+			return nil, model.InternalServerError
 		}
 		if !achieved.Valid {
 			achieved.Bool = false
@@ -243,30 +254,32 @@ func (ps *PokemonService) GetAllPokemon() ([]dto.AllPokemon, error) {
 			pokemonList = append(pokemonList, p)
 		}
 	}
-	log.Print("Retrieved all pokemon")
+	ctx.Logger.Info("Retrieved all ribbon pokemon")
 	for _, p := range pokemonList {
 		allPokemon = append(allPokemon, *p)
 	}
 	return allPokemon, nil
 }
 
-func (ps *PokemonService) CatchPokemon(pokemon string) (*dto.Pokemon, error) {
-	details, err := ps.getPokemon(pokemon)
+func (ps *PokemonService) CatchPokemon(ctx *model.RQContext, pokemon string) (*dto.Pokemon, error) {
+	ctx.Logger.Info("Marking pokemon as caught", zap.String("pokemonId", pokemon))
+	details, err := ps.getPokemon(ctx, pokemon)
 	if err != nil {
 		return nil, err
 	}
 	if details.Details.CaughtAt != nil {
-		return nil, errors.New("Pokemon already caught")
+		return nil, model.PokemonAlreadyCaught
 	}
 	_, err = ps.connection.GetDB().Exec("UPDATE ribbon_pokemon SET caught_at = CURRENT_TIMESTAMP WHERE pokemon = ?", pokemon)
 	if err != nil {
+		ctx.Logger.Error("Failed to mark pokemon as caught", zap.String("pokemonId", pokemon), zap.Error(err))
 		return nil, err
 	}
-	return ps.GetPokemon(pokemon)
+	return ps.GetPokemon(ctx, pokemon)
 }
 
-func (ps *PokemonService) UpdatePokemon(pokemon string, updateData dto.UpdatePokemon) (*dto.Pokemon, error) {
-	details, err := ps.getPokemon(pokemon)
+func (ps *PokemonService) UpdatePokemon(ctx *model.RQContext, pokemon string, updateData dto.UpdatePokemon) (*dto.Pokemon, error) {
+	details, err := ps.getPokemon(ctx, pokemon)
 	if err != nil {
 		return nil, err
 	}
@@ -297,17 +310,21 @@ func (ps *PokemonService) UpdatePokemon(pokemon string, updateData dto.UpdatePok
 		pokemon,
 	)
 	if err != nil {
+		ctx.Logger.Error("Error updating pokemon data",
+			zap.String("pokemonId", pokemon),
+			zap.Error(err),
+		)
 		return nil, err
 	}
-	return ps.GetPokemon(pokemon)
+	return ps.GetPokemon(ctx, pokemon)
 }
 
-func (ps *PokemonService) CreatePokemon(pokemon *dto.AddNewRibbonPokemon) (*dto.Pokemon, error) {
-	viewOrder, err := ps.getNextViewOrder()
+func (ps *PokemonService) CreatePokemon(ctx *model.RQContext, pokemon *dto.AddNewRibbonPokemon) (*dto.Pokemon, error) {
+	viewOrder, err := ps.getNextViewOrder(ctx)
 	if err != nil {
 		return nil, err
 	}
-	formId, err := ps.pokemonDataService.GetFormId(pokemon.PokedexId, pokemon.Form)
+	formId, err := ps.pokemonDataService.GetFormId(ctx, pokemon.PokedexId, pokemon.Form)
 	if err != nil {
 		return nil, err
 	}
@@ -317,38 +334,45 @@ func (ps *PokemonService) CreatePokemon(pokemon *dto.AddNewRibbonPokemon) (*dto.
 		pokemon.Pokemon, pokemon.Pokemon, pokemon.PokedexId, formId, viewOrder,
 	)
 	if err != nil {
-		return nil, err
+		ctx.Logger.Error("Failed to create new pokemon",
+			zap.String("pokemonId", pokemon.Pokemon),
+			zap.Int("pokedexId", pokemon.PokedexId),
+			zap.Int("formId", formId),
+			zap.Int("viewOrder", viewOrder),
+			zap.Error(err),
+		)
+		return nil, model.InternalServerError
 	}
 
-	err = ps.saveGames(pokemon)
+	err = ps.saveGames(ctx, pokemon)
 	if err != nil {
 		return nil, err
 	}
 
-	return ps.getPokemon(pokemon.Pokemon)
+	return ps.getPokemon(ctx, pokemon.Pokemon)
 }
 
-func (ps *PokemonService) ValidateCreate(pokemon *dto.AddNewRibbonPokemon) ([]responses.Error, error) {
+func (ps *PokemonService) ValidateCreate(ctx *model.RQContext, pokemon *dto.AddNewRibbonPokemon) ([]responses.Error, error) {
 	var errors []responses.Error
 
 	// Trim everything
 	pokemon.Pokemon = strings.TrimSpace(pokemon.Pokemon)
 	pokemon.Form = strings.TrimSpace(pokemon.Form)
-	validation, err := ps.validatePokemonId(pokemon.Pokemon)
+	validation, err := ps.validatePokemonId(ctx, pokemon.Pokemon)
 	if err != nil {
 		return nil, err
 	}
 	if validation != nil {
 		errors = append(errors, *validation)
 	}
-	validation, err = ps.validatePokemon(pokemon.PokedexId, pokemon.Form)
+	validation, err = ps.validatePokemon(ctx, pokemon.PokedexId, pokemon.Form)
 	if err != nil {
 		return nil, err
 	}
 	if validation != nil {
 		errors = append(errors, *validation)
 	}
-	validation, err = ps.validateGames(pokemon.Games)
+	validation, err = ps.validateGames(ctx, pokemon.Games)
 	if err != nil {
 		return nil, err
 	}
@@ -361,12 +385,12 @@ func (ps *PokemonService) ValidateCreate(pokemon *dto.AddNewRibbonPokemon) ([]re
 	return nil, nil
 }
 
-func (ps *PokemonService) validatePokemonId(pokemonId string) (*responses.Error, error) {
+func (ps *PokemonService) validatePokemonId(ctx *model.RQContext, pokemonId string) (*responses.Error, error) {
 	if pokemonId == "" {
 		e := responses.CreateError("pokemon", "PokemonId cannot be empty")
 		return &e, nil
 	} else {
-		existing, err := ps.getPokemon(pokemonId)
+		existing, err := ps.getPokemon(ctx, pokemonId)
 		if existing != nil {
 			e := responses.CreateError("pokemon", "PokemonId already in use")
 			return &e, nil
@@ -378,8 +402,8 @@ func (ps *PokemonService) validatePokemonId(pokemonId string) (*responses.Error,
 	return nil, nil
 }
 
-func (ps *PokemonService) validatePokemon(pokedexNo int, form string) (*responses.Error, error) {
-	pokemon, err := ps.pokemonDataService.GetPokemon(pokedexNo)
+func (ps *PokemonService) validatePokemon(ctx *model.RQContext, pokedexNo int, form string) (*responses.Error, error) {
+	pokemon, err := ps.pokemonDataService.GetPokemon(ctx, pokedexNo)
 	log.Print(pokemon)
 	if err != nil {
 		return nil, err
@@ -405,9 +429,9 @@ func (ps *PokemonService) validatePokemon(pokedexNo int, form string) (*response
 	return nil, nil
 }
 
-func (ps *PokemonService) validateGames(games []string) (*responses.Error, error) {
+func (ps *PokemonService) validateGames(ctx *model.RQContext, games []string) (*responses.Error, error) {
 	log.Print("validateGames: getting games")
-	allGames, err := ps.gameService.GetAllGames()
+	allGames, err := ps.gameService.GetAllGames(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -432,21 +456,26 @@ func (ps *PokemonService) validateGames(games []string) (*responses.Error, error
 	return nil, nil
 }
 
-func (ps *PokemonService) getNextViewOrder() (int, error) {
+func (ps *PokemonService) getNextViewOrder(ctx *model.RQContext) (int, error) {
 	var number int
 	row := ps.connection.GetDB().QueryRow("SELECT view_order FROM ribbon_pokemon ORDER BY view_order DESC LIMIT 1")
 	err := row.Scan(&number)
 	if err != nil {
-		return 0, err
+		ctx.Logger.Error("Error getting next view order", zap.Error(err))
+		return 0, model.InternalServerError
 	}
 	return number + 1, nil
 }
 
-func (ps *PokemonService) saveGames(pokemon *dto.AddNewRibbonPokemon) error {
-	ribbonPokemonId, err := ps.GetPokemonId(pokemon.Pokemon)
+func (ps *PokemonService) saveGames(ctx *model.RQContext, pokemon *dto.AddNewRibbonPokemon) error {
+	ribbonPokemonId, err := ps.GetPokemonId(ctx, pokemon.Pokemon)
 	if err != nil {
 		return err
 	}
+	ctx.Logger.Info("saveGames: Adding games to ribbon pokemon",
+		zap.Strings("games", pokemon.Games),
+		zap.Int("ribbonPokemonId", ribbonPokemonId),
+	)
 	log.Printf("saveGames: Adding %s to %d", pokemon.Games, ribbonPokemonId)
 	var query = "INSERT INTO ribbon_pokemon_games (ribbon_pokemon_id, game_key) VALUES "
 	var params []interface{}
@@ -462,17 +491,25 @@ func (ps *PokemonService) saveGames(pokemon *dto.AddNewRibbonPokemon) error {
 		first = false
 	}
 	_, err = ps.connection.GetDB().Exec(query, params...)
+	if err != nil {
+		ctx.Logger.Error(
+			"Failed to save games to ribbon pokemon",
+			zap.Strings("games", pokemon.Games),
+			zap.Int("ribbonPokemonId", ribbonPokemonId),
+			zap.Error(err),
+		)
+	}
 	return err
 }
 
-func (ps *PokemonService) GetPokemonId(pokemon string) (int, error) {
-	log.Printf("GetPokemonId: Retrieving pokemon %s", pokemon)
+func (ps *PokemonService) GetPokemonId(ctx *model.RQContext, pokemon string) (int, error) {
+	ctx.Logger.Info("Retrieving pokemon", zap.String("pokemonId", pokemon))
 	var query = "SELECT ribbon_pokemon_id FROM ribbon_pokemon WHERE pokemon = ?"
 	var number int
 	row := ps.connection.GetDB().QueryRow(query, pokemon)
 	err := row.Scan(&number)
 	if err != nil {
-		log.Printf("GetPokemonId: Error while retrieving pokemon %s. %s", pokemon, err.Error())
+		ctx.Logger.Error("Failed to retrieve pokemon", zap.String("pokemonId", pokemon), zap.Error(err))
 		return 0, model.InternalServerError
 	}
 	return number, nil

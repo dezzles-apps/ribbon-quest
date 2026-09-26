@@ -2,13 +2,14 @@ package ribbons
 
 import (
 	"database/sql"
+	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 	"errors"
-	"log"
 
 	_ "embed"
 
 	cdb "github.com/dezzles-apps/go-common/db"
+	"go.uber.org/zap"
 )
 
 //go:embed sql/get-game-info.sql
@@ -151,12 +152,12 @@ func (gs *GameService) loadRibbonsForPokemon(game string, pokemon []*dto.GamePok
 	return nil
 }
 
-func (gs *GameService) GetAllGames() ([]*dto.GameWithStats, error) {
+func (gs *GameService) GetAllGames(ctx *model.RQContext) ([]*dto.GameWithStats, error) {
 	games := []*dto.GameWithStats{}
 	rows, err := gs.connection.GetDB().Query(getAllGamesQuery)
 	if err != nil {
-		log.Printf("Error: GetAllGames: %s", err.Error())
-		return nil, err
+		ctx.Logger.Error("Error retrieving all games", zap.Error(err))
+		return nil, model.InternalServerError
 	}
 	defer rows.Close()
 	var allGames map[string]*dto.GameWithStats = make(map[string]*dto.GameWithStats)
@@ -167,7 +168,7 @@ func (gs *GameService) GetAllGames() ([]*dto.GameWithStats, error) {
 		var total int
 		err := rows.Scan(&game.GameKey, &game.Name, &achievedRow, &total)
 		if err != nil {
-			log.Printf("Error: GetAllGames-Scan: %s", err.Error())
+			ctx.Logger.Error("GetAllGames: error scanning games", zap.Error(err))
 			return nil, err
 		}
 		if _, exists := allGames[game.GameKey]; !exists {
@@ -182,8 +183,9 @@ func (gs *GameService) GetAllGames() ([]*dto.GameWithStats, error) {
 
 	}
 	if err = rows.Err(); err != nil {
-		return nil, err
+		ctx.Logger.Error("Error retrieving all games", zap.Error(err))
+		return nil, model.InternalServerError
 	}
-
+	ctx.Logger.Info("Successfully retrieved all games")
 	return games, nil
 }

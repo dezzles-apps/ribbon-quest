@@ -1,13 +1,13 @@
 package data
 
 import (
+	"dezzles-apps/rq-server/model"
 	dto "dezzles-apps/rq-server/model/dto/data"
-	"errors"
-	"log"
 
 	_ "embed"
 
 	"github.com/dezzles-apps/go-common/db"
+	"go.uber.org/zap"
 )
 
 //go:embed sql/get-pokemon-data.sql
@@ -25,14 +25,14 @@ func NewPokemonDataService(
 	}
 }
 
-func (pc *PokemonDataService) GetAllPokemon() ([]*dto.PokemonData, error) {
+func (pc *PokemonDataService) GetAllPokemon(ctx *model.RQContext) ([]*dto.PokemonData, error) {
 	var pokemonMap = make(map[int]*dto.PokemonData)
 	var results = []*dto.PokemonData{}
 
 	var rows, err = pc.connection.GetDB().Query(getPokemonDataQuery)
 	if err != nil {
-		log.Printf("Error retrieving all pokemon: %s", err.Error())
-		return nil, errors.New("Internal server error")
+		ctx.Logger.Error("Error retrieving all pokemon", zap.Error(err))
+		return nil, model.InternalServerError
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -42,8 +42,8 @@ func (pc *PokemonDataService) GetAllPokemon() ([]*dto.PokemonData, error) {
 		var formSprite string
 		err := rows.Scan(&pokedexId, &species, &formName, &formSprite)
 		if err != nil {
-			log.Printf("Error scannig row: %s", err.Error())
-			return nil, errors.New("Internal server error")
+			ctx.Logger.Error("Error scanning pokemon row", zap.Error(err))
+			return nil, model.InternalServerError
 		}
 		form := dto.Form{
 			FormName: formName,
@@ -63,15 +63,17 @@ func (pc *PokemonDataService) GetAllPokemon() ([]*dto.PokemonData, error) {
 
 		}
 	}
+	ctx.Logger.Info("Successfully retrieved pokemon data")
 	return results, nil
 }
 
-func (pc *PokemonDataService) GetPokemon(pokedexNo int) (*dto.PokemonData, error) {
+func (pc *PokemonDataService) GetPokemon(ctx *model.RQContext, pokedexNo int) (*dto.PokemonData, error) {
 	var result *dto.PokemonData = nil
+	ctx.Logger.Info("Retrieving Pokemon", zap.Int("pokedexNo", pokedexNo))
 	var rows, err = pc.connection.GetDB().Query(getPokemonDataQuery+" AND pf.pokedex_id = ?", pokedexNo)
 	if err != nil {
-		log.Printf("Error retrieving all pokemon: %s", err.Error())
-		return nil, errors.New("Internal server error")
+		ctx.Logger.Error("Error retrieving Pokemon", zap.Int("pokedexNo", pokedexNo), zap.Error(err))
+		return nil, model.InternalServerError
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -82,8 +84,8 @@ func (pc *PokemonDataService) GetPokemon(pokedexNo int) (*dto.PokemonData, error
 		var formSprite string
 		err := rows.Scan(&result.PokedexNo, &result.Species, &formName, &formSprite)
 		if err != nil {
-			log.Printf("Error scannig row: %s", err.Error())
-			return nil, errors.New("Internal server error")
+			ctx.Logger.Error("Error retrieving Pokemon", zap.Int("pokedexNo", pokedexNo), zap.Error(err))
+			return nil, model.InternalServerError
 		}
 		form := dto.Form{
 			FormName: formName,
@@ -92,19 +94,23 @@ func (pc *PokemonDataService) GetPokemon(pokedexNo int) (*dto.PokemonData, error
 
 		result.Forms = append(result.Forms, form)
 	}
+	ctx.Logger.Info("Successfully retrieved Pokemon", zap.Int("pokedexNo", pokedexNo))
 	return result, nil
 }
 
-func (pds *PokemonDataService) GetFormId(pokedexId int, form string) (int, error) {
-	var number int
+func (pds *PokemonDataService) GetFormId(ctx *model.RQContext, pokedexNo int, form string) (int, error) {
+	var formId int
+	ctx.Logger.Info("Retrieving Pokemon form id", zap.Int("pokedexNo", pokedexNo), zap.String("form", form))
 	row := pds.connection.GetDB().QueryRow(
 		"SELECT form_id FROM pokemon_forms pf WHERE pf.pokedex_id = ? AND pf.form_name = ?",
-		pokedexId,
+		pokedexNo,
 		form,
 	)
-	err := row.Scan(&number)
+	err := row.Scan(&formId)
 	if err != nil {
-		return 0, err
+		ctx.Logger.Error("Error retrieving Pokemon form", zap.Int("pokedexNo", pokedexNo), zap.String("form", form), zap.Error(err))
+		return 0, model.InternalServerError
 	}
-	return number, nil
+	ctx.Logger.Info("Retrieved Pokemon form", zap.Int("pokedexNo", pokedexNo), zap.String("form", form), zap.Int("formId", formId))
+	return formId, nil
 }
