@@ -1,6 +1,7 @@
 package ribbons
 
 import (
+	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 	"errors"
 
@@ -22,8 +23,8 @@ func NewRibbonStatsService(
 	}
 }
 
-func (rss *RibbonStatsService) GetStats() (*dto.RibbonStats, error) {
-	pokemon, err := rss.pokemonService.GetAllPokemon()
+func (rss *RibbonStatsService) GetStats(ctx *model.RQContext) (*dto.RibbonStats, error) {
+	pokemon, err := rss.pokemonService.GetAllPokemon(ctx)
 	if err != nil {
 		return nil, errors.New("Something went wrong")
 	}

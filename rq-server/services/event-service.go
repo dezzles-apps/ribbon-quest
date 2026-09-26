@@ -2,14 +2,15 @@ package services
 
 import (
 	"database/sql"
+	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 	"errors"
-	"log"
 	"time"
 
 	_ "embed"
 
 	cdb "github.com/dezzles-apps/go-common/db"
+	"go.uber.org/zap"
 )
 
 //go:embed sql/get-events.sql
@@ -72,17 +73,17 @@ func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 	return eventList, nil
 }
 
-func (es *EventService) GetLatestEvents(date string) ([]dto.Event, error) {
+func (es *EventService) GetLatestEvents(ctx *model.RQContext, date string) ([]dto.Event, error) {
 	var rows *sql.Rows
 	var err error
+	ctx.Logger.Info("Getting latest events")
 
 	if date != "" {
 		parsedDate, err := time.Parse(time.RFC3339, date)
 		if err != nil {
-			log.Printf("Date issue: %s", err.Error())
+			ctx.Logger.Info("Invalid date provided", zap.String("date", date))
 			return nil, errors.New("Invalid key")
 		}
-		log.Printf("Key: %s", parsedDate)
 		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v2 WHERE timestamp < ? LIMIT 10", parsedDate)
 	} else {
 		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v2 LIMIT 10")
@@ -91,5 +92,6 @@ func (es *EventService) GetLatestEvents(date string) ([]dto.Event, error) {
 		return nil, err
 	}
 	defer rows.Close()
+	ctx.Logger.Info("Latest events retrieved")
 	return es.readEvents(rows)
 }

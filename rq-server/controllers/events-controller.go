@@ -2,12 +2,13 @@ package controllers
 
 import (
 	"dezzles-apps/rq-server/services"
-	"log"
 	"time"
 
+	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type EventsController struct {
@@ -29,8 +30,9 @@ func (ec *EventsController) registerRoutes(router *gin.Engine) {
 }
 
 func (ec *EventsController) getEvents(c *gin.Context) {
+	ctx := model.GetContext(c)
 	date := c.Query("key")
-	events, err := ec.eventService.GetLatestEvents(date)
+	events, err := ec.eventService.GetLatestEvents(ctx, date)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
@@ -42,6 +44,6 @@ func (ec *EventsController) getEvents(c *gin.Context) {
 		next := events[len(events)-1].EventTime.Format(time.RFC3339)
 		result.Next = &next
 	}
-	log.Printf("Event Count: %d", len(events))
+	ctx.Logger.Info("Retrieved events", zap.Int("eventCount", len(events)))
 	c.JSON(200, gin.H{"data": result})
 }

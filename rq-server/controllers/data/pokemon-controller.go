@@ -1,6 +1,7 @@
 package data
 
 import (
+	"dezzles-apps/rq-server/model"
 	services "dezzles-apps/rq-server/services/data"
 
 	"github.com/gin-gonic/gin"
@@ -25,9 +26,11 @@ func (pc *PokemonController) registerRoutes(router *gin.Engine) {
 }
 
 func (pc *PokemonController) getPokemon(c *gin.Context) {
-	result, err := pc.pokemonService.GetAllPokemon()
+	ctx := model.GetContext(c)
+	result, err := pc.pokemonService.GetAllPokemon(ctx)
 	if err != nil {
-		c.JSON(200, gin.H{"errors": "Something went wrong"})
+		c.JSON(400, gin.H{"errors": model.InternalServerError})
+		return
 	}
 	c.JSON(200, gin.H{"data": result})
 }

@@ -15,6 +15,8 @@ sidecars:
   - name: rq-server
     image: us-west2-docker.pkg.dev/dezzles-apps/dezzles-apps-docker/rq-server
     port: 8083
+    monitoring:
+      enabled: true
     secrets:
       - envName: DATABASE_PASSWORD_PROD
         secretName: ribbon-quest-db-prod
