@@ -141,7 +141,7 @@ func (ps *PokemonService) getPokemonGames(ctx *model.RQContext, pokemonName stri
 	for _, game := range gamesMap {
 		games = append(games, *game)
 	}
-	ctx.Logger.Info("Retrieved games for ribbon pokmeon", zap.String("pokemonId", pokemonName))
+	ctx.Logger.Info("Retrieved games for ribbon pokemon", zap.String("pokemonId", pokemonName))
 	return games, nil
 }
 
