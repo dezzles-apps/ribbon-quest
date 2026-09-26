@@ -10,6 +10,7 @@ import (
 	_ "embed"
 
 	cdb "github.com/dezzles-apps/go-common/db"
+	"go.uber.org/zap"
 )
 
 //go:embed sql/get-ribbon.sql
@@ -69,22 +70,29 @@ func (rs *RibbonService) RemoveRibbon(ctx *model.RQContext, pokemon string, ribb
 }
 
 func (rs *RibbonService) addRibbon(ctx *model.RQContext, pokemon int, ribbon string) error {
+	ctx.Logger.Info("Adding earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 	_, err := rs.connection.GetDB().Exec("INSERT INTO ribbons_earned (ribbon_pokemon_id, ribbon_key) VALUES (?, ?)", pokemon, ribbon)
 	if err != nil {
+		ctx.Logger.Error("Error adding ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon), zap.Error(err))
 		return err
 	}
+	ctx.Logger.Info("Added earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 	return nil
 }
 
 func (rs *RibbonService) removeRibbon(ctx *model.RQContext, pokemon int, ribbon string) error {
+	ctx.Logger.Info("Removing earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 	_, err := rs.connection.GetDB().Exec("DELETE FROM ribbons_earned WHERE ribbon_pokemon_id = ? AND ribbon_key = ?", pokemon, ribbon)
 	if err != nil {
+		ctx.Logger.Error("Error removing ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon), zap.Error(err))
 		return err
 	}
+	ctx.Logger.Info("Removing earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 	return nil
 }
 
 func (rs *RibbonService) getRibbon(ctx *model.RQContext, pokemon int, ribbon string) (*dto.PokemonRibbon, error) {
+	ctx.Logger.Info("Retrieving earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 	ribbonData := &dto.PokemonRibbon{}
 	log.Printf("getRibbon: Retrieving ribbon %d:%s", pokemon, ribbon)
 	err := rs.connection.GetDB().QueryRow(getRibbonQuery, pokemon, ribbon).Scan(
@@ -97,9 +105,10 @@ func (rs *RibbonService) getRibbon(ctx *model.RQContext, pokemon int, ribbon str
 		if err == sql.ErrNoRows {
 			return nil, errors.New("Invalid ribbon combination")
 		}
-		log.Printf("getRibbon: Error retrieving ribbon %d:%s. %s", pokemon, ribbon, err.Error())
+		ctx.Logger.Error("Error retrieving ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon), zap.Error(err))
 		return nil, model.InternalServerError
 	}
+	ctx.Logger.Info("Retrieved earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 
 	return ribbonData, nil
 }
