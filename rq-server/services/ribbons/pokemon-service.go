@@ -312,11 +312,6 @@ func (ps *PokemonService) UpdatePokemon(ctx *model.RQContext, pokemon string, up
 	if err != nil {
 		ctx.Logger.Error("Error updating pokemon data",
 			zap.String("pokemonId", pokemon),
-			zap.String("nickname", details.Details.Nickname),
-			zap.String("nature", details.Details.Nature),
-			zap.String("characteristic", details.Details.Characteristic),
-			zap.String("notes", details.Details.Notes),
-			zap.Bool("shiny", details.Details.Shiny),
 			zap.Error(err),
 		)
 		return nil, err
