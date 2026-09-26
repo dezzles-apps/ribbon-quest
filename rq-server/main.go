@@ -46,7 +46,10 @@ func main() {
 	defer otelShutdown()
 
 	ctx := context.Background()
-	logExporter, _ := otlplogs.NewExporter(ctx)
+	logExporter, err := otlplogs.NewExporter(ctx)
+	if err != nil {
+		log.Fatalf("Error configuring OTLP log exporter: %s", err.Error())
+	}
 	loggerProvider := sdk.NewLoggerProvider(
 		sdk.WithBatcher(logExporter),
 	)
