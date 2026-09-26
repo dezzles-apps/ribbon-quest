@@ -31,6 +31,7 @@ func (rsc *RibbonStatsController) getStats(c *gin.Context) {
 	stats, err := rsc.ribbonStatsService.GetStats(ctx)
 	if err != nil {
 		c.JSON(200, gin.H{"errors": model.InternalServerError})
+		return
 	}
 	c.JSON(200, gin.H{"data": stats})
 }
