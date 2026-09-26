@@ -51,6 +51,7 @@ func main() {
 		log.Fatalf("Error configuring OTLP log exporter: %s", err.Error())
 	}
 	loggerProvider := sdk.NewLoggerProvider(
+		sdk.WithResource(newResource()),
 		sdk.WithBatcher(logExporter),
 	)
 	defer loggerProvider.Shutdown(ctx)
