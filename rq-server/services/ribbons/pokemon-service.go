@@ -496,9 +496,10 @@ func (ps *PokemonService) saveGames(ctx *model.RQContext, pokemon *dto.AddNewRib
 			"Failed to save games to ribbon pokemon",
 			zap.Strings("games", pokemon.Games),
 			zap.Int("ribbonPokemonId", ribbonPokemonId),
+			zap.Error(err),
 		)
 	}
-	return nil
+	return err
 }
 
 func (ps *PokemonService) GetPokemonId(ctx *model.RQContext, pokemon string) (int, error) {
