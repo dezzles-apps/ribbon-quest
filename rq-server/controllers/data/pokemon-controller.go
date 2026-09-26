@@ -29,7 +29,8 @@ func (pc *PokemonController) getPokemon(c *gin.Context) {
 	ctx := model.GetContext(c)
 	result, err := pc.pokemonService.GetAllPokemon(ctx)
 	if err != nil {
-		c.JSON(200, gin.H{"errors": model.InternalServerError})
+		c.JSON(400, gin.H{"errors": model.InternalServerError})
+		return
 	}
 	c.JSON(200, gin.H{"data": result})
 }
