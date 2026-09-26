@@ -43,7 +43,8 @@ func (ac *AuthController) register(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	err := ac.userService.RegisterUser(input)
+	ctx := model.GetContext(c)
+	err := ac.userService.RegisterUser(ctx, input)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
@@ -57,7 +58,8 @@ func (ac *AuthController) login(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	err := ac.userService.LoginUser(input)
+	ctx := model.GetContext(c)
+	err := ac.userService.LoginUser(ctx, input)
 	if err != nil {
 		c.JSON(401, gin.H{"error": err.Error()})
 		return

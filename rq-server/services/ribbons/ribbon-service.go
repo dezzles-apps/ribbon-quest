@@ -30,45 +30,45 @@ func NewRibbonService(
 	}
 }
 
-func (rs *RibbonService) AddRibbon(pokemon string, ribbon string) (*dto.PokemonRibbon, error) {
+func (rs *RibbonService) AddRibbon(ctx *model.RQContext, pokemon string, ribbon string) (*dto.PokemonRibbon, error) {
 	log.Printf("AddRibbon: Adding ribbon %s to %s", ribbon, pokemon)
-	pokemonId, err := rs.pokemonService.GetPokemonId(pokemon)
+	pokemonId, err := rs.pokemonService.GetPokemonId(ctx, pokemon)
 	if err != nil {
 		log.Printf("AddRibbon: Error adding ribbon %s to %s. %s", ribbon, pokemon, err.Error())
 		return nil, model.InternalServerError
 	}
-	r, err := rs.getRibbon(pokemonId, ribbon)
+	r, err := rs.getRibbon(ctx, pokemonId, ribbon)
 	if err != nil {
 		return nil, err
 	}
 	if r.Achieved {
 		return r, nil
 	}
-	err = rs.addRibbon(pokemonId, ribbon)
+	err = rs.addRibbon(ctx, pokemonId, ribbon)
 	if err != nil {
 		return nil, err
 	}
-	return rs.getRibbon(pokemonId, ribbon)
+	return rs.getRibbon(ctx, pokemonId, ribbon)
 }
 
-func (rs *RibbonService) RemoveRibbon(pokemon string, ribbon string) (*dto.PokemonRibbon, error) {
-	pokemonId, err := rs.pokemonService.GetPokemonId(pokemon)
+func (rs *RibbonService) RemoveRibbon(ctx *model.RQContext, pokemon string, ribbon string) (*dto.PokemonRibbon, error) {
+	pokemonId, err := rs.pokemonService.GetPokemonId(ctx, pokemon)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = rs.getRibbon(pokemonId, ribbon)
+	_, err = rs.getRibbon(ctx, pokemonId, ribbon)
 	if err != nil {
 		return nil, err
 	}
-	err = rs.removeRibbon(pokemonId, ribbon)
+	err = rs.removeRibbon(ctx, pokemonId, ribbon)
 	if err != nil {
 		return nil, err
 	}
-	return rs.getRibbon(pokemonId, ribbon)
+	return rs.getRibbon(ctx, pokemonId, ribbon)
 }
 
-func (rs *RibbonService) addRibbon(pokemon int, ribbon string) error {
+func (rs *RibbonService) addRibbon(ctx *model.RQContext, pokemon int, ribbon string) error {
 	_, err := rs.connection.GetDB().Exec("INSERT INTO ribbons_earned (ribbon_pokemon_id, ribbon_key) VALUES (?, ?)", pokemon, ribbon)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (rs *RibbonService) addRibbon(pokemon int, ribbon string) error {
 	return nil
 }
 
-func (rs *RibbonService) removeRibbon(pokemon int, ribbon string) error {
+func (rs *RibbonService) removeRibbon(ctx *model.RQContext, pokemon int, ribbon string) error {
 	_, err := rs.connection.GetDB().Exec("DELETE FROM ribbons_earned WHERE ribbon_pokemon_id = ? AND ribbon_key = ?", pokemon, ribbon)
 	if err != nil {
 		return err
@@ -84,7 +84,7 @@ func (rs *RibbonService) removeRibbon(pokemon int, ribbon string) error {
 	return nil
 }
 
-func (rs *RibbonService) getRibbon(pokemon int, ribbon string) (*dto.PokemonRibbon, error) {
+func (rs *RibbonService) getRibbon(ctx *model.RQContext, pokemon int, ribbon string) (*dto.PokemonRibbon, error) {
 	ribbonData := &dto.PokemonRibbon{}
 	log.Printf("getRibbon: Retrieving ribbon %d:%s", pokemon, ribbon)
 	err := rs.connection.GetDB().QueryRow(getRibbonQuery, pokemon, ribbon).Scan(
