@@ -68,7 +68,7 @@ func main() {
 	authMiddleware := middleware.NewAuthMiddleware(&config.App)
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
-	router.Use(otelgin.Middleware("ribbon-quest"))
+	router.Use(otelgin.Middleware(os.Getenv("OTEL_SERVICE_NAME")))
 	router.Use(middleware.WithTraceMetadata(logger))
 	router.Use(ErrorHandler())
 

@@ -15,20 +15,13 @@ sidecars:
   - name: rq-server
     image: us-west2-docker.pkg.dev/dezzles-apps/dezzles-apps-docker/rq-server
     port: 8083
-    env:
-      - envName: OTEL_EXPORTER_OTLP_ENDPOINT
-        value: https://in-otel.hyperdx.io
-      - envName: OTEL_EXPORTER_OTLP_PROTOCOL
-        value: http/protobuf
-      - envName: OTEL_SERVICE_NAME
-        value: ribbon-quest
+    monitoring:
+      enabled: true
     secrets:
       - envName: DATABASE_PASSWORD_PROD
         secretName: ribbon-quest-db-prod
       - envName: JWT_SECRET_PROD
         secretName: ribbon-quest-jwt-prod
-      - envName: OTEL_EXPORTER_OTLP_HEADERS
-        secretName: hyperdx-key
 publish:
   enabled: true
   title: Ribbon Quest
