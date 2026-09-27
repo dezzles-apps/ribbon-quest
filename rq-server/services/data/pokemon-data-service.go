@@ -7,6 +7,7 @@ import (
 	_ "embed"
 
 	"github.com/dezzles-apps/go-common/db"
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"go.uber.org/zap"
 )
 
@@ -25,7 +26,7 @@ func NewPokemonDataService(
 	}
 }
 
-func (pc *PokemonDataService) GetAllPokemon(ctx *model.RQContext) ([]*dto.PokemonData, error) {
+func (pc *PokemonDataService) GetAllPokemon(ctx *cmodel.DAContext) ([]*dto.PokemonData, error) {
 	var pokemonMap = make(map[int]*dto.PokemonData)
 	var results = []*dto.PokemonData{}
 
@@ -67,7 +68,7 @@ func (pc *PokemonDataService) GetAllPokemon(ctx *model.RQContext) ([]*dto.Pokemo
 	return results, nil
 }
 
-func (pc *PokemonDataService) GetPokemon(ctx *model.RQContext, pokedexNo int) (*dto.PokemonData, error) {
+func (pc *PokemonDataService) GetPokemon(ctx *cmodel.DAContext, pokedexNo int) (*dto.PokemonData, error) {
 	var result *dto.PokemonData = nil
 	ctx.Logger.Info("Retrieving Pokemon", zap.Int("pokedexNo", pokedexNo))
 	var rows, err = pc.connection.GetDB().Query(getPokemonDataQuery+" AND pf.pokedex_id = ?", pokedexNo)
@@ -98,7 +99,7 @@ func (pc *PokemonDataService) GetPokemon(ctx *model.RQContext, pokedexNo int) (*
 	return result, nil
 }
 
-func (pds *PokemonDataService) GetFormId(ctx *model.RQContext, pokedexNo int, form string) (int, error) {
+func (pds *PokemonDataService) GetFormId(ctx *cmodel.DAContext, pokedexNo int, form string) (int, error) {
 	var formId int
 	ctx.Logger.Info("Retrieving Pokemon form id", zap.Int("pokedexNo", pokedexNo), zap.String("form", form))
 	row := pds.connection.GetDB().QueryRow(

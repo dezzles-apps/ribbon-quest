@@ -4,6 +4,7 @@ import (
 	"dezzles-apps/rq-server/model"
 	services "dezzles-apps/rq-server/services/data"
 
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,7 +27,7 @@ func (pc *PokemonController) registerRoutes(router *gin.Engine) {
 }
 
 func (pc *PokemonController) getPokemon(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	result, err := pc.pokemonService.GetAllPokemon(ctx)
 	if err != nil {
 		c.JSON(400, gin.H{"errors": model.InternalServerError})
