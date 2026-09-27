@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	cdb "github.com/dezzles-apps/go-common/db"
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -27,7 +28,7 @@ func NewUserService(
 	}
 }
 
-func (us *UserService) LoginUser(ctx *model.RQContext, input model.AuthInput) error {
+func (us *UserService) LoginUser(ctx *cmodel.DAContext, input model.AuthInput) error {
 	user, err := us.GetUserByUsername(ctx, input.Username)
 	if err != nil {
 		return err
@@ -43,7 +44,7 @@ func (us *UserService) LoginUser(ctx *model.RQContext, input model.AuthInput) er
 	return nil
 }
 
-func (us *UserService) RegisterUser(ctx *model.RQContext, input model.AuthInput) error {
+func (us *UserService) RegisterUser(ctx *cmodel.DAContext, input model.AuthInput) error {
 	if !us.configService.CanRegisterUsers() {
 		return errors.New("user registration is disabled")
 	}
@@ -68,7 +69,7 @@ func (us *UserService) RegisterUser(ctx *model.RQContext, input model.AuthInput)
 
 }
 
-func (us *UserService) GetUserByUsername(ctx *model.RQContext, username string) (*db.User, error) {
+func (us *UserService) GetUserByUsername(ctx *cmodel.DAContext, username string) (*db.User, error) {
 	username = strings.ToLower(username)
 	var user db.User
 	err := us.database.GetDB().QueryRow("SELECT username, password_hash FROM users WHERE username = ?", username).Scan(&user.Username, &user.Password)

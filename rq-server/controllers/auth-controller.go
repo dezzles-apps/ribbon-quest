@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
 )
@@ -43,7 +44,7 @@ func (ac *AuthController) register(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	err := ac.userService.RegisterUser(ctx, input)
 	if err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
@@ -58,7 +59,7 @@ func (ac *AuthController) login(c *gin.Context) {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	err := ac.userService.LoginUser(ctx, input)
 	if err != nil {
 		c.JSON(401, gin.H{"error": err.Error()})
