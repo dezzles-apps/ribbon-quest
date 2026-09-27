@@ -4,9 +4,9 @@ import (
 	"dezzles-apps/rq-server/services"
 	"time"
 
-	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -30,7 +30,7 @@ func (ec *EventsController) registerRoutes(router *gin.Engine) {
 }
 
 func (ec *EventsController) getEvents(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	date := c.Query("key")
 	events, err := ec.eventService.GetLatestEvents(ctx, date)
 	if err != nil {

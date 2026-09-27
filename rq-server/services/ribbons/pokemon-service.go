@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	cdb "github.com/dezzles-apps/go-common/db"
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"github.com/dezzles-apps/go-common/model/responses"
 	"go.uber.org/zap"
 )
@@ -44,7 +45,7 @@ func NewPokemonService(
 	}
 }
 
-func (ps *PokemonService) GetPokemon(ctx *model.RQContext, pokemonName string) (*dto.Pokemon, error) {
+func (ps *PokemonService) GetPokemon(ctx *cmodel.DAContext, pokemonName string) (*dto.Pokemon, error) {
 	Pokemon, err := ps.getPokemon(ctx, pokemonName)
 	if err != nil {
 		return nil, err
@@ -62,7 +63,7 @@ func (ps *PokemonService) GetPokemon(ctx *model.RQContext, pokemonName string) (
 	return Pokemon, nil
 }
 
-func (ps *PokemonService) getPokemon(ctx *model.RQContext, pokemonName string) (*dto.Pokemon, error) {
+func (ps *PokemonService) getPokemon(ctx *cmodel.DAContext, pokemonName string) (*dto.Pokemon, error) {
 	Pokemon := &dto.Pokemon{}
 	ctx.Logger.Info("Getting ribbon pokemon", zap.String("pokemonId", pokemonName))
 	row := ps.connection.GetDB().QueryRow(getPokemonInfo, pokemonName)
@@ -107,7 +108,7 @@ func (ps *PokemonService) getPokemon(ctx *model.RQContext, pokemonName string) (
 	return Pokemon, nil
 }
 
-func (ps *PokemonService) getPokemonGames(ctx *model.RQContext, pokemonName string) ([]dto.PokemonGame, error) {
+func (ps *PokemonService) getPokemonGames(ctx *cmodel.DAContext, pokemonName string) ([]dto.PokemonGame, error) {
 	var gamesMap map[string]*dto.PokemonGame = make(map[string]*dto.PokemonGame)
 	rows, err := ps.connection.GetDB().Query(getPokemonGames, pokemonName)
 	if err != nil {
@@ -145,7 +146,7 @@ func (ps *PokemonService) getPokemonGames(ctx *model.RQContext, pokemonName stri
 	return games, nil
 }
 
-func (ps *PokemonService) getPokemonRibbons(ctx *model.RQContext, pokemonName string) ([]dto.PokemonRibbon, error) {
+func (ps *PokemonService) getPokemonRibbons(ctx *cmodel.DAContext, pokemonName string) ([]dto.PokemonRibbon, error) {
 	var ribbons []dto.PokemonRibbon
 	ctx.Logger.Info("Getting ribbons for Pokemon", zap.String("pokemonId", pokemonName))
 	rows, err := ps.connection.GetDB().Query(getPokemonRibbons, pokemonName)
@@ -185,7 +186,7 @@ func (ps *PokemonService) getPokemonRibbons(ctx *model.RQContext, pokemonName st
 	return ribbons, nil
 }
 
-func (ps *PokemonService) GetAllPokemon(ctx *model.RQContext) ([]dto.AllPokemon, error) {
+func (ps *PokemonService) GetAllPokemon(ctx *cmodel.DAContext) ([]dto.AllPokemon, error) {
 	ctx.Logger.Info("Retrieving all ribbon pokemon")
 
 	var allPokemon []dto.AllPokemon
@@ -261,7 +262,7 @@ func (ps *PokemonService) GetAllPokemon(ctx *model.RQContext) ([]dto.AllPokemon,
 	return allPokemon, nil
 }
 
-func (ps *PokemonService) CatchPokemon(ctx *model.RQContext, pokemon string) (*dto.Pokemon, error) {
+func (ps *PokemonService) CatchPokemon(ctx *cmodel.DAContext, pokemon string) (*dto.Pokemon, error) {
 	ctx.Logger.Info("Marking pokemon as caught", zap.String("pokemonId", pokemon))
 	details, err := ps.getPokemon(ctx, pokemon)
 	if err != nil {
@@ -278,7 +279,7 @@ func (ps *PokemonService) CatchPokemon(ctx *model.RQContext, pokemon string) (*d
 	return ps.GetPokemon(ctx, pokemon)
 }
 
-func (ps *PokemonService) UpdatePokemon(ctx *model.RQContext, pokemon string, updateData dto.UpdatePokemon) (*dto.Pokemon, error) {
+func (ps *PokemonService) UpdatePokemon(ctx *cmodel.DAContext, pokemon string, updateData dto.UpdatePokemon) (*dto.Pokemon, error) {
 	details, err := ps.getPokemon(ctx, pokemon)
 	if err != nil {
 		return nil, err
@@ -319,7 +320,7 @@ func (ps *PokemonService) UpdatePokemon(ctx *model.RQContext, pokemon string, up
 	return ps.GetPokemon(ctx, pokemon)
 }
 
-func (ps *PokemonService) CreatePokemon(ctx *model.RQContext, pokemon *dto.AddNewRibbonPokemon) (*dto.Pokemon, error) {
+func (ps *PokemonService) CreatePokemon(ctx *cmodel.DAContext, pokemon *dto.AddNewRibbonPokemon) (*dto.Pokemon, error) {
 	viewOrder, err := ps.getNextViewOrder(ctx)
 	if err != nil {
 		return nil, err
@@ -352,7 +353,7 @@ func (ps *PokemonService) CreatePokemon(ctx *model.RQContext, pokemon *dto.AddNe
 	return ps.getPokemon(ctx, pokemon.Pokemon)
 }
 
-func (ps *PokemonService) ValidateCreate(ctx *model.RQContext, pokemon *dto.AddNewRibbonPokemon) ([]responses.Error, error) {
+func (ps *PokemonService) ValidateCreate(ctx *cmodel.DAContext, pokemon *dto.AddNewRibbonPokemon) ([]responses.Error, error) {
 	var errors []responses.Error
 
 	// Trim everything
@@ -385,7 +386,7 @@ func (ps *PokemonService) ValidateCreate(ctx *model.RQContext, pokemon *dto.AddN
 	return nil, nil
 }
 
-func (ps *PokemonService) validatePokemonId(ctx *model.RQContext, pokemonId string) (*responses.Error, error) {
+func (ps *PokemonService) validatePokemonId(ctx *cmodel.DAContext, pokemonId string) (*responses.Error, error) {
 	if pokemonId == "" {
 		e := responses.CreateError("pokemon", "PokemonId cannot be empty")
 		return &e, nil
@@ -402,7 +403,7 @@ func (ps *PokemonService) validatePokemonId(ctx *model.RQContext, pokemonId stri
 	return nil, nil
 }
 
-func (ps *PokemonService) validatePokemon(ctx *model.RQContext, pokedexNo int, form string) (*responses.Error, error) {
+func (ps *PokemonService) validatePokemon(ctx *cmodel.DAContext, pokedexNo int, form string) (*responses.Error, error) {
 	pokemon, err := ps.pokemonDataService.GetPokemon(ctx, pokedexNo)
 	log.Print(pokemon)
 	if err != nil {
@@ -429,7 +430,7 @@ func (ps *PokemonService) validatePokemon(ctx *model.RQContext, pokedexNo int, f
 	return nil, nil
 }
 
-func (ps *PokemonService) validateGames(ctx *model.RQContext, games []string) (*responses.Error, error) {
+func (ps *PokemonService) validateGames(ctx *cmodel.DAContext, games []string) (*responses.Error, error) {
 	log.Print("validateGames: getting games")
 	allGames, err := ps.gameService.GetAllGames(ctx)
 	if err != nil {
@@ -456,7 +457,7 @@ func (ps *PokemonService) validateGames(ctx *model.RQContext, games []string) (*
 	return nil, nil
 }
 
-func (ps *PokemonService) getNextViewOrder(ctx *model.RQContext) (int, error) {
+func (ps *PokemonService) getNextViewOrder(ctx *cmodel.DAContext) (int, error) {
 	var number int
 	row := ps.connection.GetDB().QueryRow("SELECT view_order FROM ribbon_pokemon ORDER BY view_order DESC LIMIT 1")
 	err := row.Scan(&number)
@@ -467,7 +468,7 @@ func (ps *PokemonService) getNextViewOrder(ctx *model.RQContext) (int, error) {
 	return number + 1, nil
 }
 
-func (ps *PokemonService) saveGames(ctx *model.RQContext, pokemon *dto.AddNewRibbonPokemon) error {
+func (ps *PokemonService) saveGames(ctx *cmodel.DAContext, pokemon *dto.AddNewRibbonPokemon) error {
 	ribbonPokemonId, err := ps.GetPokemonId(ctx, pokemon.Pokemon)
 	if err != nil {
 		return err
@@ -502,7 +503,7 @@ func (ps *PokemonService) saveGames(ctx *model.RQContext, pokemon *dto.AddNewRib
 	return err
 }
 
-func (ps *PokemonService) GetPokemonId(ctx *model.RQContext, pokemon string) (int, error) {
+func (ps *PokemonService) GetPokemonId(ctx *cmodel.DAContext, pokemon string) (int, error) {
 	ctx.Logger.Info("Retrieving pokemon", zap.String("pokemonId", pokemon))
 	var query = "SELECT ribbon_pokemon_id FROM ribbon_pokemon WHERE pokemon = ?"
 	var number int

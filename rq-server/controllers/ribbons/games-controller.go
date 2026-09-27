@@ -1,9 +1,9 @@
 package ribbons
 
 import (
-	"dezzles-apps/rq-server/model"
 	services "dezzles-apps/rq-server/services/ribbons"
 
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,7 +31,7 @@ func (gc *GamesController) registerRoutes(router *gin.Engine) {
 }
 
 func (gc *GamesController) getAllGames(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	allGames, err := gc.gameService.GetAllGames(ctx)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -42,8 +42,9 @@ func (gc *GamesController) getAllGames(c *gin.Context) {
 }
 
 func (gc *GamesController) getGame(c *gin.Context) {
+	ctx := cmodel.GetContext(c)
 	game := c.Param("game")
-	gameData, err := gc.gameService.GetGame(game)
+	gameData, err := gc.gameService.GetGame(ctx, game)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

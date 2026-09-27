@@ -2,10 +2,10 @@ package ribbons
 
 import (
 	"dezzles-apps/rq-server/middleware"
-	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 	services "dezzles-apps/rq-server/services/ribbons"
 
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -43,7 +43,7 @@ func (pc *PokemonController) registerRoutes(router *gin.Engine, authMiddleware *
 }
 
 func (pc *PokemonController) getAllPokemon(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	allPokemon, err := pc.pokemonService.GetAllPokemon(ctx)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
@@ -54,7 +54,7 @@ func (pc *PokemonController) getAllPokemon(c *gin.Context) {
 }
 
 func (pc *PokemonController) getPokemon(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	pokemon := c.Param("pokemon")
 	pokemonData, err := pc.pokemonService.GetPokemon(ctx, pokemon)
 	if err != nil {
@@ -66,7 +66,7 @@ func (pc *PokemonController) getPokemon(c *gin.Context) {
 }
 
 func (pc *PokemonController) addRibbon(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	pokemon := c.Param("pokemon")
 	ribbon := c.Param("ribbon")
 
@@ -80,7 +80,7 @@ func (pc *PokemonController) addRibbon(c *gin.Context) {
 }
 
 func (pc *PokemonController) removeRibbon(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	pokemon := c.Param("pokemon")
 	ribbon := c.Param("ribbon")
 
@@ -94,7 +94,7 @@ func (pc *PokemonController) removeRibbon(c *gin.Context) {
 }
 
 func (pc *PokemonController) catchPokemon(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	pokemon := c.Param("pokemon")
 
 	pokemonData, err := pc.pokemonService.CatchPokemon(ctx, pokemon)
@@ -107,7 +107,7 @@ func (pc *PokemonController) catchPokemon(c *gin.Context) {
 }
 
 func (pc *PokemonController) updatePokemon(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	pokemon := c.Param("pokemon")
 	var updateData dto.UpdatePokemon
 	if err := c.ShouldBindJSON(&updateData); err != nil {
@@ -125,7 +125,7 @@ func (pc *PokemonController) updatePokemon(c *gin.Context) {
 }
 
 func (pc *PokemonController) createPokemon(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	var updateData dto.AddNewRibbonPokemon
 	ctx.Logger.Info("Creating new pokemon")
 	if err := c.ShouldBindJSON(&updateData); err != nil {
