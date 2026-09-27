@@ -2,12 +2,13 @@ package services
 
 import (
 	"database/sql"
-	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 	"errors"
 	"time"
 
 	_ "embed"
+
+	cmodel "github.com/dezzles-apps/go-common/model"
 
 	cdb "github.com/dezzles-apps/go-common/db"
 	"go.uber.org/zap"
@@ -73,7 +74,7 @@ func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 	return eventList, nil
 }
 
-func (es *EventService) GetLatestEvents(ctx *model.RQContext, date string) ([]dto.Event, error) {
+func (es *EventService) GetLatestEvents(ctx *cmodel.DAContext, date string) ([]dto.Event, error) {
 	var rows *sql.Rows
 	var err error
 	ctx.Logger.Info("Getting latest events")

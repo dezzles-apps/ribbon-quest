@@ -4,6 +4,7 @@ import (
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/services/ribbons"
 
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"github.com/gin-gonic/gin"
 )
 
@@ -27,7 +28,7 @@ func (rsc *RibbonStatsController) createRoutes(router *gin.Engine) {
 }
 
 func (rsc *RibbonStatsController) getStats(c *gin.Context) {
-	ctx := model.GetContext(c)
+	ctx := cmodel.GetContext(c)
 	stats, err := rsc.ribbonStatsService.GetStats(ctx)
 	if err != nil {
 		c.JSON(200, gin.H{"errors": model.InternalServerError})

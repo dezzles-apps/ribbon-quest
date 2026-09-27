@@ -10,6 +10,7 @@ import (
 	_ "embed"
 
 	cdb "github.com/dezzles-apps/go-common/db"
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"go.uber.org/zap"
 )
 
@@ -31,7 +32,7 @@ func NewRibbonService(
 	}
 }
 
-func (rs *RibbonService) AddRibbon(ctx *model.RQContext, pokemon string, ribbon string) (*dto.PokemonRibbon, error) {
+func (rs *RibbonService) AddRibbon(ctx *cmodel.DAContext, pokemon string, ribbon string) (*dto.PokemonRibbon, error) {
 	log.Printf("AddRibbon: Adding ribbon %s to %s", ribbon, pokemon)
 	pokemonId, err := rs.pokemonService.GetPokemonId(ctx, pokemon)
 	if err != nil {
@@ -52,7 +53,7 @@ func (rs *RibbonService) AddRibbon(ctx *model.RQContext, pokemon string, ribbon 
 	return rs.getRibbon(ctx, pokemonId, ribbon)
 }
 
-func (rs *RibbonService) RemoveRibbon(ctx *model.RQContext, pokemon string, ribbon string) (*dto.PokemonRibbon, error) {
+func (rs *RibbonService) RemoveRibbon(ctx *cmodel.DAContext, pokemon string, ribbon string) (*dto.PokemonRibbon, error) {
 	pokemonId, err := rs.pokemonService.GetPokemonId(ctx, pokemon)
 	if err != nil {
 		return nil, err
@@ -69,7 +70,7 @@ func (rs *RibbonService) RemoveRibbon(ctx *model.RQContext, pokemon string, ribb
 	return rs.getRibbon(ctx, pokemonId, ribbon)
 }
 
-func (rs *RibbonService) addRibbon(ctx *model.RQContext, pokemon int, ribbon string) error {
+func (rs *RibbonService) addRibbon(ctx *cmodel.DAContext, pokemon int, ribbon string) error {
 	ctx.Logger.Info("Adding earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 	_, err := rs.connection.GetDB().Exec("INSERT INTO ribbons_earned (ribbon_pokemon_id, ribbon_key) VALUES (?, ?)", pokemon, ribbon)
 	if err != nil {
@@ -80,7 +81,7 @@ func (rs *RibbonService) addRibbon(ctx *model.RQContext, pokemon int, ribbon str
 	return nil
 }
 
-func (rs *RibbonService) removeRibbon(ctx *model.RQContext, pokemon int, ribbon string) error {
+func (rs *RibbonService) removeRibbon(ctx *cmodel.DAContext, pokemon int, ribbon string) error {
 	ctx.Logger.Info("Removing earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 	_, err := rs.connection.GetDB().Exec("DELETE FROM ribbons_earned WHERE ribbon_pokemon_id = ? AND ribbon_key = ?", pokemon, ribbon)
 	if err != nil {
@@ -91,7 +92,7 @@ func (rs *RibbonService) removeRibbon(ctx *model.RQContext, pokemon int, ribbon 
 	return nil
 }
 
-func (rs *RibbonService) getRibbon(ctx *model.RQContext, pokemon int, ribbon string) (*dto.PokemonRibbon, error) {
+func (rs *RibbonService) getRibbon(ctx *cmodel.DAContext, pokemon int, ribbon string) (*dto.PokemonRibbon, error) {
 	ctx.Logger.Info("Retrieving earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
 	ribbonData := &dto.PokemonRibbon{}
 	log.Printf("getRibbon: Retrieving ribbon %d:%s", pokemon, ribbon)
