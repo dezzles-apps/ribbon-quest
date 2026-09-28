@@ -4,7 +4,7 @@ info:
   seq: 10
 
 http:
-  method: PUT
+  method: DELETE
   url: http://localhost:8083/api/ribbons/v1/pokemon/Vulpix/games/OMEGA_RUBY
   headers:
     - name: Authorization
