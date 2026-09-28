@@ -15,4 +15,5 @@ FROM ribbon_pokemon
     AND ribbon_pokemon.ribbon_pokemon_id = ribbons_earned.ribbon_pokemon_id
   )
 WHERE ribbon_pokemon.pokemon = ?
+AND ribbons.ribbon_key IS NOT NULL
 ORDER BY ribbons.category ASC, ribbons.view_order ASC

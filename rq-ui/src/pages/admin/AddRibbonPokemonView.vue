@@ -116,7 +116,6 @@ onMounted(load)
     title="New Ribbon Pokemon"
     variant="tonal"
   >
-    {{  errors }}
     <v-form>
       <v-container v-if="!loading">
         <v-text-field

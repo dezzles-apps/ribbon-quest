@@ -119,7 +119,19 @@ const router = createRouter({
           href: '/admin/ribbons/pokemon/new'
         }
       }
-    }
+    },
+    {
+      path: '/admin/ribbons/pokemon/:pokemonId',
+      name: 'admin-edit-ribbon-pokemon',
+      component: () => import('@/pages/admin/EditRibbonPokemonView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'admin-pokemon',
+          title: (i: any) => (`Edit ${i.pokemonId}`),
+          href: (i: any) => (`/admin/ribbons/pokemon/${i.pokemonId}`)
+        }
+      }
+    },
   ],
 })
 
