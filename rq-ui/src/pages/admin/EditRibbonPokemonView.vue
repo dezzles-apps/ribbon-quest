@@ -170,7 +170,7 @@ function hasGame(gameKey: String) : boolean {
 async function fetchData() {
   await Promise.all([
     fetchPokemon(), fetchGames()
-  ]).then(() => {
+  ]).finally(() => {
     loading.value = false
   })
 }
