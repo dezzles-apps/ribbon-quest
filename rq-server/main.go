@@ -36,7 +36,6 @@ func newResource() *resource.Resource {
 func main() {
 	monitor.Initialise()
 	defer monitor.Shutdown()
-
 	monitor.Logger.Info("Starting app")
 	config, err := cmodel.LoadConfig[model.AppConfig]()
 	if err != nil {

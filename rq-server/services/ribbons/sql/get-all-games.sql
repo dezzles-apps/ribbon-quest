@@ -21,5 +21,6 @@ SELECT ribbons.game_key, ribbons.game_name, ribbons.achieved, count(*) FROM (
   )
   ORDER BY games.view_order, pokemon.view_order, ribbons.category ASC, ribbons.view_order ASC
 ) as ribbons
+WHERE ribbons.game_key IS NOT NULL
 GROUP BY ribbons.game_key, ribbons.game_name, achieved
 ORDER BY ribbons.view_order ASC
