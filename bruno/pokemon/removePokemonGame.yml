@@ -1,0 +1,19 @@
+info:
+  name: removePokemonGame
+  type: http
+  seq: 10
+
+http:
+  method: PUT
+  url: http://localhost:8083/api/ribbons/v1/pokemon/Vulpix/games/OMEGA_RUBY
+  headers:
+    - name: Authorization
+      value: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3OTA2OTgwNTUsImlkIjoiZGV6emxlcyJ9.gFwca6fAWRANRe5X8fDqwpbjFGoJ0JOU2kEk7JOxRog
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false
