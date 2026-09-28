@@ -39,6 +39,9 @@ func (pc *PokemonController) registerRoutes(router *gin.Engine, authMiddleware *
 		pokemonGroup.POST("/:pokemon/catch", authMiddleware.ValidateUser, pc.catchPokemon)
 		pokemonGroup.PUT("/:pokemon", authMiddleware.ValidateUser, pc.updatePokemon)
 		pokemonGroup.POST("/", authMiddleware.ValidateUser, pc.createPokemon)
+
+		pokemonGroup.PUT("/:pokemon/games/:gameKey", authMiddleware.ValidateUser, pc.addPokemonGame)
+		pokemonGroup.DELETE("/:pokemon/games/:gameKey", authMiddleware.ValidateUser, pc.removePokemonGame)
 	}
 }
 
@@ -144,6 +147,34 @@ func (pc *PokemonController) createPokemon(c *gin.Context) {
 	}
 
 	updatedPokemon, err := pc.pokemonService.CreatePokemon(ctx, &updateData)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": updatedPokemon})
+}
+
+func (pc *PokemonController) addPokemonGame(c *gin.Context) {
+	ctx := cmodel.GetContext(c)
+	pokemon := c.Param("pokemon")
+	gameKey := c.Param("gameKey")
+
+	updatedPokemon, err := pc.pokemonService.AddPokemonGame(ctx, pokemon, gameKey)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": updatedPokemon})
+}
+
+func (pc *PokemonController) removePokemonGame(c *gin.Context) {
+	ctx := cmodel.GetContext(c)
+	pokemon := c.Param("pokemon")
+	gameKey := c.Param("gameKey")
+
+	updatedPokemon, err := pc.pokemonService.RemovePokemonGame(ctx, pokemon, gameKey)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return

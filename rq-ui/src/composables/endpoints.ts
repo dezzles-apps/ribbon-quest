@@ -9,6 +9,7 @@ export const Ribbons = {
   GetPokemon: (pokemon: string) => `/api/ribbons/v1/pokemon/${pokemon}`,
   CatchPokemon: (pokemon: string) => `/api/ribbons/v1/pokemon/${pokemon}/catch`,
   UpdatePokemon: (pokemon: string) => `/api/ribbons/v1/pokemon/${pokemon}`,
+  UpdatePokemonGame: (pokemon: string, gameKey: string) =>  `/api/ribbons/v1/pokemon/${pokemon}/games/${gameKey}`,
   UpdateRibbon: (pokemon: string, ribbonKey: string) => `/api/ribbons/v1/pokemon/${pokemon}/ribbons/${ribbonKey}`,
   GetStats: '/api/ribbons/v1/stats'
 };
