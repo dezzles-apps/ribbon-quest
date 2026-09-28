@@ -406,7 +406,6 @@ func (ps *PokemonService) validatePokemonId(ctx *cmodel.DAContext, pokemonId str
 
 func (ps *PokemonService) validatePokemon(ctx *cmodel.DAContext, pokedexNo int, form string) (*responses.Error, error) {
 	pokemon, err := ps.pokemonDataService.GetPokemon(ctx, pokedexNo)
-	log.Print(pokemon)
 	if err != nil {
 		return nil, err
 	}
