@@ -16,4 +16,5 @@ LEFT JOIN ribbons_earned pr on (
 )
 WHERE
   game_ribbons.game_key = ?
+  AND ribbons.enabled = true
 ORDER BY pokemon.view_order, ribbons.category ASC, ribbons.view_order ASC

@@ -14,4 +14,5 @@ FROM ribbon_pokemon
   LEFT JOIN ribbons on game_ribbons.ribbon_key = ribbons.ribbon_key
   LEFT JOIN ribbons_earned on ribbons_earned.ribbon_key = ribbons.ribbon_key
 WHERE ribbon_pokemon.pokemon = ?
+AND ribbons.enabled = true
 ORDER BY game_view_order ASC

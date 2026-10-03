@@ -26,6 +26,7 @@ SELECT pokemon, pokedex_id, species, form_name, sprite_ref, nickname, caught_at,
       ribbons_earned.ribbon_key = ribbons.ribbon_key
       AND pokemon.ribbon_pokemon_id = ribbons_earned.ribbon_pokemon_id
     )
+  WHERE ribbons.enabled = true
   ORDER BY pokemon.view_order ASC
 ) as ribbon_types
 GROUP BY pokemon, pokedex_id, species, form_name, sprite_ref, nickname, caught_at, nature, characteristic, notes, shiny, achieved, ribbon_types.achieved 
