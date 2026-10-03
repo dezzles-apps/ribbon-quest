@@ -32,7 +32,9 @@ func (ec *EventsController) registerRoutes(router *gin.Engine) {
 func (ec *EventsController) getEvents(c *gin.Context) {
 	ctx := cmodel.GetContext(c)
 	date := c.Query("key")
-	events, err := ec.eventService.GetLatestEvents(ctx, date)
+	category := c.Query("category")
+	pokemon := c.Query("pokemon")
+	events, err := ec.eventService.GetEvents(ctx, date, category, pokemon)
 	if err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
