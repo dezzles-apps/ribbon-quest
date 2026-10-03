@@ -4,6 +4,7 @@ import type { RibbonStats } from '@/types/ribbons';
 import type { Response } from '@/types/responses';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
+import Events from '@/components/Events.vue'
 import Loading from '@/components/Loading.vue';
 const loading = ref(true);
 const stats = ref({} as RibbonStats);
@@ -26,7 +27,7 @@ onMounted(loadStats);
 
 <template>
   <v-sheet
-    class="d-flex flex-wrap mx-auto px-4"
+    class="d-flex flex-wrap mx-auto px-10"
     elevation="2"
     rounded
   >
@@ -112,6 +113,8 @@ onMounted(loadStats);
           <li>Other features as they come to mind</li>
         </ul>
       </div>
+      <h1 class="text-center">Latest Updates</h1>
     </div>
+    <Events category="RIBBONS" />
   </v-sheet>
 </template>

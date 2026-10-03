@@ -14,6 +14,7 @@ import Events from '@/components/Events.vue'
             challenges into a single website. At the moment this site is running the Ribbon Quest I'm
             currently on, but will expand as I come up with more silly ideas.
           </div>
+          <h1 class="text-center">Latest Updates</h1>
           <Events />
         </div>
 

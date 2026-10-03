@@ -9,6 +9,8 @@ import API from '@/composables/endpoints';
 import Loading from '@/components/Loading.vue';
 import PokemonInfo from '@/components/PokemonInfo.vue';
 import GameInfo from '@/components/GameInfo.vue';
+import Events from '@/components/Events.vue'
+
 const route = useRoute();
 const loading = ref(true);
 const { apiFetch } = useApi();
@@ -54,6 +56,18 @@ onMounted(fetchPokemon);
       :ribbons="pokemon.ribbons"
       :pokemon="pokemon.pokemon"
     />
+    <v-expansion-panels
+      gap="16"
+    >
+      <v-expansion-panel
+        title="Latest Events"
+      >
+        <v-expansion-panel-text>
+          <Events category="RIBBONS" :pokemon="route.params.pokemon as string"/>
+        </v-expansion-panel-text>
+      </v-expansion-panel>
+    </v-expansion-panels>
+
     <GameInfo
       v-for="game in pokemon.games"
       :gameKey="game.gameKey"
