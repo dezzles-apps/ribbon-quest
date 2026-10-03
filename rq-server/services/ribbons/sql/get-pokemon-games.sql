@@ -9,5 +9,6 @@ FROM ribbon_pokemon pokemon
   LEFT JOIN game_ribbons ON games.game_key = game_ribbons.game_key
   LEFT JOIN ribbons ON ribbons.ribbon_key = game_ribbons.ribbon_key 
 WHERE pokemon.pokemon = ?
+AND ribbons.enabled = true
 AND games.game_key IS NOT NULL 
 ORDER BY game_view_order ASC, ribbons.category ASC, ribbons.view_order ASC
