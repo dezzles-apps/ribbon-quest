@@ -7,6 +7,17 @@ import type { Page, Response } from '@/types/responses';
 import RibbonColours from '@/composables/ribbons';
 import { useDates } from '@/composables/useDates';
 import API from '@/composables/endpoints';
+
+const props = defineProps({
+  pokemon: {
+    type: String,
+    required: false
+  },
+  category: {
+    type: String,
+    required: false
+  }
+})
 const loading = ref(true);
 const events = ref([] as Event[] );
 const next = ref('' as string | null);
@@ -16,11 +27,17 @@ const dates = useDates();
 
 function loadEvents() {
   let url = API.Events.GetAllEvents
+  let params = {} as any
   if (next.value) {
-    url = url + '?' + new URLSearchParams({
-      key: next.value
-    })
+    params.key = next.value
   }
+  if (props.category) {
+    params.category = props.category
+  }
+  if (props.pokemon) {
+    params.pokemon = props.pokemon
+  }
+  url = url + '?' + new URLSearchParams(params)
   return apiFetch(url)
     .then(async resp => {
       if (!resp.ok) {
@@ -63,11 +80,11 @@ onMounted(loadEvents)
 
 
 <template>
-  <h1 class="text-center">Latest Updates</h1>
   <Loading v-if="loading" />
-  <div v-else>
+  <div v-else style="width: 100%;">
     <v-timeline
       side="end"
+      class="mx-auto"
     >
       <v-timeline-item
         v-for="(item, idx) in events"
@@ -102,7 +119,8 @@ onMounted(loadEvents)
         </v-alert>
       </v-timeline-item>
     </v-timeline>
-    <div class="ma-auto" style="text-align: center;">
+  </div>
+    <div class="ma-auto pb-3" style="text-align: center;">
       <v-btn
         v-if="!allLoaded"
         color="green"
@@ -114,5 +132,4 @@ onMounted(loadEvents)
       </v-btn>
       <div v-if="allLoaded">No more events...</div>
     </div>
-  </div>
 </template>

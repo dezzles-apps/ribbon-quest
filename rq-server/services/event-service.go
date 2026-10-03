@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dezzles-apps/rq-server/model/dto"
 	"errors"
+	"strings"
 	"time"
 
 	_ "embed"
@@ -29,15 +30,16 @@ func NewEventService(db *cdb.Database) *EventService {
 
 func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 	eventList := []dto.Event{}
-	var ribbonKey sql.NullString
-	var pokemon sql.NullString
-	var nickname sql.NullString
-	var ribbonName sql.NullString
-	var ribbonCategory sql.NullString
-	var ribbonType sql.NullString
 	for rows.Next() {
+		var ribbonKey sql.NullString
+		var pokemon sql.NullString
+		var nickname sql.NullString
+		var ribbonName sql.NullString
+		var ribbonCategory sql.NullString
+		var ribbonType sql.NullString
 		event := dto.Event{}
 		err := rows.Scan(
+			&event.Category,
 			&event.Type,
 			&event.EventTime,
 			&pokemon,
@@ -89,10 +91,42 @@ func (es *EventService) GetLatestEvents(ctx *cmodel.DAContext, date string) ([]d
 	} else {
 		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v2 LIMIT 10")
 	}
+	defer rows.Close()
 	if err != nil {
 		return nil, err
 	}
+	ctx.Logger.Info("Latest events retrieved")
+	return es.readEvents(rows)
+}
+
+func (es *EventService) GetEvents(ctx *cmodel.DAContext, date string, category string, pokemon string) ([]dto.Event, error) {
+	var query strings.Builder
+	var params []any
+	query.WriteString("SELECT * FROM events_v3 WHERE 1")
+
+	if date != "" {
+		parsedDate, err := time.Parse(time.RFC3339, date)
+		if err != nil {
+			ctx.Logger.Info("Invalid date provided", zap.String("date", date))
+			return nil, errors.New("Invalid key")
+		}
+		params = append(params, parsedDate)
+		query.WriteString(" AND timestamp < ?")
+	}
+	if category != "" {
+		params = append(params, category)
+		query.WriteString(" AND event_category = ?")
+	}
+	if pokemon != "" {
+		params = append(params, pokemon)
+		query.WriteString(" AND pokemon = ?")
+	}
+	query.WriteString(" LIMIT 10")
+	rows, err := es.connection.GetDB().Query(query.String(), params...)
 	defer rows.Close()
+	if err != nil {
+		return nil, err
+	}
 	ctx.Logger.Info("Latest events retrieved")
 	return es.readEvents(rows)
 }
