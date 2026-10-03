@@ -56,7 +56,6 @@ func (ps *PokemonService) GetPokemon(ctx *cmodel.DAContext, pokemonName string) 
 	}
 	Pokemon.Games = games
 	ribbons, err := ps.getPokemonRibbons(ctx, pokemonName)
-	log.Print(ribbons)
 	if err != nil {
 		return nil, err
 	}
@@ -444,7 +443,6 @@ func (ps *PokemonService) validateGames(ctx *cmodel.DAContext, games []string) (
 		var r = responses.CreateError("games", "At least one game must be selected")
 		return &r, nil
 	}
-	log.Print(gameMap)
 
 	for _, g := range games {
 		if _, exists := gameMap[g]; !exists {
