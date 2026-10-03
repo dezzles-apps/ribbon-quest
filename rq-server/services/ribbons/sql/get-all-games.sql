@@ -19,6 +19,7 @@ SELECT ribbons.game_key, ribbons.game_name, ribbons.achieved, count(*) FROM (
     pokemon.ribbon_pokemon_id = pr.ribbon_pokemon_id
     AND ribbons.ribbon_key = pr.ribbon_key
   )
+  WHERE ribbons.enabled = true
   ORDER BY games.view_order, pokemon.view_order, ribbons.category ASC, ribbons.view_order ASC
 ) as ribbons
 WHERE ribbons.game_key IS NOT NULL
