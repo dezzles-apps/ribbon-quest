@@ -478,20 +478,21 @@ func (ps *PokemonService) saveGames(ctx *cmodel.DAContext, pokemon *dto.AddNewRi
 		zap.Int("ribbonPokemonId", ribbonPokemonId),
 	)
 	log.Printf("saveGames: Adding %s to %d", pokemon.Games, ribbonPokemonId)
-	var query = "INSERT INTO ribbon_pokemon_games (ribbon_pokemon_id, game_key) VALUES "
-	var params []interface{}
+	var query strings.Builder
+	query.WriteString("INSERT INTO ribbon_pokemon_games (ribbon_pokemon_id, game_key) VALUES ")
+	var params []any
 	var first = true
 	for _, game := range pokemon.Games {
 		if !first {
-			query += ", "
+			query.WriteString(", ")
 		}
-		query += "(?, ?)"
+		query.WriteString("(?, ?)")
 		params = append(params, ribbonPokemonId)
 		params = append(params, game)
 
 		first = false
 	}
-	_, err = ps.connection.GetDB().Exec(query, params...)
+	_, err = ps.connection.GetDB().Exec(query.String(), params...)
 	if err != nil {
 		ctx.Logger.Error(
 			"Failed to save games to ribbon pokemon",
