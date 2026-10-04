@@ -3,3 +3,6 @@ variables:
   - secret: true
     name: token
     description: ""
+  - name: host
+    value: http://localhost:8083
+    description: ""
