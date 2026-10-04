@@ -63,33 +63,9 @@ onMounted(fetchPokedex);
     <Box
       v-for="box in entries"
       :entries="box"
+      :pokedex="pokedex.name"
     />
-    <!--v-expansion-panels
-      gap="16"
-    >
-      <v-expansion-panel
-        title="Latest Events"
-      >
-        <v-expansion-panel-text>
-          <Events category="RIBBONS" :pokemon="route.params.pokemon as string"/>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
 
-    <GameInfo
-      v-for="game in pokemon.games"
-      :gameKey="game.gameKey"
-      :name="game.name"
-      :includeLink="true"
-    >
-      <template v-slot:content>
-        <Ribbons
-          :key="game.gameKey"
-          :ribbons="game.ribbons.map(ribbonKey => ribbonMap.get(ribbonKey)!).filter(ribbon => ribbon !== undefined)"
-          :pokemon="pokemon.pokemon"
-        />
-      </template>
-    </GameInfo-->
   </div>
   <div v-else>
     <p>Pokedex not found.</p>

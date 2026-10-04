@@ -16,7 +16,8 @@ export const Ribbons = {
 
 const Pokedexes = {
   GetAllPokedexes: '/api/pokedexes/v1',
-  GetPokedex: (pokedex: string) => `/api/pokedexes/v1/${pokedex}`
+  GetPokedex: (pokedex: string) => `/api/pokedexes/v1/${pokedex}`,
+  UpdatePokedex: (pokedex: string, pokedexNo: string) => `/api/pokedexes/v1/${pokedex}/entries/${pokedexNo}`
 }
 
 export const Data = {

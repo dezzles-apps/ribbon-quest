@@ -3,8 +3,10 @@ package pokedexes
 import (
 	"database/sql"
 	_ "embed"
+	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 
 	errs "dezzles-apps/rq-server/model"
 	model "dezzles-apps/rq-server/model/dto/pokedexes"
@@ -19,6 +21,15 @@ var getAllPokedexesQuery string
 
 //go:embed sql/get-pokedex-entries.sql
 var getPokedexEntries string
+
+//go:embed sql/get-pokedex-entry.sql
+var getPokedexEntry string
+
+//go:embed sql/uncatch-pokemon.sql
+var uncatchPokemon string
+
+//go:embed sql/catch-pokemon.sql
+var catchPokemon string
 
 type PokedexService struct {
 	connection *cdb.Database
@@ -88,6 +99,24 @@ func (ps *PokedexService) getPokedex(ctx *cmodel.DAContext, name string) (*model
 	return &pokedex, prefix, padding, nil
 }
 
+func (ps *PokedexService) getPokedexEntry(ctx *cmodel.DAContext, pokedex string, inputNo string, pokedexNo int) (*model.PokedexEntry, error) {
+	ctx.Logger.Info("Getting pokedexEntry", zap.String("pokedex", pokedex), zap.Int("pokedexNo", pokedexNo))
+	row := ps.connection.GetDB().QueryRow(getPokedexEntry, pokedex, pokedexNo)
+	if row.Err() != nil {
+		ctx.Logger.Info("Error getting pokedex entry", zap.String("pokedex", pokedex), zap.Int("pokedexNo", pokedexNo), zap.Error(row.Err()))
+		return nil, errs.InternalServerError
+	}
+	var entry model.PokedexEntry
+	entry.PokedexNo = inputNo
+	var tempNo int
+	err := row.Scan(&tempNo, &entry.Pokemon, &entry.SpriteRef, &entry.Caught)
+	if err != nil {
+		ctx.Logger.Info("Error scanning pokedex entry", zap.String("pokedex", pokedex), zap.Int("pokedexNo", pokedexNo), zap.Error(row.Err()))
+		return nil, errs.InternalServerError
+	}
+	return &entry, nil
+}
+
 func (ps *PokedexService) getPokedexEntries(ctx *cmodel.DAContext, pokedex *model.Pokedex, prefix string, padding int) error {
 	rows, err := ps.connection.GetDB().Query(getPokedexEntries, pokedex.Name)
 	defer rows.Close()
@@ -112,4 +141,42 @@ func (ps *PokedexService) getPokedexEntries(ctx *cmodel.DAContext, pokedex *mode
 		pokedex.Entries = append(pokedex.Entries, entry)
 	}
 	return nil
+}
+
+func (ps *PokedexService) UncatchPokemon(ctx *cmodel.DAContext, pokedex string, pokedexNo string) (*model.PokedexEntry, error) {
+	_, number, ok := strings.Cut(pokedexNo, "-")
+	if !ok {
+		return nil, errors.New("Invalid pokedexNo")
+	}
+	actualNo, err := strconv.Atoi(number)
+	if err != nil {
+		ctx.Logger.Error("Failed to get PokedexNumber", zap.String("pokedexNo", pokedexNo), zap.Error(err))
+	}
+	ctx.Logger.Info("Uncatching Pokemon", zap.String("pokedex", pokedex), zap.Int("pokedexNo", actualNo))
+	_, err = ps.connection.GetDB().Exec(uncatchPokemon, pokedex, actualNo)
+	if err != nil {
+		ctx.Logger.Error("Failed to update Entry", zap.String("pokedex", pokedex), zap.String("pokedexNo", pokedexNo), zap.Error(err))
+		return nil, errs.InternalServerError
+	}
+	ctx.Logger.Info("Uncaught Pokemon", zap.String("pokedex", pokedex), zap.Int("pokedexNo", actualNo))
+	return ps.getPokedexEntry(ctx, pokedex, pokedexNo, actualNo)
+}
+
+func (ps *PokedexService) CatchPokemon(ctx *cmodel.DAContext, pokedex string, pokedexNo string) (*model.PokedexEntry, error) {
+	_, number, ok := strings.Cut(pokedexNo, "-")
+	if !ok {
+		return nil, errors.New("Invalid pokedexNo")
+	}
+	actualNo, err := strconv.Atoi(number)
+	if err != nil {
+		ctx.Logger.Error("Failed to get PokedexNumber", zap.String("pokedexNo", pokedexNo), zap.Error(err))
+	}
+	ctx.Logger.Info("Catching Pokemon", zap.String("pokedex", pokedex), zap.Int("pokedexNo", actualNo))
+	_, err = ps.connection.GetDB().Exec(catchPokemon, pokedex, actualNo)
+	if err != nil {
+		ctx.Logger.Error("Failed to update Entry", zap.String("pokedex", pokedex), zap.String("pokedexNo", pokedexNo), zap.Error(err))
+		return nil, errs.InternalServerError
+	}
+	ctx.Logger.Info("Caught Pokemon", zap.String("pokedex", pokedex), zap.Int("pokedexNo", actualNo))
+	return ps.getPokedexEntry(ctx, pokedex, pokedexNo, actualNo)
 }

@@ -22,15 +22,17 @@ func NewPokedexController(
 	var controller = &PokedexController{
 		pokedexService: pokedexService,
 	}
-	controller.registerRoutes(router)
+	controller.registerRoutes(router, authMiddleware)
 	return controller
 }
 
-func (pc *PokedexController) registerRoutes(router *gin.Engine) {
+func (pc *PokedexController) registerRoutes(router *gin.Engine, authMiddleware *middleware.AuthMiddleware) {
 	group := router.Group("/api/pokedexes/v1")
 	{
 		group.GET("/", pc.getPokedexes)
 		group.GET("/:pokedex", pc.getPokedex)
+		group.POST("/:pokedex/entries/:pokedexNo", authMiddleware.ValidateUser, pc.catchPokemon)
+		group.DELETE("/:pokedex/entries/:pokedexNo", authMiddleware.ValidateUser, pc.uncatchPokemon)
 	}
 }
 
@@ -55,4 +57,30 @@ func (pc *PokedexController) getPokedexes(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"data": pokedexes})
+}
+
+func (pc *PokedexController) uncatchPokemon(c *gin.Context) {
+	ctx := cmodel.GetContext(c)
+	pokedex := c.Param("pokedex")
+	pokedexNo := c.Param("pokedexNo")
+	res, err := pc.pokedexService.UncatchPokemon(ctx, pokedex, pokedexNo)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": res})
+}
+
+func (pc *PokedexController) catchPokemon(c *gin.Context) {
+	ctx := cmodel.GetContext(c)
+	pokedex := c.Param("pokedex")
+	pokedexNo := c.Param("pokedexNo")
+	res, err := pc.pokedexService.CatchPokemon(ctx, pokedex, pokedexNo)
+	if err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": res})
 }
