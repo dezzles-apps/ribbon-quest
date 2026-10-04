@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS pokedex_entries (
   pokedex_id BIGINT UNSIGNED NOT NULL REFERENCES pokedexes(pokedex_id),
   caught_at TIMESTAMP NULL DEFAULT NULL,
   form_id BIGINT UNSIGNED NOT NULL REFERENCES pokemon_forms(form_id),
+  no_event_trigger BOOLEAN NOT NULL DEFAULT FALSE,
   PRIMARY KEY (pokedex_entry_id, pokedex_id)
 );
 

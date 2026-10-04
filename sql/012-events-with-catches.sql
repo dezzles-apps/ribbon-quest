@@ -1,3 +1,4 @@
+
 CREATE VIEW events_v4 as SELECT * FROM ((SELECT
   'RIBBONS' as event_category,
   'RIBBON' as event_type,
@@ -43,5 +44,6 @@ FROM pokedex_entries pe
   LEFT JOIN pokemon_data pd ON pd.pokedex_id = pf.pokedex_id
   LEFT JOIN pokedexes pokedex ON pe.pokedex_id = pokedex.pokedex_id
   WHERE pe.caught_at IS NOT NULL
+  AND pe.no_event_trigger = false
 )
 ORDER BY timestamp DESC) as events_v4;

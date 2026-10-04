@@ -104,12 +104,16 @@ onMounted(loadEvents)
                 earned the {{ item.metadata.ribbonName }} {{ item.metadata.ribbonType.toLowerCase() }} 
               </div>
               <div v-else-if="item.eventType == 'RIBBON_CATCH'" style="display: inline">
-                Caught a{{ ['A','E', 'I', 'O', 'U'].indexOf(item.metadata.pokemon[0]) == 0 ? 'n' : '' }}
+                Caught a{{ ['A','E', 'I', 'O', 'U'].indexOf(item.metadata.pokemon[0]) != -1 ? 'n' : '' }}
                 <RouterLink :to="{ name: 'ribbons-pokemon', params: { pokemon: item.metadata.pokemon }}">{{  item.metadata.pokemon }}</RouterLink>
                 <div v-if="item.metadata.nickname != item.metadata.pokemon" style="display: inline-block">
                   &nbsp;named {{ item.metadata.nickname }}
                 </div>
                 for the <RouterLink :to="{ name: 'ribbons' }">Ribbon Quest</RouterLink>
+              </div>
+              <div v-else-if="item.eventType == 'POKEDEX_CATCH'" style="display: inline;">
+                 Caught a{{ ['A','E', 'I', 'O', 'U'].indexOf(item.metadata.pokemon[0]) != -1 ? 'n' : '' }} {{  item.metadata.pokemon }} for the 
+                <RouterLink :to="{ name: 'dexofmyown-pokedex', params: { pokedex: item.metadata.pokedex }}">{{  item.metadata.pokedex }} Pokedex</RouterLink>
               </div>
               <div v-else>
                 Unknown event type: {{  item.eventType }}

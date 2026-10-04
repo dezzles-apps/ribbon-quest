@@ -9,6 +9,7 @@ const authStore = useAuthStore();
 const api = useApi();
 
 const props = defineProps<{
+  pokedex: string
   entries: PokedexEntry[]
 }>()
 
@@ -44,15 +45,14 @@ function toggleEntry(entry: PokedexEntry) {
   if (!authStore.isAuthenticated) {
     return;
   }
-  /*
-  const isLoading = loadingRibbons.value.get(ribbon.ribbonKey) || false;
+  const isLoading = loadingRibbons.value.get(entry.pokedexNo) || false;
   if (isLoading) {
     return;
   }
 
-  loadingRibbons.value.set(ribbon.ribbonKey, true);
-  let method = ribbon.achieved ? 'DELETE' : 'POST';
-  api.apiFetch(API.Ribbons.UpdateRibbon(props.pokemon, ribbon.ribbonKey), {
+  loadingRibbons.value.set(entry.pokedexNo, true);
+  let method = entry.caught ? 'DELETE' : 'POST';
+  api.apiFetch(API.Pokedexes.UpdatePokedex(props.pokedex, entry.pokedexNo), {
     method: method,
     headers: {
       'Content-Type': 'application/json'
@@ -62,17 +62,15 @@ function toggleEntry(entry: PokedexEntry) {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      let newRibbon = await response.json();
-      ribbon.achieved = newRibbon.data.achieved;
-      ribbon.achievedAt = newRibbon.data.achievedAt;
+      let newData = await response.json();
+      entry.caught = newData.data.caught;
     })
     .catch(error => {
-      console.error('Error toggling ribbon:', error);
+      console.error('Error toggling catch:', error);
     })
     .finally(() => {
-      loadingRibbons.value.set(ribbon.ribbonKey, false);
+      loadingRibbons.value.set(entry.pokedexNo, false);
     });
-    */
 }
 
 
@@ -88,18 +86,15 @@ function toggleEntry(entry: PokedexEntry) {
         class="ribbon"
         :class="getRibbonClass(entry)"
         v-for="entry in props.entries"
+        :style="{ backgroundImage: `url('${getPokemonImage(entry)}')` }"
         :key="entry.pokedexNo"
         @click="toggleEntry(entry)"
       >
         <div class="ribbon-name">
           {{ entry.pokedexNo }}
         </div>
-        <img
-          :src="getPokemonImage(entry)"
-          :alt="entry.pokemon"
-          class="pokemon-image"
-        />
-        <div class="ribbon-name">
+
+        <div class="ribbon-pokemon-name">
           {{ entry.pokemon }}
         </div>
       </div>
@@ -110,6 +105,7 @@ function toggleEntry(entry: PokedexEntry) {
 <style scoped>
 .ribbon {
   margin: 10px;
+  position: relative;
   align-items: center;
   text-align: center;
   width: 110px;
@@ -117,6 +113,9 @@ function toggleEntry(entry: PokedexEntry) {
   outline-width: 5px;
   outline-style: solid;
   border-radius: 10px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 50% auto;
 }
 
 .ribbon-loading {
@@ -128,6 +127,16 @@ function toggleEntry(entry: PokedexEntry) {
 }
 
 .ribbon-name {
+  font-weight: bold;
+  margin-right: 10px;
+  width: 100%;
+  color: darkslategray;
+}
+
+.ribbon-pokemon-name {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
   font-weight: bold;
   margin-right: 10px;
   width: 100%;
