@@ -32,7 +32,7 @@ onMounted(loadStats);
     rounded
   >
     <div class="box mb-4">
-      <h1 class="title is-4">Dezzles' Ribbon Quest</h1>
+      <h1 class="title is-4 text-center">Dezzles' Ribbon Quest</h1>
       <div class="d-flex align-center ma-auto justify-space-between" style="max-width: 300px;">
         <div class="mt-n2">
           <v-card-title>Progress</v-card-title>
@@ -102,16 +102,6 @@ onMounted(loadStats);
       </div>
       <div>
         Yeah... We're pretty light on rules for this one, but we'll see how we go.
-      </div>
-      <br />
-      <div>
-        Currently the site only displays information about the Pokemon I have selected and their ribbons,
-        but I'll be adding more features as time goes on. New features that I'm planning to add:
-        <ul>
-          <li>Ribbons by game</li>
-          <li>Event tracking (e.g. A pokemon being caught, completing a game's ribbons, being transferred to HOME)</li>
-          <li>Other features as they come to mind</li>
-        </ul>
       </div>
       <h1 class="text-center">Latest Updates</h1>
     </div>

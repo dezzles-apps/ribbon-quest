@@ -14,6 +14,11 @@ export const Ribbons = {
   GetStats: '/api/ribbons/v1/stats'
 };
 
+const Pokedexes = {
+  GetAllPokedexes: '/api/pokedexes/v1',
+  GetPokedex: (pokedex: string) => `/api/pokedexes/v1/${pokedex}`
+}
+
 export const Data = {
   GetPokemonData: '/api/data/v1/pokemon'
 }
@@ -27,4 +32,5 @@ export default {
   Data,
   Ribbons,
   Events,
+  Pokedexes,
 }

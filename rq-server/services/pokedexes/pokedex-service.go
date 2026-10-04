@@ -45,7 +45,7 @@ func (ps *PokedexService) GetPokedexes(ctx *cmodel.DAContext) ([]model.Pokedex, 
 		dex := model.Pokedex{}
 		var total sql.NullInt32
 		var caught sql.NullInt32
-		err = rows.Scan(&dex.Name, &caught, &total)
+		err = rows.Scan(&dex.Name, &caught, &total, &dex.Image, &dex.Notes)
 		if err != nil {
 			ctx.Logger.Error("Scanning pokedexes failed", zap.Error(err))
 			return nil, errs.InternalServerError
@@ -75,8 +75,8 @@ func (ps *PokedexService) getPokedex(ctx *cmodel.DAContext, name string) (*model
 	var pokedex model.Pokedex
 	var prefix string
 	var padding int
-	row := ps.connection.GetDB().QueryRow("SELECT name, prefix, padding FROM pokedexes WHERE name = ?", name)
-	err := row.Scan(&pokedex.Name, &prefix, &padding)
+	row := ps.connection.GetDB().QueryRow("SELECT name, prefix, padding, image, notes FROM pokedexes WHERE name = ?", name)
+	err := row.Scan(&pokedex.Name, &prefix, &padding, &pokedex.Image, &pokedex.Notes)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, "", 0, errs.PokedexNotFound
