@@ -16,7 +16,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
-	"go.uber.org/zap"
 )
 
 var monitor = monitoring.Monitoring{}
@@ -37,7 +36,7 @@ func newResource() *resource.Resource {
 func main() {
 	monitor.Initialise()
 	defer monitor.Shutdown()
-	monitor.Logger, _ = zap.NewProduction()
+	//monitor.Logger, _ = zap.NewProduction()
 	monitor.Logger.Info("Starting app")
 	config, err := cmodel.LoadConfig[model.AppConfig]()
 	if err != nil {
