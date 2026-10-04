@@ -54,6 +54,7 @@ func main() {
 
 	initialisers.InitialiseRibbons(router, authMiddleware, database)
 	initialisers.InitialiseData(router, database)
+	initialisers.InitialisePokedex(router, authMiddleware, database)
 
 	controllers.NewAuthController(router, &config.App, userService)
 	controllers.NewEventsController(router, *eventService)

@@ -37,6 +37,7 @@ func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 		var ribbonName sql.NullString
 		var ribbonCategory sql.NullString
 		var ribbonType sql.NullString
+		var pokedex sql.NullString
 		event := dto.Event{}
 		err := rows.Scan(
 			&event.Category,
@@ -48,6 +49,7 @@ func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 			&ribbonName,
 			&ribbonCategory,
 			&ribbonType,
+			&pokedex,
 		)
 		if err != nil {
 			return nil, err
@@ -70,6 +72,9 @@ func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 		}
 		if ribbonType.Valid {
 			event.MetaData["ribbonType"] = ribbonType.String
+		}
+		if pokedex.Valid {
+			event.MetaData["pokedex"] = pokedex.String
 		}
 		eventList = append(eventList, event)
 	}
@@ -102,7 +107,7 @@ func (es *EventService) GetLatestEvents(ctx *cmodel.DAContext, date string) ([]d
 func (es *EventService) GetEvents(ctx *cmodel.DAContext, date string, category string, pokemon string) ([]dto.Event, error) {
 	var query strings.Builder
 	var params []any
-	query.WriteString("SELECT * FROM events_v3 WHERE 1")
+	query.WriteString("SELECT * FROM events_v4 WHERE 1")
 
 	if date != "" {
 		parsedDate, err := time.Parse(time.RFC3339, date)
