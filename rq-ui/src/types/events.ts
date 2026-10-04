@@ -11,6 +11,7 @@ interface EventMetadata {
   ribbonName: string
   ribbonCategory: string
   ribbonType: string
+  pokedex: string
 }
 
 export type {

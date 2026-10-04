@@ -28,6 +28,7 @@ function logout() {
     v-model="drawer"
     :location="$vuetify.display.mobile ? 'bottom' : undefined"
     temporary
+    width="300"
   >
     <v-list>
       <v-list-item href="/">Home</v-list-item>
@@ -43,6 +44,24 @@ function logout() {
         <v-list-item href="/ribbons">Info</v-list-item>
         <v-list-item href="/ribbons/games">By Game</v-list-item>
         <v-list-item href="/ribbons/pokemon">By Pokemon</v-list-item>
+      </v-list-group>
+      <v-list-group>
+        <template v-slot:activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-notebook"
+            title="A Dex of My Own"
+          ></v-list-item>
+        </template>
+        <v-list-item
+          href="/dexofmyown"
+          title="Info"
+        />
+        <v-list-item
+          href="/dexofmyown/pokedexes"
+          title="Pokedexes"
+        />
+
       </v-list-group>
       <v-divider />
       <v-list-item

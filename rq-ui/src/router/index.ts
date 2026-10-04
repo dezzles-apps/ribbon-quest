@@ -132,6 +132,42 @@ const router = createRouter({
         }
       }
     },
+    {
+      path: '/dexofmyown',
+      name: 'dexofmyown-info',
+      component: () => import('@/pages/pokedexes/InfoView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'home',
+          title: 'Dex of My Own',
+          href: '/dexofmyown'
+        }
+      }
+    },
+    {
+      path: '/dexofmyown/pokedexes',
+      name: 'dexofmyown-pokedexes',
+      component: () => import('@/pages/pokedexes/PokedexesView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'dexofmyown-info',
+          title: 'Pokedexes',
+          href: '/dexofmyown/pokedexes'
+        }
+      }
+    },
+    {
+      path: '/dexofmyown/pokedexes/:pokedex',
+      name: 'dexofmyown-pokedex',
+      component: () => import('@/pages/pokedexes/PokedexView.vue'),
+      meta: {
+        crumbs: {
+          parent: 'dexofmyown-pokedexes',
+          title: (i: any) => (`${i.pokedex}`),
+          href: (i: any) => (`/dexofmyown/pokedexes/${i.pokedex}`)
+        }
+      }
+    }
   ],
 })
 
