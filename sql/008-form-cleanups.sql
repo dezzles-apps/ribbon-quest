@@ -26,7 +26,7 @@ INSERT INTO pokemon_forms (form_id, pokedex_id, form_name, sprite_ref, is_form) 
   (10023, 88, 'Alolan', 'grimer-alolan', 1),
   (10024, 89, 'Alolan', 'muk-alolan', 1),
   (10025, 100, 'Hisuian', 'voltorb-hisuian', 1),
-  (10026, 101, 'Hisuian', 'voltorb-hisuian', 1),
+  (10026, 101, 'Hisuian', 'electrode-hisuian', 1),
   (10027, 103, 'Alolan', 'exeggutor-alolan', 1),
   (10028, 105, 'Alolan', 'marowak-alolan', 1),
   (10029, 110, 'Galarian', 'weezing-galarian', 1),
@@ -50,7 +50,7 @@ INSERT INTO pokemon_forms (form_id, pokedex_id, form_name, sprite_ref, is_form) 
   (10047, 413, 'Sandy', 'wormadam-sandy', 1),
   (10048, 413, 'Trash', 'wormadam-trash', 1),
   (10049, 422, 'West Sea', 'shellos-west', 1),
-  (10050, 422, 'East Sea', 'gastrodon-east', 1),
+  (10050, 423, 'East Sea', 'gastrodon-east', 1),
   (10051, 503, 'Hisuian', 'samurott-hisuian', 1),
   (10052, 521, 'Female', 'unfezant-f', 1),
   (10053, 549, 'Hisuian', 'lilligant-hisuian', 1),
@@ -59,7 +59,7 @@ INSERT INTO pokemon_forms (form_id, pokedex_id, form_name, sprite_ref, is_form) 
   (10056, 555, 'Galarian', 'darmanitan-galarian-standard', 1),
   (10057, 562, 'Galarian', 'yamask-galarian', 1),
   (10058, 570, 'Hisuian', 'zorua-hisuian', 1),
-  (10059, 571, 'Hisuian', 'zorua-hisuian', 1),
+  (10059, 571, 'Hisuian', 'zoroark-hisuian', 1),
   (10060, 592, 'Male', 'frillish', 1),
   (10061, 593, 'Male', 'jellicent', 1),
   (10062, 618, 'Galarian', 'stunfisk-galarian', 1),
@@ -130,7 +130,7 @@ UPDATE ribbon_pokemon rp SET form_id = 1;
 
 DELETE FROM pokemon_forms WHERE form_id IN (20, 22, 29, 31, 33, 43, 45, 58, 60, 62, 63, 65, 71, 73, 89, 91, 93, 95, 97, 99, 101, 105, 111, 113, 125, 127, 130, 134, 140, 153, 160, 161, 162, 179, 181, 183, 195, 233, 239, 252, 257, 265, 307, 309, 458, 459, 461, 462, 472, 473, 555, 574, 603, 605, 606, 612, 620, 629, 631, 653, 655, 681, 692, 731, 732, 733, 734, 735, 736, 737, 738, 739, 740, 741, 742, 743, 744, 745, 746, 747, 748, 749, 753, 754, 755, 756, 758, 759, 760, 761, 762, 764, 765, 766, 767, 775, 803, 805, 813, 825, 847, 848, 878, 879, 880, 881, 882, 883, 911, 960, 988, 1005, 1007, 1016, 1018, 1033, 1043, 1050, 1051, 1052, 1100, 1101, 1106);
 
-UPDATE pokemon_forms SET form_id = pokedex_id WHERE is_form = 0
+UPDATE pokemon_forms SET form_id = pokedex_id WHERE is_form = 0;
 
 -- Manual form fixes
 UPDATE ribbon_pokemon SET form_id = pokedex_id;
