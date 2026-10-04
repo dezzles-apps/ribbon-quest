@@ -36,6 +36,7 @@ func newResource() *resource.Resource {
 func main() {
 	monitor.Initialise()
 	defer monitor.Shutdown()
+	//monitor.Logger, _ = zap.NewProduction()
 	monitor.Logger.Info("Starting app")
 	config, err := cmodel.LoadConfig[model.AppConfig]()
 	if err != nil {
@@ -54,6 +55,7 @@ func main() {
 
 	initialisers.InitialiseRibbons(router, authMiddleware, database)
 	initialisers.InitialiseData(router, database)
+	initialisers.InitialisePokedex(router, authMiddleware, database)
 
 	controllers.NewAuthController(router, &config.App, userService)
 	controllers.NewEventsController(router, *eventService)
