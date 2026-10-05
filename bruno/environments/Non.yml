@@ -1,0 +1,5 @@
+name: Non
+variables:
+  - name: host
+    value: https://non.ribbon-quest.dezzles-test.com
+    description: ""
