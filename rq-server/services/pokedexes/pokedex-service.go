@@ -78,7 +78,6 @@ func (ps *PokedexService) GetPokedex(ctx *cmodel.DAContext, name string) (*model
 	if err != nil {
 		return nil, err
 	}
-	err = ps.getPokedexEntries(ctx, result, prefix, padding)
 	if err := ps.getPokedexEntries(ctx, result, prefix, padding); err != nil {
 		return nil, err
 	}
