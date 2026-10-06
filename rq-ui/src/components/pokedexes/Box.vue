@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
+import { isEntryVisible } from '@/composables/box';
 
 const authStore = useAuthStore();
 const api = useApi();
@@ -11,6 +12,7 @@ const api = useApi();
 const props = defineProps<{
   pokedex: string
   entries: PokedexEntry[]
+  filter: string
 }>()
 
 
@@ -24,6 +26,9 @@ const loadingRibbons = ref(new Map<string, boolean>());
 
 function getRibbonClass(entry: PokedexEntry): string[] {
   const classes: string[] = [];
+  if (!isEntryVisible(props.filter, entry.pokemon)) {
+    classes.push('ribbon-low-opacity')
+  }
   if (entry.caught) {
     classes.push('ribbon-achieved');
   } else {
@@ -37,7 +42,7 @@ function getRibbonClass(entry: PokedexEntry): string[] {
     }
   }
   classes.push(`ribbon-stats`);
-
+  
   return classes;
 }
 
@@ -170,5 +175,8 @@ function toggleEntry(entry: PokedexEntry) {
 .ribbon-shopping {
   background-color: #F6CF71;
   outline-color: #d5a32c;
+}
+.ribbon-low-opacity {
+  opacity: 10%;
 }
 </style>

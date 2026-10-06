@@ -8,14 +8,14 @@ import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
 import Loading from '@/components/Loading.vue';
 import PokedexInfo from '@/components/pokedexes/PokedexInfo.vue';
-
+import { entryVisible } from '@/composables/box';
 const route = useRoute();
 const loading = ref(true);
 const { apiFetch } = useApi();
 
 const pokedex = ref<Pokedex | null>(null);
-const entries = ref<PokedexEntry[][]>([])
-
+const entries = ref<PokedexEntry[][]>([]);
+const filter = ref('');
 
 function createEntries(input: PokedexEntry[]) {
   let result = [] as PokedexEntry[][]
@@ -46,6 +46,14 @@ async function fetchPokedex() {
   }
 }
 
+function isVisible(box : PokedexEntry[]) {
+  let search = filter.value.trim()
+  if (!search) {
+    return true
+  }
+  return box.map((v : PokedexEntry) => v.pokemon).filter(entryVisible(search)).length > 0
+}
+
 onMounted(fetchPokedex);
 </script>
 
@@ -60,11 +68,21 @@ onMounted(fetchPokedex);
         :includeLink="false"
       />
     </section>
-    <Box
+    <v-text-field
+      label="Filter"
+      prepend-inner-icon="mdi-map-marker"
+      v-model="filter"
+    ></v-text-field>
+    <div
       v-for="box in entries"
-      :entries="box"
-      :pokedex="pokedex.name"
-    />
+    >
+      <Box
+        v-if="isVisible(box)"
+        :entries="box"
+        :pokedex="pokedex.name"
+        :filter="filter"
+      />
+    </div>
 
   </div>
   <div v-else>
