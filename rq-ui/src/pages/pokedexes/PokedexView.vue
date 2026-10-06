@@ -16,6 +16,7 @@ const { apiFetch } = useApi();
 const pokedex = ref<Pokedex | null>(null);
 const entries = ref<PokedexEntry[][]>([]);
 const filter = ref('');
+const hideCompleteBoxes = ref(false);
 
 function createEntries(input: PokedexEntry[]) {
   let result = [] as PokedexEntry[][]
@@ -47,6 +48,9 @@ async function fetchPokedex() {
 }
 
 function isVisible(box : PokedexEntry[]) {
+  if (hideCompleteBoxes.value) {
+    return box.filter(v => v.caught).length != box.length
+  }
   let search = filter.value.trim()
   if (!search) {
     return true
@@ -73,6 +77,7 @@ onMounted(fetchPokedex);
       prepend-inner-icon="mdi-map-marker"
       v-model="filter"
     ></v-text-field>
+    <v-checkbox label="Hide Complete Boxes" v-model="hideCompleteBoxes"></v-checkbox>
     <div
       v-for="box in entries"
     >
