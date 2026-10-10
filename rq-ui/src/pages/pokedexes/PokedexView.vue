@@ -48,14 +48,15 @@ async function fetchPokedex() {
 }
 
 function isVisible(box : PokedexEntry[]) {
+  let shouldDisplay = true
   if (hideCompleteBoxes.value) {
-    return box.filter(v => v.caught).length != box.length
+    shouldDisplay = box.filter(v => v.caught).length != box.length
   }
   let search = filter.value.trim()
-  if (!search) {
-    return true
+  if (search) {
+    shouldDisplay = shouldDisplay && box.map((v : PokedexEntry) => v.pokemon).filter(entryVisible(search)).length > 0
   }
-  return box.map((v : PokedexEntry) => v.pokemon).filter(entryVisible(search)).length > 0
+  return shouldDisplay
 }
 
 onMounted(fetchPokedex);
