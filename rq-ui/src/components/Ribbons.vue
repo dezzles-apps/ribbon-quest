@@ -4,14 +4,15 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
-
+import type { RibbonFilter } from '@/types/filters';
 const authStore = useAuthStore();
 const api = useApi();
 
 const props = defineProps<{
   title?: string;
   pokemon: string;
-  ribbons: PokemonRibbon[]
+  ribbons: PokemonRibbon[];
+  filter?: RibbonFilter
 }>()
 
 const loadingRibbons = ref(new Map<string, boolean>());
@@ -69,6 +70,15 @@ function toggleRibbon(ribbon: PokemonRibbon) {
     });
 }
 
+function showRibbon(ribbon : PokemonRibbon) {
+  const filter = props.filter;
+  if (!filter)
+    return true;
+  if (filter.hideCompleteRibbons) {
+    return !ribbon.achieved;
+  }
+  return true;
+}
 
 </script>
 
@@ -81,7 +91,7 @@ function toggleRibbon(ribbon: PokemonRibbon) {
       <div
         class="ribbon"
         :class="getRibbonClass(ribbon)"
-        v-for="ribbon in props.ribbons"
+        v-for="ribbon in props.ribbons.filter(showRibbon)"
         :key="ribbon.ribbonKey"
         @click="toggleRibbon(ribbon)"
       >
