@@ -26,13 +26,14 @@ const loadingRibbons = ref(new Map<string, boolean>());
 
 function getRibbonClass(entry: PokedexEntry): string[] {
   const classes: string[] = [];
+  let mod = ''
   if (!isEntryVisible(props.filter, entry.pokemon)) {
-    classes.push('ribbon-low-opacity')
+    mod = '-low-opacity'
   }
   if (entry.caught) {
-    classes.push('ribbon-achieved');
+    classes.push('ribbon-achieved' + mod);
   } else {
-    classes.push('ribbon-not-achieved');
+    classes.push('ribbon-not-achieved' + mod);
   }
   if (authStore.isAuthenticated) {
     if (loadingRibbons.value.get(entry.pokedexNo)) {
@@ -148,8 +149,16 @@ function toggleEntry(entry: PokedexEntry) {
   color: darkslategray;
 }
 
+.ribbon-achieved-low-opacity {
+  opacity: 0.5;
+}
+
 .ribbon-not-achieved {
   opacity: 0.5;
+}
+
+.ribbon-not-achieved-low-opacity {
+  opacity: 0.20;
 }
 
 .ribbon-julie {
