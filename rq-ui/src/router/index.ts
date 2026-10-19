@@ -7,6 +7,8 @@
 // Composables
 import { createRouter, createWebHistory } from 'vue-router'
 import Index from '@/pages/HomeView.vue'
+import ShinyCatches from '@/pages/shinies/ShinyCatches.vue'
+import ShinyStats from '@/pages/shinies/ShinyStats.vue'
 import { Games } from '@/data/games';
 
 const router = createRouter({
@@ -165,6 +167,30 @@ const router = createRouter({
           parent: 'dexofmyown-pokedexes',
           title: (i: any) => (`${i.pokedex}`),
           href: (i: any) => (`/dexofmyown/pokedexes/${i.pokedex}`)
+        }
+      }
+    },
+    {
+      path: '/shinies',
+      name: 'shiny-stats',
+      component: ShinyStats,
+      meta: {
+        crumbs: {
+          parent: 'home',
+          title: 'Shiny Stats',
+          href: '/shinies'
+        }
+      }
+    },
+    {
+      path: '/shinies/catches',
+      name: 'shiny-catches',
+      component: ShinyCatches,
+      meta: {
+        crumbs: {
+          parent: 'shiny-stats',
+          title: 'Shiny Catches',
+          href: '/shinies/catches'
         }
       }
     }

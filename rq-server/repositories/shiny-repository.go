@@ -54,9 +54,10 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 		var gameKey string
 		var natureKey string
 		var characteristicKey string
+		var methodKey string
 		err = rows.Scan(&entry.ShinyId, &pokedexNo, &entry.Species.Name, &entry.Species.Form, &entry.Species.ImageRef,
 			&entry.Details.CaughtAt, &natureKey, &characteristicKey, &entry.Details.Level,
-			&entry.Details.Notes, &gameKey,
+			&entry.Details.Notes, &gameKey, &methodKey,
 		)
 		if err != nil {
 			ctx.Logger.Info("Error getting shinies", zap.Error(err))
@@ -69,7 +70,7 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 		if game, err := repo.common.GetGame(gameKey); err != nil {
 			ctx.Logger.Warn("Failed to map game", zap.String("gameKey", gameKey), zap.Error(err))
 		} else {
-			entry.Details.Game = *game
+			entry.Details.Game = game
 		}
 
 		// Map Nature
@@ -86,6 +87,12 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 			entry.Details.Characteristic = *characteristic
 		}
 
+		// Map Method
+		if method, err := repo.common.GetMethod(methodKey); err != nil {
+			ctx.Logger.Warn("Failed to map method", zap.String("methodKey", methodKey), zap.Error(err))
+		} else {
+			entry.Details.Method = method
+		}
 		shinies = append(shinies, entry)
 	}
 	return shinies, nil

@@ -64,6 +64,25 @@ function logout() {
 
       </v-list-group>
       <v-divider />
+      <v-list-group>
+        <template v-slot:activator="{ props }">
+          <v-list-item
+            v-bind="props"
+            prepend-icon="mdi-shimmer"
+            title="Shinies"
+          ></v-list-item>
+        </template>
+        <v-list-item
+          href="/shinies"
+          title="Stats"
+        />
+        <v-list-item
+          href="/shinies/catches"
+          title="Shinies Caught"
+        />
+
+      </v-list-group>
+      <v-divider />
       <v-list-item
         href="/login"
         v-if="!authStore.isAuthenticated"
