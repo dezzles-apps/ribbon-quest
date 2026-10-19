@@ -34,6 +34,7 @@ const headers = [
   { title: 'Method', value: 'details.method.value' },
   { title: 'Nature', value: 'details.nature.value' },
   { title: 'Characteristic', value: 'details.characteristic.value' },
+  { title: 'Gender', value: 'details.gender.value' },
   { title: 'Game', value: 'details.game.value' },
   { title: 'Caught At', key: 'details.caughtAt', value: (item:ShinyPokemon) => toLocal(item.details.caughtAt) }
 ] 

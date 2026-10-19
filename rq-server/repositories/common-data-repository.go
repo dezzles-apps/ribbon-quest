@@ -10,10 +10,12 @@ type CommonDataRepository interface {
 	GetNatures() ([]model.KeyValuePair, error)
 	GetGames() ([]model.KeyValuePair, error)
 	GetMethods() ([]model.KeyValuePair, error)
+	GetGenders() ([]model.KeyValuePair, error)
 	GetCharacteristic(key string) (*model.KeyValuePair, error)
 	GetNature(key string) (*model.KeyValuePair, error)
 	GetGame(key string) (*model.KeyValuePair, error)
 	GetMethod(key string) (*model.KeyValuePair, error)
+	GetGender(key string) (*model.KeyValuePair, error)
 }
 
 type StaticCommonDataRepository struct {
@@ -21,6 +23,7 @@ type StaticCommonDataRepository struct {
 	natures         []model.KeyValuePair
 	games           []model.KeyValuePair
 	methods         []model.KeyValuePair
+	genders         []model.KeyValuePair
 }
 
 func NewCommonDataService() CommonDataRepository {
@@ -29,6 +32,7 @@ func NewCommonDataService() CommonDataRepository {
 	cds.loadNatures()
 	cds.loadGames()
 	cds.loadMethods()
+	cds.loadGenders()
 	return cds
 }
 
@@ -46,6 +50,10 @@ func (cds *StaticCommonDataRepository) GetGames() ([]model.KeyValuePair, error) 
 
 func (cds *StaticCommonDataRepository) GetMethods() ([]model.KeyValuePair, error) {
 	return cds.methods, nil
+}
+
+func (cds *StaticCommonDataRepository) GetGenders() ([]model.KeyValuePair, error) {
+	return cds.genders, nil
 }
 
 func (cds *StaticCommonDataRepository) GetGame(key string) (*model.KeyValuePair, error) {
@@ -82,6 +90,15 @@ func (cds *StaticCommonDataRepository) GetNature(key string) (*model.KeyValuePai
 		}
 	}
 	return nil, &errors.InvalidNature
+}
+
+func (cds *StaticCommonDataRepository) GetGender(key string) (*model.KeyValuePair, error) {
+	for i, n := range cds.genders {
+		if n.Key == key {
+			return &cds.genders[i], nil
+		}
+	}
+	return nil, &errors.InvalidGender
 }
 
 func (cds *StaticCommonDataRepository) loadNatures() {
@@ -189,5 +206,13 @@ func (cds *StaticCommonDataRepository) loadMethods() {
 		{Key: "SANDWICH", Value: "Sandwich Hunting"},
 		{Key: "SV_MASS_OUTBREAK", Value: "Scarlet/Violet Mass Outbreaks"},
 		{Key: "SPARKLING_DONUT", Value: "Sparkling Donut"},
+	}
+}
+
+func (cds *StaticCommonDataRepository) loadGenders() {
+	cds.genders = []model.KeyValuePair{
+		{Key: "M", Value: "Male"},
+		{Key: "F", Value: "Female"},
+		{Key: "U", Value: "Unknown"},
 	}
 }

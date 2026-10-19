@@ -10,7 +10,8 @@ SELECT
   s.level,
   s.notes,
   s.game,
-  s.method
+  s.method,
+  s.gender
 FROM shinies s
 LEFT JOIN pokemon_forms pf ON pf.form_id = s.form_id
 LEFT JOIN pokemon_data pd ON pd.pokedex_id = pf.pokedex_id

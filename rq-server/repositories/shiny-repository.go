@@ -55,9 +55,10 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 		var natureKey string
 		var characteristicKey string
 		var methodKey string
+		var genderKey string
 		err = rows.Scan(&entry.ShinyId, &pokedexNo, &entry.Species.Name, &entry.Species.Form, &entry.Species.ImageRef,
 			&entry.Details.CaughtAt, &natureKey, &characteristicKey, &entry.Details.Level,
-			&entry.Details.Notes, &gameKey, &methodKey,
+			&entry.Details.Notes, &gameKey, &methodKey, &genderKey,
 		)
 		if err != nil {
 			ctx.Logger.Info("Error getting shinies", zap.Error(err))
@@ -93,6 +94,14 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 		} else {
 			entry.Details.Method = method
 		}
+
+		// Map Gender
+		if gender, err := repo.common.GetGender(genderKey); err != nil {
+			ctx.Logger.Warn("Failed to map gender", zap.String("genderKey", genderKey), zap.Error(err))
+		} else {
+			entry.Details.Gender = gender
+		}
+
 		shinies = append(shinies, entry)
 	}
 	return shinies, nil
