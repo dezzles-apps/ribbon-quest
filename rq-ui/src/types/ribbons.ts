@@ -30,6 +30,7 @@ interface CatchDetails {
   game: KeyValuePair
   level: number
   method: KeyValuePair
+  gender: KeyValuePair
 }
 
 interface Pokemon extends PokemonDetails {

@@ -21,6 +21,7 @@ type CatchDetails struct {
 	Notes          string              `json:"notes"`
 	Shiny          bool                `json:"shiny"`
 	Game           *model.KeyValuePair `json:"game"`
+	Gender         *model.KeyValuePair `json:"gender"`
 	Method         *model.KeyValuePair `json:"method"`
 }
 
