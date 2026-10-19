@@ -29,7 +29,7 @@ interface CatchDetails {
   shiny: boolean
   game: KeyValuePair
   level: number
-
+  method: KeyValuePair
 }
 
 interface Pokemon extends PokemonDetails {
@@ -98,5 +98,6 @@ export type {
   PokemonRibbon,
   PokemonGame,
   PokemonStats,
-  RibbonStats
+  RibbonStats,
+  ShinyPokemon
 }

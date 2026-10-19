@@ -13,14 +13,15 @@ type PokemonSpecies struct {
 }
 
 type CatchDetails struct {
-	Nickname       string             `json:"nickname"`
-	CaughtAt       *time.Time         `json:"caughtAt"`
-	Nature         model.KeyValuePair `json:"nature"`
-	Characteristic model.KeyValuePair `json:"characteristic"`
-	Level          int                `json:"level"`
-	Notes          string             `json:"notes"`
-	Shiny          bool               `json:"shiny"`
-	Game           model.KeyValuePair `json:"game"`
+	Nickname       string              `json:"nickname"`
+	CaughtAt       *time.Time          `json:"caughtAt"`
+	Nature         model.KeyValuePair  `json:"nature"`
+	Characteristic model.KeyValuePair  `json:"characteristic"`
+	Level          int                 `json:"level"`
+	Notes          string              `json:"notes"`
+	Shiny          bool                `json:"shiny"`
+	Game           *model.KeyValuePair `json:"game"`
+	Method         *model.KeyValuePair `json:"method"`
 }
 
 type Pokemon struct {

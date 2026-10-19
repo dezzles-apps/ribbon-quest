@@ -4,12 +4,14 @@ SELECT
   pd.species,
   pf.form_name,
   pf.sprite_ref,
-  s.catch_time,
+  s.caught_at,
   s.nature,
   s.characteristic,
   s.level,
   s.notes,
-  s.game
+  s.game,
+  s.method
 FROM shinies s
 LEFT JOIN pokemon_forms pf ON pf.form_id = s.form_id
 LEFT JOIN pokemon_data pd ON pd.pokedex_id = pf.pokedex_id
+ORDER BY caught_at DESC
