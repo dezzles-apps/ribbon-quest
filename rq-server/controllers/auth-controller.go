@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"dezzles-apps/rq-server/interfaces"
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/services"
 
@@ -17,21 +18,18 @@ type AuthController struct {
 	userService *services.UserService
 }
 
-func NewAuthController(
-	router *gin.Engine,
-	config *model.AppConfig,
-	userService *services.UserService,
-) *AuthController {
+func (ac *AuthController) Initialise(
+	ctx interfaces.ControllerInitContext,
+) {
 	var controller = &AuthController{
-		config:      config,
-		userService: userService,
+		config:      ctx.Config(),
+		userService: ctx.Services().Users,
 	}
-	controller.registerRoutes(router)
-	return controller
+	controller.registerRoutes(ctx)
 }
 
-func (ac *AuthController) registerRoutes(router *gin.Engine) {
-	authGroup := router.Group("/api/auth/v1")
+func (ac *AuthController) registerRoutes(ctx interfaces.ControllerInitContext) {
+	authGroup := ctx.Router().Group("/api/auth/v1")
 	{
 		authGroup.POST("/register", ac.register)
 		authGroup.POST("/login", ac.login)
@@ -67,7 +65,7 @@ func (ac *AuthController) login(c *gin.Context) {
 	}
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":  input.Username,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"exp": time.Now().Add(time.Hour * 72).Unix(),
 	})
 
 	token, err := generateToken.SignedString([]byte(ac.config.JwtSecret))

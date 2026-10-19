@@ -55,11 +55,11 @@ function getPokemonImage(): string {
           <tr v-if="props.details.details.notes">
             <td colspan="2">{{ props.details.details.notes }}</td>
           </tr>
-          <tr v-if="props.details.details.nature">
-            <td>{{props.details.details.nickname }} is {{ props.details.details.nature ?? 'Unknown' }}</td>
+          <tr v-if="props.details.details.nature.value">
+            <td>{{props.details.details.nickname }} is {{ props.details.details.nature.value ?? 'Unknown' }}</td>
           </tr>
-          <tr v-if="props.details.details.characteristic">
-            <td colspan="2">{{ props.details.details.characteristic }}</td>
+          <tr v-if="props.details.details.characteristic.value">
+            <td colspan="2">{{ props.details.details.characteristic.value }}</td>
           </tr>
           <tr v-if="props.details.details.caughtAt">
             <td>Caught at:</td>

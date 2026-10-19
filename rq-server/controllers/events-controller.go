@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"dezzles-apps/rq-server/interfaces"
 	"dezzles-apps/rq-server/services"
 	"time"
 
@@ -15,18 +16,17 @@ type EventsController struct {
 	eventService *services.EventService
 }
 
-func NewEventsController(
-	router *gin.Engine,
-	eventService services.EventService,
+func (ec *EventsController) Initialise(
+	ctx interfaces.ControllerInitContext,
 ) {
 	controller := EventsController{
-		eventService: &eventService,
+		eventService: ctx.Services().Events,
 	}
-	controller.registerRoutes(router)
+	controller.registerRoutes(ctx)
 }
 
-func (ec *EventsController) registerRoutes(router *gin.Engine) {
-	router.GET("/api/events/v1", ec.getEvents)
+func (ec *EventsController) registerRoutes(ctx interfaces.ControllerInitContext) {
+	ctx.Router().GET("/api/events/v1", ec.getEvents)
 }
 
 func (ec *EventsController) getEvents(c *gin.Context) {

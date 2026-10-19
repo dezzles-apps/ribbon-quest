@@ -1,3 +1,5 @@
+import type { KeyValuePair } from './data'
+
 interface PokemonDetails {
   pokemon: string
   species: PokemonSpecies
@@ -11,14 +13,22 @@ interface PokemonSpecies {
   imageRef: string
 }
 
+interface ShinyPokemon {
+  shinyId: number
+  species: PokemonSpecies
+  details: CatchDetails
+}
+
 interface CatchDetails {
   nickname: string
   caughtAt: string
   caught: boolean
-  nature: string
+  nature: KeyValuePair
   notes: string
-  characteristic: string
+  characteristic: KeyValuePair
   shiny: boolean
+  game: KeyValuePair
+  level: number
 
 }
 
