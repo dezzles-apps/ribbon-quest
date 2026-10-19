@@ -2,9 +2,9 @@ package main
 
 import (
 	"dezzles-apps/rq-server/controllers"
-	"dezzles-apps/rq-server/initialisers"
 	"dezzles-apps/rq-server/middleware"
 	"dezzles-apps/rq-server/model"
+	"dezzles-apps/rq-server/repositories"
 	"dezzles-apps/rq-server/services"
 	"os"
 
@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel/sdk/resource"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
+	"go.uber.org/zap"
 )
 
 var monitor = monitoring.Monitoring{}
@@ -36,7 +37,7 @@ func newResource() *resource.Resource {
 func main() {
 	monitor.Initialise()
 	defer monitor.Shutdown()
-	//monitor.Logger, _ = zap.NewProduction()
+	monitor.Logger, _ = zap.NewProduction()
 	monitor.Logger.Info("Starting app")
 	config, err := cmodel.LoadConfig[model.AppConfig]()
 	if err != nil {
@@ -53,12 +54,10 @@ func main() {
 	monitor.ConfigureGinRouter(router)
 	router.Use(ErrorHandler())
 
-	initialisers.InitialiseRibbons(router, authMiddleware, database)
-	initialisers.InitialiseData(router, database)
-	initialisers.InitialisePokedex(router, authMiddleware, database)
-
-	controllers.NewAuthController(router, &config.App, userService)
-	controllers.NewEventsController(router, *eventService)
+	repoContext := repositories.InitaliseRepositories(database)
+	serviceContext := services.ServiceContext{}
+	serviceContext.Initialise(database, *repoContext)
+	controllers.InitialiseControllers(router, authMiddleware, &config.App, &serviceContext)
 	router.Run(":8083")
 }
 

@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS shinies (
+  shiny_id SERIAL PRIMARY KEY,
+  form_id BIGINT UNSIGNED NOT NULL REFERENCES pokemon_forms(form_id),
+  level INT NOT NULL,
+  game VARCHAR(64) NOT NULL,
+  method VARCHAR(64) NOT NULL,
+  characteristic VARCHAR(64) NOT NULL,
+  nature VARCHAR(64) NOT NULL,
+  catch_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  notes VARCHAR(255) DEFAULT ""
+)

@@ -99,9 +99,9 @@ function getSnackInfo(details: Pokemon) : SnackbarDetails {
 function syncDetails(pokemon: Pokemon, data: Pokemon) {
   pokemon.details.caughtAt = data.details.caughtAt;
   pokemon.details.nickname = data.details.nickname ?? '';
-  pokemon.details.nature = data.details.nature ?? '';
+  pokemon.details.nature = data.details.nature ?? {};
   pokemon.details.shiny = data.details.shiny?? false;
-  pokemon.details.characteristic = data.details.characteristic?? '';
+  pokemon.details.characteristic = data.details.characteristic?? {};
   pokemon.details.notes = data.details.notes?? '';
   pokemon.games = data.games;
 }
@@ -140,8 +140,8 @@ function updatePokemon(pokemon: Pokemon) {
       },
       body: JSON.stringify({
         shiny: pokemon.details.shiny,
-        nature: pokemon.details.nature,
-        characteristic: pokemon.details.characteristic,
+        nature: pokemon.details.nature.value,
+        characteristic: pokemon.details.characteristic.value,
         nickname: pokemon.details.nickname,
         notes: pokemon.details.notes
       })
@@ -195,12 +195,12 @@ onMounted(fetchData);
       ></v-text-field>
       <v-select
         label="Nature"
-        v-model="pokemon.details.nature"
+        v-model="pokemon.details.nature.value"
         :items="natures"
       ></v-select>
       <v-text-field
         label="Characteristic"
-        v-model="pokemon.details.characteristic"
+        v-model="pokemon.details.characteristic.value"
         type="text"
       ></v-text-field>
       <v-textarea

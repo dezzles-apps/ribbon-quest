@@ -1,6 +1,7 @@
 package ribbons
 
 import (
+	"dezzles-apps/rq-server/interfaces"
 	services "dezzles-apps/rq-server/services/ribbons"
 
 	cmodel "github.com/dezzles-apps/go-common/model"
@@ -11,19 +12,17 @@ type GamesController struct {
 	gameService *services.GameService
 }
 
-func NewGamesController(
-	router *gin.Engine,
-	gameService *services.GameService,
-) *GamesController {
+func (gc *GamesController) Initialise(
+	ctx interfaces.ControllerInitContext,
+) {
 	var controller = &GamesController{
-		gameService: gameService,
+		gameService: ctx.Services().RibbonGames,
 	}
-	controller.registerRoutes(router)
-	return controller
+	controller.registerRoutes(ctx)
 }
 
-func (gc *GamesController) registerRoutes(router *gin.Engine) {
-	gameGroup := router.Group("/api/ribbons/v1/games")
+func (gc *GamesController) registerRoutes(ctx interfaces.ControllerInitContext) {
+	gameGroup := ctx.Router().Group("/api/ribbons/v1/games")
 	{
 		gameGroup.GET("/:game", gc.getGame)
 		gameGroup.GET("/", gc.getAllGames)

@@ -7,6 +7,7 @@ import (
 	dataservices "dezzles-apps/rq-server/services/data"
 	_ "embed"
 	"log"
+	"strconv"
 	"strings"
 
 	cdb "github.com/dezzles-apps/go-common/db"
@@ -96,10 +97,10 @@ func (ps *PokemonService) getPokemon(ctx *cmodel.DAContext, pokemonName string) 
 		Pokemon.Details.CaughtAt = &caughtAt.Time
 	}
 	if nature.Valid {
-		Pokemon.Details.Nature = nature.String
+		Pokemon.Details.Nature.Value = nature.String
 	}
 	if characteristic.Valid {
-		Pokemon.Details.Characteristic = characteristic.String
+		Pokemon.Details.Characteristic.Value = characteristic.String
 	}
 	if notes.Valid {
 		Pokemon.Details.Notes = notes.String
@@ -231,14 +232,14 @@ func (ps *PokemonService) GetAllPokemon(ctx *cmodel.DAContext) ([]dto.AllPokemon
 				Current: 0,
 				Total:   0,
 			}
-			p.Species.PokedexId = pokedexId
+			p.Species.PokedexId = strconv.Itoa(pokedexId)
 			p.Species.Name = species
 			p.Species.Form = form
 			p.Species.ImageRef = spriteRef
 
 			p.Details.Nickname = nickname
-			p.Details.Nature = nature.String
-			p.Details.Characteristic = characteristic.String
+			p.Details.Nature.Value = nature.String
+			p.Details.Characteristic.Value = characteristic.String
 			p.Details.Notes = notes.String
 			p.Details.Shiny = shiny.Bool
 
@@ -288,10 +289,10 @@ func (ps *PokemonService) UpdatePokemon(ctx *cmodel.DAContext, pokemon string, u
 		details.Details.Nickname = updateData.Nickname
 	}
 	if updateData.Nature != "" {
-		details.Details.Nature = updateData.Nature
+		details.Details.Nature.Value = updateData.Nature
 	}
 	if updateData.Characteristic != "" {
-		details.Details.Characteristic = updateData.Characteristic
+		details.Details.Characteristic.Value = updateData.Characteristic
 	}
 	if updateData.Shiny != nil {
 		details.Details.Shiny = *updateData.Shiny
@@ -304,8 +305,8 @@ func (ps *PokemonService) UpdatePokemon(ctx *cmodel.DAContext, pokemon string, u
 	_, err = ps.connection.GetDB().Exec(
 		"UPDATE ribbon_pokemon SET nickname = ?, nature = ?, characteristic = ?, notes = ?, shiny = ? WHERE pokemon = ?",
 		details.Details.Nickname,
-		details.Details.Nature,
-		details.Details.Characteristic,
+		details.Details.Nature.Value,
+		details.Details.Characteristic.Value,
 		details.Details.Notes,
 		details.Details.Shiny,
 		pokemon,

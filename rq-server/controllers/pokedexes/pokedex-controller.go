@@ -1,9 +1,8 @@
 package pokedexes
 
 import (
+	"dezzles-apps/rq-server/interfaces"
 	services "dezzles-apps/rq-server/services/pokedexes"
-
-	"dezzles-apps/rq-server/middleware"
 
 	cmodel "github.com/dezzles-apps/go-common/model"
 
@@ -14,25 +13,22 @@ type PokedexController struct {
 	pokedexService *services.PokedexService
 }
 
-func NewPokedexController(
-	router *gin.Engine,
-	authMiddleware *middleware.AuthMiddleware,
-	pokedexService *services.PokedexService,
-) *PokedexController {
+func (pc *PokedexController) Initialise(
+	ctx interfaces.ControllerInitContext,
+) {
 	var controller = &PokedexController{
-		pokedexService: pokedexService,
+		ctx.Services().Pokedex,
 	}
-	controller.registerRoutes(router, authMiddleware)
-	return controller
+	controller.registerRoutes(ctx)
 }
 
-func (pc *PokedexController) registerRoutes(router *gin.Engine, authMiddleware *middleware.AuthMiddleware) {
-	group := router.Group("/api/pokedexes/v1")
+func (pc *PokedexController) registerRoutes(ctx interfaces.ControllerInitContext) {
+	group := ctx.Router().Group("/api/pokedexes/v1")
 	{
 		group.GET("/", pc.getPokedexes)
 		group.GET("/:pokedex", pc.getPokedex)
-		group.POST("/:pokedex/entries/:pokedexNo", authMiddleware.ValidateUser, pc.catchPokemon)
-		group.DELETE("/:pokedex/entries/:pokedexNo", authMiddleware.ValidateUser, pc.uncatchPokemon)
+		group.POST("/:pokedex/entries/:pokedexNo", ctx.AuthMiddleware().ValidateUser, pc.catchPokemon)
+		group.DELETE("/:pokedex/entries/:pokedexNo", ctx.AuthMiddleware().ValidateUser, pc.uncatchPokemon)
 	}
 }
 

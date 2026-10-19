@@ -9,7 +9,13 @@ interface Form {
   imageRef: string
 }
 
+interface KeyValuePair {
+  key: string
+  value: string
+}
+
 export type {
   PokemonData,
+  KeyValuePair,
   Form
 }
