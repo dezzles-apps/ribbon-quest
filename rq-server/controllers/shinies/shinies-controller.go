@@ -26,6 +26,7 @@ func (pc *ShinyController) registerRoutes(ctx interfaces.ControllerInitContext) 
 	shinies := ctx.Router().Group("/api/shinies/v1")
 	{
 		shinies.GET("/", pc.getShinies)
+		shinies.GET("/stats", pc.getShinyStats)
 	}
 }
 
@@ -38,4 +39,18 @@ func (pc *ShinyController) getShinies(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"data": pokedexes})
+}
+
+func (pc *ShinyController) getShinyStats(c *gin.Context) {
+	ctx := cmodel.GetContext(c)
+	startDate := c.Query("startDate")
+	endDate := c.Query("endDate")
+
+	stats, err := pc.shinyService.GetShinyStats(ctx, startDate, endDate)
+	if err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{"data": stats})
 }

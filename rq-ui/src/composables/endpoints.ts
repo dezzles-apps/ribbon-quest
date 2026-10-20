@@ -15,7 +15,8 @@ export const Ribbons = {
 };
 
 export const Shinies = {
-  GetAllShinies: '/api/shinies/v1'
+  GetAllShinies: '/api/shinies/v1',
+  GetStats: '/api/shinies/v1/stats'
 }
 
 const Pokedexes = {
