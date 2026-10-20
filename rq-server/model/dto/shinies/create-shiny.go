@@ -11,6 +11,7 @@ type CreateShinyRequest struct {
 	Method         string `json:"method"`
 	Characteristic string `json:"characteristic"`
 	Nature         string `json:"nature"`
+	Gender         string `json:"gender"`
 	Notes          string `json:"notes"`
 }
 

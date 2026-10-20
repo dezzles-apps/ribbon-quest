@@ -131,5 +131,13 @@ func (svc *ShinyService) ValidateRequest(request request.CreateShinyRequest) []r
 		results = append(results, *natureErr)
 	}
 
+	genderErr := svc.commonDataService.ValidGender(request.Gender)
+	if genderErr != nil {
+		if genderErr == &errors.InternalServerError {
+			return []responses.Error{*genderErr}
+		}
+		results = append(results, *genderErr)
+	}
+
 	return results
 }

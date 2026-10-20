@@ -35,6 +35,10 @@ func (cds *CommonDataService) GetMethods() ([]model.KeyValuePair, error) {
 	return cds.repository.GetMethods()
 }
 
+func (cds *CommonDataService) GetGenders() ([]model.KeyValuePair, error) {
+	return cds.repository.GetGenders()
+}
+
 func (cds *CommonDataService) ValidGame(game string) *responses.Error {
 	games, err := cds.GetGames()
 	if err != nil {
@@ -85,4 +89,17 @@ func (cds *CommonDataService) ValidNature(nature string) *responses.Error {
 		}
 	}
 	return &errors.InvalidNature
+}
+
+func (cds *CommonDataService) ValidGender(gender string) *responses.Error {
+	genders, err := cds.GetGenders()
+	if err != nil {
+		return nil
+	}
+	for _, n := range genders {
+		if n.Key == gender {
+			return nil
+		}
+	}
+	return &errors.InvalidGender
 }
