@@ -100,10 +100,10 @@ func (gs *GameService) getPokemonByGame(ctx *cmodel.DAContext, gameName string) 
 			pokemon.Details.CaughtAt = &caughtAt.Time
 		}
 		if nature.Valid {
-			pokemon.Details.Nature = nature.String
+			pokemon.Details.Nature.Value = nature.String
 		}
 		if characteristic.Valid {
-			pokemon.Details.Characteristic = characteristic.String
+			pokemon.Details.Characteristic.Value = characteristic.String
 		}
 		if shiny.Valid {
 			pokemon.Details.Shiny = shiny.Bool

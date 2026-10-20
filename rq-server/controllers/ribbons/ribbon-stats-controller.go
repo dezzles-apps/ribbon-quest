@@ -1,6 +1,7 @@
 package ribbons
 
 import (
+	"dezzles-apps/rq-server/interfaces"
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/services/ribbons"
 
@@ -12,19 +13,17 @@ type RibbonStatsController struct {
 	ribbonStatsService *ribbons.RibbonStatsService
 }
 
-func NewRibbonStatsController(
-	router *gin.Engine,
-	service *ribbons.RibbonStatsService,
-) *RibbonStatsController {
+func (rsc *RibbonStatsController) Initialise(
+	ctx interfaces.ControllerInitContext,
+) {
 	controller := RibbonStatsController{
-		ribbonStatsService: service,
+		ribbonStatsService: ctx.Services().RibbonStats,
 	}
-	controller.createRoutes(router)
-	return &controller
+	controller.createRoutes(ctx)
 }
 
-func (rsc *RibbonStatsController) createRoutes(router *gin.Engine) {
-	router.GET("/api/ribbons/v1/stats", rsc.getStats)
+func (rsc *RibbonStatsController) createRoutes(ctx interfaces.ControllerInitContext) {
+	ctx.Router().GET("/api/ribbons/v1/stats", rsc.getStats)
 }
 
 func (rsc *RibbonStatsController) getStats(c *gin.Context) {

@@ -69,7 +69,12 @@ function getIcon(event : Event) {
       return 'mdi-seal'
     case 'RIBBON_CATCH':
       return 'mdi-pokeball'
+    case 'POKEDEX_CATCH':
+      return 'mdi-notebook'
+    case 'SHINY_CATCH':
+      return 'mdi-shimmer'
     default:
+      console.warn('Unknown icon: ' + event.eventType)
       return 'mdi-help-circle-outline'
   }
 }
@@ -114,6 +119,9 @@ onMounted(loadEvents)
               <div v-else-if="item.eventType == 'POKEDEX_CATCH'" style="display: inline;">
                  Caught a{{ ['A','E', 'I', 'O', 'U'].indexOf(item.metadata.pokemon[0]) != -1 ? 'n' : '' }} {{  item.metadata.pokemon }} for the 
                 <RouterLink :to="{ name: 'dexofmyown-pokedex', params: { pokedex: item.metadata.pokedex }}">{{  item.metadata.pokedex }} Pokedex</RouterLink>
+              </div>
+              <div v-else-if="item.eventType == 'SHINY_CATCH'" style="display: inline;">
+                 Caught a shiny {{  item.metadata.pokemon }}
               </div>
               <div v-else>
                 Unknown event type: {{  item.eventType }}

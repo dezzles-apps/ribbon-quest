@@ -14,6 +14,10 @@ export const Ribbons = {
   GetStats: '/api/ribbons/v1/stats'
 };
 
+export const Shinies = {
+  GetAllShinies: '/api/shinies/v1'
+}
+
 const Pokedexes = {
   GetAllPokedexes: '/api/pokedexes/v1',
   GetPokedex: (pokedex: string) => `/api/pokedexes/v1/${pokedex}`,
@@ -34,4 +38,5 @@ export default {
   Ribbons,
   Events,
   Pokedexes,
+  Shinies,
 }

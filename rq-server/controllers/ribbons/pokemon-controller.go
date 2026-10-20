@@ -1,7 +1,7 @@
 package ribbons
 
 import (
-	"dezzles-apps/rq-server/middleware"
+	"dezzles-apps/rq-server/interfaces"
 	"dezzles-apps/rq-server/model/dto"
 	services "dezzles-apps/rq-server/services/ribbons"
 
@@ -15,33 +15,29 @@ type PokemonController struct {
 	ribbonService  *services.RibbonService
 }
 
-func NewPokemonController(
-	router *gin.Engine,
-	pokemonService *services.PokemonService,
-	ribbonService *services.RibbonService,
-	authMiddleware *middleware.AuthMiddleware,
-) *PokemonController {
+func (pc *PokemonController) Initialise(
+	ctx interfaces.ControllerInitContext,
+) {
 	var controller = &PokemonController{
-		pokemonService: pokemonService,
-		ribbonService:  ribbonService,
+		pokemonService: ctx.Services().RibbonPokemon,
+		ribbonService:  ctx.Services().Ribbons,
 	}
-	controller.registerRoutes(router, authMiddleware)
-	return controller
+	controller.registerRoutes(ctx)
 }
 
-func (pc *PokemonController) registerRoutes(router *gin.Engine, authMiddleware *middleware.AuthMiddleware) {
-	pokemonGroup := router.Group("/api/ribbons/v1/pokemon")
+func (pc *PokemonController) registerRoutes(ctx interfaces.ControllerInitContext) {
+	pokemonGroup := ctx.Router().Group("/api/ribbons/v1/pokemon")
 	{
 		pokemonGroup.GET("/", pc.getAllPokemon)
 		pokemonGroup.GET("/:pokemon", pc.getPokemon)
-		pokemonGroup.POST("/:pokemon/ribbons/:ribbon", authMiddleware.ValidateUser, pc.addRibbon)
-		pokemonGroup.DELETE("/:pokemon/ribbons/:ribbon", authMiddleware.ValidateUser, pc.removeRibbon)
-		pokemonGroup.POST("/:pokemon/catch", authMiddleware.ValidateUser, pc.catchPokemon)
-		pokemonGroup.PUT("/:pokemon", authMiddleware.ValidateUser, pc.updatePokemon)
-		pokemonGroup.POST("/", authMiddleware.ValidateUser, pc.createPokemon)
+		pokemonGroup.POST("/:pokemon/ribbons/:ribbon", ctx.AuthMiddleware().ValidateUser, pc.addRibbon)
+		pokemonGroup.DELETE("/:pokemon/ribbons/:ribbon", ctx.AuthMiddleware().ValidateUser, pc.removeRibbon)
+		pokemonGroup.POST("/:pokemon/catch", ctx.AuthMiddleware().ValidateUser, pc.catchPokemon)
+		pokemonGroup.PUT("/:pokemon", ctx.AuthMiddleware().ValidateUser, pc.updatePokemon)
+		pokemonGroup.POST("/", ctx.AuthMiddleware().ValidateUser, pc.createPokemon)
 
-		pokemonGroup.PUT("/:pokemon/games/:gameKey", authMiddleware.ValidateUser, pc.addPokemonGame)
-		pokemonGroup.DELETE("/:pokemon/games/:gameKey", authMiddleware.ValidateUser, pc.removePokemonGame)
+		pokemonGroup.PUT("/:pokemon/games/:gameKey", ctx.AuthMiddleware().ValidateUser, pc.addPokemonGame)
+		pokemonGroup.DELETE("/:pokemon/games/:gameKey", ctx.AuthMiddleware().ValidateUser, pc.removePokemonGame)
 	}
 }
 

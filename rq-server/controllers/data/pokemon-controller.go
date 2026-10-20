@@ -1,6 +1,7 @@
 package data
 
 import (
+	"dezzles-apps/rq-server/interfaces"
 	"dezzles-apps/rq-server/model"
 	services "dezzles-apps/rq-server/services/data"
 
@@ -12,18 +13,17 @@ type PokemonController struct {
 	pokemonService *services.PokemonDataService
 }
 
-func NewPokemonController(
-	router *gin.Engine,
-	pokemonService *services.PokemonDataService,
+func (pc *PokemonController) Initialise(
+	ctx interfaces.ControllerInitContext,
 ) {
 	var controller = &PokemonController{
-		pokemonService: pokemonService,
+		pokemonService: ctx.Services().PokemonData,
 	}
-	controller.registerRoutes(router)
+	controller.registerRoutes(ctx)
 }
 
-func (pc *PokemonController) registerRoutes(router *gin.Engine) {
-	router.GET("/api/data/v1/pokemon", pc.getPokemon)
+func (pc *PokemonController) registerRoutes(ctx interfaces.ControllerInitContext) {
+	ctx.Router().GET("/api/data/v1/pokemon", pc.getPokemon)
 }
 
 func (pc *PokemonController) getPokemon(c *gin.Context) {

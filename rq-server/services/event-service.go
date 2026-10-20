@@ -107,7 +107,7 @@ func (es *EventService) GetLatestEvents(ctx *cmodel.DAContext, date string) ([]d
 func (es *EventService) GetEvents(ctx *cmodel.DAContext, date string, category string, pokemon string) ([]dto.Event, error) {
 	var query strings.Builder
 	var params []any
-	query.WriteString("SELECT * FROM events_v4 WHERE 1")
+	query.WriteString("SELECT * FROM events_v5 WHERE 1")
 
 	if date != "" {
 		parsedDate, err := time.Parse(time.RFC3339, date)
