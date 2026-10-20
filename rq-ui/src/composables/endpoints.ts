@@ -26,7 +26,8 @@ const Pokedexes = {
 }
 
 export const Data = {
-  GetPokemonData: '/api/data/v1/pokemon'
+  GetPokemonData: '/api/data/v1/pokemon',
+  GetCommonData: '/api/data/v1/common',
 }
 
 export const Events = {

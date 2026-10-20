@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"dezzles-apps/rq-server/model/dto"
+	"dezzles-apps/rq-server/model/dto/shinies"
 	"dezzles-apps/rq-server/model/errors"
 	_ "embed"
 	"fmt"
@@ -22,6 +23,7 @@ var getShiniesByDateRange string
 type ShinyRepository interface {
 	GetAllShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, *responses.Error)
 	GetShiniesByDateRange(ctx *cmodel.DAContext, startDate string, endDate string) ([]dto.ShinyPokemon, *responses.Error)
+	SaveShiny(ctx *cmodel.DAContext, request shinies.CreateShinyRequest) []responses.Error
 }
 
 type DatabaseShinyRepository struct {
@@ -37,6 +39,54 @@ func NewDatabaseShinyRepository(
 		connection: connection,
 		common:     common,
 	}
+}
+
+func (repo *DatabaseShinyRepository) SaveShiny(ctx *cmodel.DAContext, request shinies.CreateShinyRequest) []responses.Error {
+	// Get form_id from the form sprite_ref
+	var formId int
+	row := repo.connection.GetDB().QueryRow(
+		"SELECT form_id FROM pokemon_forms WHERE sprite_ref = ?",
+		request.Form,
+	)
+	err := row.Scan(&formId)
+	if err != nil {
+		ctx.Logger.Error("Error getting form ID", zap.String("form", request.Form), zap.Error(err))
+		return []responses.Error{errors.InternalServerError}
+	}
+
+	// Insert shiny into database
+	result, err := repo.connection.GetDB().Exec(
+		`INSERT INTO shinies (form_id, level, game, method, characteristic, nature, gender, caught_at, notes) 
+		 VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?)`,
+		formId,
+		request.Level,
+		request.Game,
+		request.Method,
+		request.Characteristic,
+		request.Nature,
+		request.Gender,
+		request.Notes,
+	)
+
+	if err != nil {
+		ctx.Logger.Error("Error saving shiny",
+			zap.String("form", request.Form),
+			zap.Int("formId", formId),
+			zap.Int("level", request.Level),
+			zap.String("game", request.Game),
+			zap.Error(err),
+		)
+		return []responses.Error{errors.InternalServerError}
+	}
+
+	shinyId, err := result.LastInsertId()
+	if err != nil {
+		ctx.Logger.Error("Error retrieving shiny ID after insert", zap.Error(err))
+		return []responses.Error{errors.InternalServerError}
+	}
+
+	ctx.Logger.Info("Shiny successfully saved", zap.Int64("shinyId", shinyId), zap.String("form", request.Form))
+	return nil
 }
 
 func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, *responses.Error) {

@@ -92,7 +92,24 @@ func (svc *ShinyService) validateAndParseDates(startDate, endDate string) (time.
 	return start, end, nil
 }
 
-func (svc *ShinyService) ValidateRequest(request request.CreateShinyRequest) []responses.Error {
+func (svc *ShinyService) ValidateRequest(ctx *cmodel.DAContext, request request.CreateShinyRequest) []responses.Error {
+	err := svc.validateRequest(request)
+	_, e := svc.pokemonDataService.GetFormIdByName(ctx, request.Form)
+	if e != nil {
+		if e == &errors.InvalidFormError {
+			err = append(err, errors.InvalidFormError)
+		} else {
+			return []responses.Error{*e}
+		}
+	}
+	if len(err) > 0 {
+		return err
+	}
+
+	return nil
+}
+
+func (svc *ShinyService) validateRequest(request request.CreateShinyRequest) []responses.Error {
 	results := make([]responses.Error, 0)
 
 	if request.Level < 1 || request.Level > 100 {
@@ -140,4 +157,12 @@ func (svc *ShinyService) ValidateRequest(request request.CreateShinyRequest) []r
 	}
 
 	return results
+}
+
+func (svc *ShinyService) CreateShiny(ctx *cmodel.DAContext, request request.CreateShinyRequest) []responses.Error {
+	errs := svc.ValidateRequest(ctx, request)
+	if len(errs) > 0 {
+		return errs
+	}
+	return svc.shinyRepository.SaveShiny(ctx, request)
 }

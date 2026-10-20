@@ -9,6 +9,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Index from '@/pages/HomeView.vue'
 import ShinyCatches from '@/pages/shinies/ShinyCatches.vue'
 import ShinyStats from '@/pages/shinies/ShinyStats.vue'
+import AddShinyPokemonView from '@/pages/admin/AddShinyPokemonView.vue'
 import { Games } from '@/data/games';
 
 const router = createRouter({
@@ -191,6 +192,18 @@ const router = createRouter({
           parent: 'shiny-stats',
           title: 'Shiny Catches',
           href: '/shinies/catches'
+        }
+      }
+    },
+    {
+      path: '/admin/shinies/catch',
+      name: 'admin-catch-shiny',
+      component: AddShinyPokemonView,
+      meta: {
+        crumbs: {
+          parent: 'shiny-stats',
+          title: 'Add New Shiny',
+          href: '/admin/shinies/catch'
         }
       }
     }

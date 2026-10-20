@@ -2,10 +2,13 @@ package data
 
 import (
 	"dezzles-apps/rq-server/model"
+	"dezzles-apps/rq-server/model/dto/data"
 	"dezzles-apps/rq-server/model/errors"
 	repos "dezzles-apps/rq-server/repositories"
 
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"github.com/dezzles-apps/go-common/model/responses"
+	"go.uber.org/zap"
 )
 
 type CommonDataService struct {
@@ -19,23 +22,61 @@ func NewCommonDataService(repository repos.CommonDataRepository) *CommonDataServ
 	return cds
 }
 
-func (cds *CommonDataService) GetCharacteristics() ([]model.KeyValuePair, error) {
+func (cds *CommonDataService) GetAllData(ctx *cmodel.DAContext) (*data.CommonData, error) {
+	result := &data.CommonData{}
+	ctx.Logger.Info("Getting common data: Characteristics")
+	kvp, err := cds.GetCharacteristics()
+	ctx.Logger.Info("Got common data: Characteristics")
+	if err != nil {
+		ctx.Logger.Error("WAT", zap.Error(err))
+		return nil, err
+	}
+	result.Characteristics = kvp
+	ctx.Logger.Info("Getting common data: Games")
+	kvp, err = cds.GetGames()
+	if err != nil {
+		return nil, err
+	}
+	result.Games = kvp
+	ctx.Logger.Info("Getting common data: Methods")
+	kvp, err = cds.GetMethods()
+	if err != nil {
+		return nil, err
+	}
+	result.Methods = kvp
+
+	ctx.Logger.Info("Getting common data: Natures")
+	kvp, err = cds.GetNatures()
+	if err != nil {
+		return nil, err
+	}
+	result.Natures = kvp
+
+	kvp, err = cds.GetGenders()
+	if err != nil {
+		return nil, err
+	}
+	result.Genders = kvp
+	return result, nil
+}
+
+func (cds *CommonDataService) GetCharacteristics() ([]model.KeyValuePair, *responses.Error) {
 	return cds.repository.GetCharacteristics()
 }
 
-func (cds *CommonDataService) GetGames() ([]model.KeyValuePair, error) {
+func (cds *CommonDataService) GetGames() ([]model.KeyValuePair, *responses.Error) {
 	return cds.repository.GetGames()
 }
 
-func (cds *CommonDataService) GetNatures() ([]model.KeyValuePair, error) {
+func (cds *CommonDataService) GetNatures() ([]model.KeyValuePair, *responses.Error) {
 	return cds.repository.GetNatures()
 }
 
-func (cds *CommonDataService) GetMethods() ([]model.KeyValuePair, error) {
+func (cds *CommonDataService) GetMethods() ([]model.KeyValuePair, *responses.Error) {
 	return cds.repository.GetMethods()
 }
 
-func (cds *CommonDataService) GetGenders() ([]model.KeyValuePair, error) {
+func (cds *CommonDataService) GetGenders() ([]model.KeyValuePair, *responses.Error) {
 	return cds.repository.GetGenders()
 }
 

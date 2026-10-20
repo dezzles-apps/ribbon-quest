@@ -122,7 +122,7 @@ func TestValidateCreateShiny(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		actual := testService.ValidateRequest(test.Request)
+		actual := testService.validateRequest(test.Request)
 		if len(actual) != 1 {
 			t.Errorf("%s: expected 1 error, got %d", test.Description, len(actual))
 			continue
