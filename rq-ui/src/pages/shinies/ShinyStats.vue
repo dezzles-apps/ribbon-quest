@@ -2,6 +2,7 @@
 import { onMounted, ref, computed } from 'vue';
 import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
+import type { ShinyStatsResponse } from '@/types/stats';
 import type { Response } from '@/types/responses';
 import { useApi } from '@/composables/useApi';
 import { useDates } from '@/composables/useDates';
@@ -10,88 +11,7 @@ import Loading from '@/components/Loading.vue';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
-interface KeyValuePair {
-  key: string;
-  value: string;
-}
 
-interface DateRange {
-  startDate: string;
-  endDate: string;
-}
-
-interface MonthStats {
-  year: number;
-  month: number;
-  monthName: string;
-  count: number;
-  cumulative: number;
-}
-
-interface GameStat {
-  game: KeyValuePair;
-  totalCatches: number;
-  monthlyBreakdown: MonthStats[];
-  averageCatchesPerMonth: number;
-}
-
-interface CatchPerGameBreakdown {
-  game: KeyValuePair;
-  rank: number;
-  catches: number;
-}
-
-interface OverallStats {
-  totalShiniesCaught: number;
-  averagePerMonth: number;
-  catchesPerGame: CatchPerGameBreakdown[];
-  totalGamesPlayed: number;
-}
-
-interface MonthlyTotal {
-  month: number;
-  monthName: string;
-  totalCatches: number;
-  gamesContributing: number;
-  topGame: KeyValuePair;
-  topGameCount: number;
-}
-
-interface GameTrend {
-  game: KeyValuePair;
-  momentum: number;
-  startMonth: number;
-  endMonth: number;
-  startCount: number;
-  endCount: number;
-}
-
-interface GameStreak {
-  game: KeyValuePair;
-  streakLength: number;
-  startMonth: number;
-  endMonth: number;
-  totalInStreak: number;
-}
-
-interface Trends {
-  upwardTrend: GameTrend[];
-  downwardTrend: GameTrend[];
-  mostActive: KeyValuePair;
-  mostActiveCount: number;
-  leastActive: KeyValuePair;
-  leastActiveCount: number;
-  streaks: GameStreak[];
-}
-
-interface ShinyStatsResponse {
-  dateRange: DateRange;
-  monthlyByGame: Record<string, MonthStats[]>;
-  gameStats: GameStat[];
-  overallStats: OverallStats;
-  monthlyTotals: MonthlyTotal[];
-  trends: Trends;
-}
 
 const loading = ref(true);
 const { apiFetch } = useApi();
