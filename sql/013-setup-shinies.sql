@@ -58,7 +58,7 @@ FROM pokedex_entries pe
   WHERE pe.caught_at IS NOT NULL
   AND pe.no_event_trigger = false
 )
-UNION
+UNION ALL
 (SELECT
   'SHINY' as event_category,
   'SHINY_CATCH' as event_type,

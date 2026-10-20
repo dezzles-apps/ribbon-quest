@@ -49,6 +49,7 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 	defer rows.Close()
 	for rows.Next() {
 		var entry dto.ShinyPokemon
+		entry.Details.Shiny = true
 		var pokedexNo int
 		var format string = "#%04d"
 		var gameKey string
@@ -103,6 +104,10 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 		}
 
 		shinies = append(shinies, entry)
+	}
+	if err := rows.Err(); err != nil {
+		ctx.Logger.Info("Error getting shiny rows", zap.Error(err))
+		return nil, &errors.InternalServerError
 	}
 	return shinies, nil
 }
