@@ -8,7 +8,7 @@ SELECT
   s.nature,
   s.characteristic,
   s.level,
-  s.notes,
+  COALESCE(s.notes, '') AS notes,
   s.game,
   s.method,
   s.gender

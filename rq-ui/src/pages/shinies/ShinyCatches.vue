@@ -36,7 +36,7 @@ const headers = [
   { title: 'Characteristic', value: 'details.characteristic.value' },
   { title: 'Gender', value: 'details.gender.value' },
   { title: 'Game', value: 'details.game.value' },
-  { title: 'Caught At', key: 'details.caughtAt', value: (item:ShinyPokemon) => toLocal(item.details.caughtAt) }
+  { title: 'Caught At', key: 'details.caughtAt', value: 'details.caughtAt' }
 ] 
 
 onMounted(fetchPokemonStats);
@@ -50,7 +50,11 @@ onMounted(fetchPokemonStats);
     :items="stats"
     item-value="name"
     item-key="shinyId"
-  ></v-data-table-virtual>
+  >
+    <template #item.details.caughtAt="{ item }">
+      {{ toLocal(item.details.caughtAt) }}
+    </template>
+  </v-data-table-virtual>
 </template>
 
 <style>
