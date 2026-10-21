@@ -10,3 +10,4 @@ database:
   database: ribbon-quest
 app:
   jwtSecret: SOME_SECRET
+  debugLogging: true

@@ -128,8 +128,6 @@ onMounted(load)
     title="New Ribbon Pokemon"
     variant="tonal"
   >
-  {{ allPokemon[36] }}
-  {{ request }}
     <v-alert v-if="submitError" class="ma-4" type="error">
       {{ submitError }}
     </v-alert>
