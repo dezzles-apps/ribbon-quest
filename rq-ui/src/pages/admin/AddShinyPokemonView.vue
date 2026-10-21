@@ -12,11 +12,14 @@ const request = ref({level: 1} as CreateShinyRequest)
 const { apiFetch } = useApi()
 const menu = shallowRef(false)
 const loading = ref(true)
+const loadError = ref('')
+const lookupsLoaded = ref(false)
 const commonData = ref({} as CommonData)
 const allPokemon = ref([] as PokemonData[])
 const selectedPokemon = ref('' as string)
 const errors = ref([] as Error[])
 const saving = ref(false)
+const submitError = ref('')
 function getPokemonData() {
   return apiFetch(API.Data.GetPokemonData)
     .then(async response => {
@@ -39,10 +42,17 @@ function getCommonData() {
 }
 
 function load() {
+  loading.value = true
+  loadError.value = ''
+  lookupsLoaded.value = false
   return Promise.all([
     getCommonData(),
     getPokemonData()
-  ]).then(v => {
+  ]).then(() => {
+    lookupsLoaded.value = true
+  }).catch(() => {
+    loadError.value = 'Unable to load the data required to add a shiny Pokémon.'
+  }).finally(() => {
     loading.value = false
   })
 }
@@ -57,24 +67,36 @@ function updateForm() {
   request.value.form = currentPokemon.value?.forms[0].formId || ''
 }
 
-function savePokemon() {
+async function savePokemon() {
+  if (loading.value || !lookupsLoaded.value || saving.value) {
+    return
+  }
   saving.value = true
   errors.value = []
-  return apiFetch(API.Shinies.GetAllShinies, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(request.value)
-  }).then(async resp => {
-    saving.value = false
+  submitError.value = ''
+  try {
+    const resp = await apiFetch(API.Shinies.GetAllShinies, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(request.value)
+    })
     const body = await resp.json() as Response<PokemonData>
-    if (body.errors) {
+    if (body.errors?.length) {
       errors.value = body.errors
       return
     }
+    if (!resp.ok) {
+      submitError.value = body.error || 'Unable to add the shiny Pokémon.'
+      return
+    }
     router.push(`/shinies/catches`)
-  })
+  } catch {
+    submitError.value = 'Unable to add the shiny Pokémon.'
+  } finally {
+    saving.value = false
+  }
 }
 
 function getErrorMessage(field : string) : string {
@@ -86,6 +108,13 @@ function getErrorMessage(field : string) : string {
     return ''
   }
   return fieldErrors[0].message
+}
+
+function getPokemonErrorMessages() {
+  return [
+    getErrorMessage('pokedexId'),
+    selectedPokemon.value === '' ? getErrorMessage('form') : '',
+  ].filter(Boolean)
 }
 
 onMounted(load)
@@ -101,6 +130,15 @@ onMounted(load)
   >
   {{ allPokemon[36] }}
   {{ request }}
+    <v-alert v-if="submitError" class="ma-4" type="error">
+      {{ submitError }}
+    </v-alert>
+
+    <v-alert v-if="loadError" class="ma-4" type="error">
+      {{ loadError }}
+      <v-btn class="ml-2" @click="load">Retry</v-btn>
+    </v-alert>
+
     <v-form>
       <v-container v-if="!loading">
         <v-select
@@ -110,7 +148,7 @@ onMounted(load)
           :items="allPokemon"
           item-title="species"
           v-on:update:model-value="updateForm"
-          :error-messages="getErrorMessage('pokedexId')"
+          :error-messages="getPokemonErrorMessages()"
         >
           <template v-slot:menu-header="{ search, filteredItems }">
             <div class="pa-2 border-b">
@@ -205,8 +243,9 @@ onMounted(load)
       </v-container>
       <v-container>
         <v-btn
-          :loading="saving"
+          :disabled="loading || !lookupsLoaded || saving"
           color="primary"
+          :loading="saving"
           @click="savePokemon"
         >
           Add New Pokemon
