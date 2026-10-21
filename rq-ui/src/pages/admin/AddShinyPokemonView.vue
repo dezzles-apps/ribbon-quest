@@ -197,6 +197,11 @@ onMounted(load)
           item-value="key"
         >
         </v-select>
+        <v-textarea
+          label="Notes"
+          v-model="request.notes"
+          :error-messages="getErrorMessage('notes')"
+        ></v-textarea>
       </v-container>
       <v-container>
         <v-btn

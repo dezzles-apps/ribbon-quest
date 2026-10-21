@@ -7,6 +7,7 @@ interface CreateShinyRequest {
   method: string
   characteristic: string
   nature: string
+  notes: string
 }
 
 export type {
