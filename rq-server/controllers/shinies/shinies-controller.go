@@ -2,6 +2,8 @@ package shinies
 
 import (
 	"dezzles-apps/rq-server/interfaces"
+	dto "dezzles-apps/rq-server/model/dto/shinies"
+	"dezzles-apps/rq-server/model/errors"
 	services "dezzles-apps/rq-server/services/shinies"
 
 	cmodel "github.com/dezzles-apps/go-common/model"
@@ -27,6 +29,7 @@ func (pc *ShinyController) registerRoutes(ctx interfaces.ControllerInitContext) 
 	{
 		shinies.GET("/", pc.getShinies)
 		shinies.GET("/stats", pc.getShinyStats)
+		shinies.POST("/", ctx.AuthMiddleware().ValidateUser, pc.createShiny)
 	}
 }
 
@@ -39,6 +42,26 @@ func (pc *ShinyController) getShinies(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"data": pokedexes})
+}
+
+func (pc *ShinyController) createShiny(c *gin.Context) {
+	var input dto.CreateShinyRequest
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+	ctx := cmodel.GetContext(c)
+	err := pc.shinyService.CreateShiny(ctx, input)
+	if err != nil {
+		if err[0] == errors.InternalServerError {
+			c.JSON(500, gin.H{"errors": err})
+		} else {
+			c.JSON(400, gin.H{"errors": err})
+		}
+		return
+	}
+
+	c.JSON(201, gin.H{"data": nil})
 }
 
 func (pc *ShinyController) getShinyStats(c *gin.Context) {

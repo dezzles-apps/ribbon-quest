@@ -3,19 +3,21 @@ package repositories
 import (
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/errors"
+
+	"github.com/dezzles-apps/go-common/model/responses"
 )
 
 type CommonDataRepository interface {
-	GetCharacteristics() ([]model.KeyValuePair, error)
-	GetNatures() ([]model.KeyValuePair, error)
-	GetGames() ([]model.KeyValuePair, error)
-	GetMethods() ([]model.KeyValuePair, error)
-	GetGenders() ([]model.KeyValuePair, error)
-	GetCharacteristic(key string) (*model.KeyValuePair, error)
-	GetNature(key string) (*model.KeyValuePair, error)
-	GetGame(key string) (*model.KeyValuePair, error)
-	GetMethod(key string) (*model.KeyValuePair, error)
-	GetGender(key string) (*model.KeyValuePair, error)
+	GetCharacteristics() ([]model.KeyValuePair, *responses.Error)
+	GetNatures() ([]model.KeyValuePair, *responses.Error)
+	GetGames() ([]model.KeyValuePair, *responses.Error)
+	GetMethods() ([]model.KeyValuePair, *responses.Error)
+	GetGenders() ([]model.KeyValuePair, *responses.Error)
+	GetCharacteristic(key string) (*model.KeyValuePair, *responses.Error)
+	GetNature(key string) (*model.KeyValuePair, *responses.Error)
+	GetGame(key string) (*model.KeyValuePair, *responses.Error)
+	GetMethod(key string) (*model.KeyValuePair, *responses.Error)
+	GetGender(key string) (*model.KeyValuePair, *responses.Error)
 }
 
 type StaticCommonDataRepository struct {
@@ -36,27 +38,27 @@ func NewCommonDataService() CommonDataRepository {
 	return cds
 }
 
-func (cds *StaticCommonDataRepository) GetCharacteristics() ([]model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetCharacteristics() ([]model.KeyValuePair, *responses.Error) {
 	return cds.characteristics, nil
 }
 
-func (cds *StaticCommonDataRepository) GetNatures() ([]model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetNatures() ([]model.KeyValuePair, *responses.Error) {
 	return cds.natures, nil
 }
 
-func (cds *StaticCommonDataRepository) GetGames() ([]model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetGames() ([]model.KeyValuePair, *responses.Error) {
 	return cds.games, nil
 }
 
-func (cds *StaticCommonDataRepository) GetMethods() ([]model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetMethods() ([]model.KeyValuePair, *responses.Error) {
 	return cds.methods, nil
 }
 
-func (cds *StaticCommonDataRepository) GetGenders() ([]model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetGenders() ([]model.KeyValuePair, *responses.Error) {
 	return cds.genders, nil
 }
 
-func (cds *StaticCommonDataRepository) GetGame(key string) (*model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetGame(key string) (*model.KeyValuePair, *responses.Error) {
 	for i, g := range cds.games {
 		if g.Key == key {
 			return &cds.games[i], nil
@@ -65,7 +67,7 @@ func (cds *StaticCommonDataRepository) GetGame(key string) (*model.KeyValuePair,
 	return nil, &errors.InvalidGame
 }
 
-func (cds *StaticCommonDataRepository) GetMethod(key string) (*model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetMethod(key string) (*model.KeyValuePair, *responses.Error) {
 	for i, m := range cds.methods {
 		if m.Key == key {
 			return &cds.methods[i], nil
@@ -74,7 +76,7 @@ func (cds *StaticCommonDataRepository) GetMethod(key string) (*model.KeyValuePai
 	return nil, &errors.InvalidMethod
 }
 
-func (cds *StaticCommonDataRepository) GetCharacteristic(key string) (*model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetCharacteristic(key string) (*model.KeyValuePair, *responses.Error) {
 	for i, c := range cds.characteristics {
 		if c.Key == key {
 			return &cds.characteristics[i], nil
@@ -83,7 +85,7 @@ func (cds *StaticCommonDataRepository) GetCharacteristic(key string) (*model.Key
 	return nil, &errors.InvalidCharacteristic
 }
 
-func (cds *StaticCommonDataRepository) GetNature(key string) (*model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetNature(key string) (*model.KeyValuePair, *responses.Error) {
 	for i, n := range cds.natures {
 		if n.Key == key {
 			return &cds.natures[i], nil
@@ -92,7 +94,7 @@ func (cds *StaticCommonDataRepository) GetNature(key string) (*model.KeyValuePai
 	return nil, &errors.InvalidNature
 }
 
-func (cds *StaticCommonDataRepository) GetGender(key string) (*model.KeyValuePair, error) {
+func (cds *StaticCommonDataRepository) GetGender(key string) (*model.KeyValuePair, *responses.Error) {
 	for i, n := range cds.genders {
 		if n.Key == key {
 			return &cds.genders[i], nil

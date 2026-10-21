@@ -11,3 +11,4 @@ database:
   prod: true
 app:
   jwtSecret: $JWT_SECRET_PROD
+  debugLogging: false

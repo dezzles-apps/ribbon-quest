@@ -1,13 +1,16 @@
 package data
 
 import (
+	"database/sql"
 	"dezzles-apps/rq-server/model"
 	dto "dezzles-apps/rq-server/model/dto/data"
+	derrors "dezzles-apps/rq-server/model/errors"
 
 	_ "embed"
 
 	"github.com/dezzles-apps/go-common/db"
 	cmodel "github.com/dezzles-apps/go-common/model"
+	"github.com/dezzles-apps/go-common/model/responses"
 	"go.uber.org/zap"
 )
 
@@ -47,6 +50,7 @@ func (pc *PokemonDataService) GetAllPokemon(ctx *cmodel.DAContext) ([]*dto.Pokem
 			return nil, model.InternalServerError
 		}
 		form := dto.Form{
+			FormId:   formSprite,
 			FormName: formName,
 			ImageRef: formSprite,
 		}
@@ -89,6 +93,7 @@ func (pc *PokemonDataService) GetPokemon(ctx *cmodel.DAContext, pokedexNo int) (
 			return nil, model.InternalServerError
 		}
 		form := dto.Form{
+			FormId:   formSprite,
 			FormName: formName,
 			ImageRef: formSprite,
 		}
@@ -97,6 +102,27 @@ func (pc *PokemonDataService) GetPokemon(ctx *cmodel.DAContext, pokedexNo int) (
 	}
 	ctx.Logger.Info("Successfully retrieved Pokemon", zap.Int("pokedexNo", pokedexNo))
 	return result, nil
+}
+
+func (pds *PokemonDataService) GetFormIdByName(ctx *cmodel.DAContext, formName string) (int, *responses.Error) {
+	var formId int
+	ctx.Logger.Info("Retrieving Pokemon form id", zap.String("formName", formName))
+	row := pds.connection.GetDB().QueryRow(
+		"SELECT form_id FROM pokemon_forms pf WHERE pf.sprite_ref = ?",
+		formName,
+	)
+	err := row.Scan(&formId)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.Logger.Error("No form found", zap.String("formName", formName), zap.Error(err))
+			return 0, &derrors.InvalidFormError
+		} else {
+			ctx.Logger.Error("Error retrieving Pokemon form", zap.String("formName", formName), zap.Error(err))
+			return 0, &derrors.InternalServerError
+		}
+	}
+	ctx.Logger.Info("Retrieved Pokemon form", zap.String("formName", formName), zap.Int("formId", formId))
+	return formId, nil
 }
 
 func (pds *PokemonDataService) GetFormId(ctx *cmodel.DAContext, pokedexNo int, form string) (int, error) {

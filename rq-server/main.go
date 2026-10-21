@@ -37,12 +37,14 @@ func newResource() *resource.Resource {
 func main() {
 	monitor.Initialise()
 	defer monitor.Shutdown()
-	monitor.Logger, _ = zap.NewProduction()
-	monitor.Logger.Info("Starting app")
 	config, err := cmodel.LoadConfig[model.AppConfig]()
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
+	if config.App.DebugLog {
+		monitor.Logger, _ = zap.NewProduction()
+	}
+	monitor.Logger.Info("Starting app")
 	err = database.Connect(&config.Database)
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)

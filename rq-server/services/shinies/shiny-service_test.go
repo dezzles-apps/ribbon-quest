@@ -38,6 +38,7 @@ func TestValidateCreateShiny(t *testing.T) {
 				Method:         "RANDOM",
 				Characteristic: "MISCHIEVOUS",
 				Nature:         "MODEST",
+				Gender:         "F",
 			},
 			Expected: errors.InvalidLevel,
 		},
@@ -50,6 +51,7 @@ func TestValidateCreateShiny(t *testing.T) {
 				Method:         "RANDOM",
 				Characteristic: "MISCHIEVOUS",
 				Nature:         "MODEST",
+				Gender:         "U",
 			},
 			Expected: errors.InvalidLevel,
 		},
@@ -62,6 +64,7 @@ func TestValidateCreateShiny(t *testing.T) {
 				Method:         "RANDOM",
 				Characteristic: "MISCHIEVOUS",
 				Nature:         "MODEST",
+				Gender:         "M",
 			},
 			Expected: errors.InvalidGame,
 		},
@@ -74,6 +77,7 @@ func TestValidateCreateShiny(t *testing.T) {
 				Method:         "NA",
 				Characteristic: "MISCHIEVOUS",
 				Nature:         "MODEST",
+				Gender:         "M",
 			},
 			Expected: errors.InvalidMethod,
 		},
@@ -86,6 +90,7 @@ func TestValidateCreateShiny(t *testing.T) {
 				Method:         "RANDOM",
 				Characteristic: "IS_JEFF",
 				Nature:         "MODEST",
+				Gender:         "M",
 			},
 			Expected: errors.InvalidCharacteristic,
 		},
@@ -98,12 +103,26 @@ func TestValidateCreateShiny(t *testing.T) {
 				Method:         "RANDOM",
 				Characteristic: "MISCHIEVOUS",
 				Nature:         "SNEAKY",
+				Gender:         "M",
 			},
 			Expected: errors.InvalidNature,
 		},
+		{
+			Description: "Returns error when invalid nature",
+			Request: shinies.CreateShinyRequest{
+				Form:           "psyduck",
+				Level:          100,
+				Game:           "OMEGA_RUBY",
+				Method:         "RANDOM",
+				Characteristic: "MISCHIEVOUS",
+				Nature:         "ADAMANT",
+				Gender:         "Z",
+			},
+			Expected: errors.InvalidGender,
+		},
 	}
 	for _, test := range tests {
-		actual := testService.ValidateRequest(test.Request)
+		actual := testService.validateRequest(test.Request)
 		if len(actual) != 1 {
 			t.Errorf("%s: expected 1 error, got %d", test.Description, len(actual))
 			continue
