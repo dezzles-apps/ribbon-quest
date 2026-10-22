@@ -28,7 +28,7 @@ async function fetchPokemonStats() {
 }
  
 const headers = [
-  { title: 'Dex No.', value: 'species.pokedexId' },
+  { title: 'Dex No.', value: 'species.pokedexNo.text' },
   { title: 'Species', key: 'Species', value: (item:ShinyPokemon) => `${item.species.name} (${item.species.form})` },
   { title: 'Level', value: 'details.level' },
   { title: 'Method', value: 'details.method.value' },

@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
+	"dezzles-apps/rq-server/model/dto/data"
 	dataservices "dezzles-apps/rq-server/services/data"
 	_ "embed"
 	"log"
-	"strconv"
 	"strings"
 
 	cdb "github.com/dezzles-apps/go-common/db"
@@ -72,9 +72,10 @@ func (ps *PokemonService) getPokemon(ctx *cmodel.DAContext, pokemonName string) 
 	var nature sql.NullString
 	var notes sql.NullString
 	var characteristic sql.NullString
+	var pokedexNo int
 	err := row.Scan(
 		&Pokemon.Pokemon,
-		&Pokemon.Species.PokedexId,
+		&pokedexNo,
 		&Pokemon.Species.Name,
 		&Pokemon.Species.Form,
 		&Pokemon.Species.ImageRef,
@@ -85,6 +86,7 @@ func (ps *PokemonService) getPokemon(ctx *cmodel.DAContext, pokemonName string) 
 		&notes,
 		&Pokemon.Details.Shiny,
 	)
+	Pokemon.Species.PokedexNo = data.CreatePokedexNumber(pokedexNo, "#", 4)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.Logger.Info("Ribbon pokemon not found", zap.String("pokemonId", pokemonName))
@@ -232,7 +234,7 @@ func (ps *PokemonService) GetAllPokemon(ctx *cmodel.DAContext) ([]dto.AllPokemon
 				Current: 0,
 				Total:   0,
 			}
-			p.Species.PokedexId = strconv.Itoa(pokedexId)
+			p.Species.PokedexNo = data.CreatePokedexNumber(pokedexId, "#", 4)
 			p.Species.Name = species
 			p.Species.Form = form
 			p.Species.ImageRef = spriteRef

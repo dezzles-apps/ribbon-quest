@@ -65,7 +65,7 @@ function getRequestBody() : NewRibbonPokemonRequest {
   } as NewRibbonPokemonRequest
   let current = getCurrentPokemon()
   if (current) {
-    result.pokedexId = current.pokedexNo
+    result.pokedexId = current.pokedexNo.number
   }
   result.form = selectedForm.value
   result.games = selectedGames.value

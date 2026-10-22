@@ -1,4 +1,5 @@
 import type { KeyValuePair } from './data'
+import type { PokedexNo } from './pokedex'
 
 interface PokemonDetails {
   pokemon: string
@@ -7,7 +8,7 @@ interface PokemonDetails {
 }
 
 interface PokemonSpecies {
-  pokedexId: number
+  pokedexNo: PokedexNo
   name: string
   form: string
   imageRef: string

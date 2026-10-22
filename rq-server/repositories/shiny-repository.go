@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"dezzles-apps/rq-server/model/dto"
+	"dezzles-apps/rq-server/model/dto/data"
 	"dezzles-apps/rq-server/model/dto/shinies"
 	"dezzles-apps/rq-server/model/errors"
 	_ "embed"
@@ -120,7 +121,8 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 			return nil, &errors.InternalServerError
 		}
 
-		entry.Species.PokedexId = fmt.Sprintf(format, pokedexNo)
+		entry.Species.PokedexNo.Number = pokedexNo
+		entry.Species.PokedexNo.Text = fmt.Sprintf(format, pokedexNo)
 
 		// Map Game
 		if game, err := repo.common.GetGame(gameKey); err != nil {
@@ -182,7 +184,6 @@ func (repo *DatabaseShinyRepository) GetShiniesByDateRange(ctx *cmodel.DAContext
 		var entry dto.ShinyPokemon
 		entry.Details.Shiny = true
 		var pokedexNo int
-		var format string = "#%04d"
 		var gameKey string
 		var natureKey string
 		var characteristicKey string
@@ -197,7 +198,7 @@ func (repo *DatabaseShinyRepository) GetShiniesByDateRange(ctx *cmodel.DAContext
 			return nil, &errors.InternalServerError
 		}
 
-		entry.Species.PokedexId = fmt.Sprintf(format, pokedexNo)
+		entry.Species.PokedexNo = data.CreatePokedexNumber(pokedexNo, "#", 4)
 
 		// Map Game
 		if game, err := repo.common.GetGame(gameKey); err != nil {

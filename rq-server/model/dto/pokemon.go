@@ -2,14 +2,15 @@ package dto
 
 import (
 	"dezzles-apps/rq-server/model"
+	"dezzles-apps/rq-server/model/dto/data"
 	"time"
 )
 
 type PokemonSpecies struct {
-	PokedexId string `json:"pokedexId"`
-	Name      string `json:"name"`
-	Form      string `json:"form"`
-	ImageRef  string `json:"imageRef"`
+	PokedexNo data.PokedexNo `json:"pokedexNo"`
+	Name      string         `json:"name"`
+	Form      string         `json:"form"`
+	ImageRef  string         `json:"imageRef"`
 }
 
 type CatchDetails struct {

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
+	"dezzles-apps/rq-server/model/dto/data"
 
 	_ "embed"
 
@@ -78,10 +79,11 @@ func (gs *GameService) getPokemonByGame(ctx *cmodel.DAContext, gameName string) 
 		var characteristic sql.NullString
 		var notes sql.NullString
 		var shiny sql.NullBool
+		var pokedexNo int
 		pokemon := &dto.GamePokemon{}
 		err := rows.Scan(
 			&pokemon.Pokemon,
-			&pokemon.Species.PokedexId,
+			&pokedexNo,
 			&pokemon.Species.Name,
 			&pokemon.Species.Form,
 			&pokemon.Species.ImageRef,
@@ -92,6 +94,7 @@ func (gs *GameService) getPokemonByGame(ctx *cmodel.DAContext, gameName string) 
 			&notes,
 			&shiny,
 		)
+		pokemon.Species.PokedexNo = data.CreatePokedexNumber(pokedexNo, "#", 4)
 		if err != nil {
 			ctx.Logger.Error("Error retrieving pokemon row for game", zap.String("gameName", gameName), zap.Error(err))
 			return nil, model.InternalServerError

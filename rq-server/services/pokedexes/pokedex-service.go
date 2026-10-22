@@ -4,11 +4,11 @@ import (
 	"database/sql"
 	_ "embed"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 
 	errs "dezzles-apps/rq-server/model"
+	"dezzles-apps/rq-server/model/dto/data"
 	model "dezzles-apps/rq-server/model/dto/pokedexes"
 
 	cdb "github.com/dezzles-apps/go-common/db"
@@ -109,7 +109,8 @@ func (ps *PokedexService) getPokedexEntry(ctx *cmodel.DAContext, pokedex string,
 		return nil, errs.InternalServerError
 	}
 	var entry model.PokedexEntry
-	entry.PokedexNo = inputNo
+	entry.PokedexNo.Text = inputNo
+	entry.PokedexNo.Number = pokedexNo
 	var tempNo int
 	err := row.Scan(&tempNo, &entry.Pokemon, &entry.SpriteRef, &entry.Caught)
 	if err != nil {
@@ -126,7 +127,6 @@ func (ps *PokedexService) getPokedexEntries(ctx *cmodel.DAContext, pokedex *mode
 		return errs.InternalServerError
 	}
 	defer rows.Close()
-	var format string = "%s-%0" + strconv.Itoa(padding) + "d"
 	for rows.Next() {
 		var entry model.PokedexEntry
 		var pokedexNo int
@@ -135,7 +135,7 @@ func (ps *PokedexService) getPokedexEntries(ctx *cmodel.DAContext, pokedex *mode
 			ctx.Logger.Info("Error scanning pokedex entries", zap.String("pokedex", pokedex.Name), zap.Error(err))
 			return errs.InternalServerError
 		}
-		entry.PokedexNo = fmt.Sprintf(format, prefix, pokedexNo)
+		entry.PokedexNo = data.CreatePokedexNumber(pokedexNo, prefix+"-", padding)
 		if entry.Caught {
 			pokedex.Stats.Caught += 1
 		}

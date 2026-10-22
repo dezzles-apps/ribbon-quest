@@ -2,12 +2,27 @@ package data
 
 import (
 	"dezzles-apps/rq-server/model"
+	"fmt"
+	"strconv"
 )
 
+type PokedexNo struct {
+	Number int    `json:"number"`
+	Text   string `json:"text"`
+}
+
+func CreatePokedexNumber(number int, lead string, digits int) PokedexNo {
+	f := "%s%0" + strconv.Itoa(digits) + "d"
+	return PokedexNo{
+		Number: number,
+		Text:   fmt.Sprintf(f, lead, number),
+	}
+}
+
 type PokemonData struct {
-	PokedexNo int    `json:"pokedexNo"`
-	Species   string `json:"species"`
-	Forms     []Form `json:"forms"`
+	PokedexNo PokedexNo `json:"pokedexNo"`
+	Species   string    `json:"species"`
+	Forms     []Form    `json:"forms"`
 }
 
 type Form struct {

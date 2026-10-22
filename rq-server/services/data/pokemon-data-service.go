@@ -57,8 +57,10 @@ func (pc *PokemonDataService) GetAllPokemon(ctx *cmodel.DAContext) ([]*dto.Pokem
 		data, exists := pokemonMap[pokedexId]
 		if !exists {
 			pokemonData := &dto.PokemonData{
-				PokedexNo: pokedexId,
-				Species:   species,
+				PokedexNo: dto.PokedexNo{
+					Number: pokedexId,
+				},
+				Species: species,
 			}
 			pokemonData.Forms = append(pokemonData.Forms, form)
 			results = append(results, pokemonData)
@@ -87,7 +89,7 @@ func (pc *PokemonDataService) GetPokemon(ctx *cmodel.DAContext, pokedexNo int) (
 		}
 		var formName string
 		var formSprite string
-		err := rows.Scan(&result.PokedexNo, &result.Species, &formName, &formSprite)
+		err := rows.Scan(&result.PokedexNo.Number, &result.Species, &formName, &formSprite)
 		if err != nil {
 			ctx.Logger.Error("Error retrieving Pokemon", zap.Int("pokedexNo", pokedexNo), zap.Error(err))
 			return nil, model.InternalServerError
