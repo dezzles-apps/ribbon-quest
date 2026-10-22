@@ -2,7 +2,7 @@ package ribbons
 
 import (
 	"dezzles-apps/rq-server/model/dto"
-	"errors"
+	"dezzles-apps/rq-server/model/errors"
 
 	"github.com/dezzles-apps/go-common/db"
 	cmodel "github.com/dezzles-apps/go-common/model"
@@ -23,10 +23,10 @@ func NewRibbonStatsService(
 	}
 }
 
-func (rss *RibbonStatsService) GetStats(ctx *cmodel.DAContext) (*dto.RibbonStats, error) {
+func (rss *RibbonStatsService) GetStats(ctx *cmodel.DAContext) (*dto.RibbonStats, errors.Error) {
 	pokemon, err := rss.pokemonService.GetAllPokemon(ctx)
 	if err != nil {
-		return nil, errors.New("Something went wrong")
+		return nil, err
 	}
 	response := dto.RibbonStats{
 		Pokemon: pokemon,

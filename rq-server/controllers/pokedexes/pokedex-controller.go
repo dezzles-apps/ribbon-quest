@@ -37,7 +37,7 @@ func (pc *PokedexController) getPokedex(c *gin.Context) {
 	dex := c.Param("pokedex")
 	pokedexes, err := pc.pokedexService.GetPokedex(ctx, dex)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -48,7 +48,7 @@ func (pc *PokedexController) getPokedexes(c *gin.Context) {
 	ctx := cmodel.GetContext(c)
 	pokedexes, err := pc.pokedexService.GetPokedexes(ctx)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -61,7 +61,7 @@ func (pc *PokedexController) uncatchPokemon(c *gin.Context) {
 	pokedexNo := c.Param("pokedexNo")
 	res, err := pc.pokedexService.UncatchPokemon(ctx, pokedex, pokedexNo)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -74,7 +74,7 @@ func (pc *PokedexController) catchPokemon(c *gin.Context) {
 	pokedexNo := c.Param("pokedexNo")
 	res, err := pc.pokedexService.CatchPokemon(ctx, pokedex, pokedexNo)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 

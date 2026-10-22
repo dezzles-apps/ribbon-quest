@@ -5,6 +5,7 @@ import (
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 	"dezzles-apps/rq-server/model/dto/data"
+	"dezzles-apps/rq-server/model/errors"
 
 	_ "embed"
 
@@ -37,21 +38,21 @@ func NewGameService(
 	}
 }
 
-func (gs *GameService) GetGame(ctx *cmodel.DAContext, gameName string) (*dto.Game, error) {
+func (gs *GameService) GetGame(ctx *cmodel.DAContext, gameName string) (*dto.Game, errors.Error) {
 	return gs.getGame(ctx, gameName)
 }
 
-func (gs *GameService) getGame(ctx *cmodel.DAContext, gameName string) (*dto.Game, error) {
+func (gs *GameService) getGame(ctx *cmodel.DAContext, gameName string) (*dto.Game, errors.Error) {
 	game := &dto.Game{}
 	ctx.Logger.Info("Retrieving game data", zap.String("gameName", gameName))
 	row := gs.connection.GetDB().QueryRow(getGameInfoQuery, gameName)
 	viewOrder := 0
-	err := row.Scan(&game.GameKey, &game.Name, &viewOrder)
-	if err != nil {
-		if err == sql.ErrNoRows {
+	dberr := row.Scan(&game.GameKey, &game.Name, &viewOrder)
+	if dberr != nil {
+		if dberr == sql.ErrNoRows {
 			return nil, model.GameNotFound
 		}
-		ctx.Logger.Error("Error retrieving game data", zap.String("gameName", gameName), zap.Error(err))
+		ctx.Logger.Error("Error retrieving game data", zap.String("gameName", gameName), zap.Error(dberr))
 		return nil, model.InternalServerError
 	}
 	pokemon, err := gs.getPokemonByGame(ctx, gameName)
@@ -63,12 +64,12 @@ func (gs *GameService) getGame(ctx *cmodel.DAContext, gameName string) (*dto.Gam
 	return game, nil
 }
 
-func (gs *GameService) getPokemonByGame(ctx *cmodel.DAContext, gameName string) ([]*dto.GamePokemon, error) {
+func (gs *GameService) getPokemonByGame(ctx *cmodel.DAContext, gameName string) ([]*dto.GamePokemon, errors.Error) {
 	pokemonList := []*dto.GamePokemon{}
 	ctx.Logger.Info("Retrieving pokemon for game", zap.String("gameName", gameName))
-	rows, err := gs.connection.GetDB().Query(getGamePokemonQuery, gameName)
-	if err != nil {
-		ctx.Logger.Error("Error retrieving pokemon for game", zap.String("gameName", gameName), zap.Error(err))
+	rows, dberr := gs.connection.GetDB().Query(getGamePokemonQuery, gameName)
+	if dberr != nil {
+		ctx.Logger.Error("Error retrieving pokemon for game", zap.String("gameName", gameName), zap.Error(dberr))
 		return nil, model.InternalServerError
 	}
 	defer rows.Close()
@@ -116,11 +117,11 @@ func (gs *GameService) getPokemonByGame(ctx *cmodel.DAContext, gameName string) 
 		}
 		pokemonList = append(pokemonList, pokemon)
 	}
-	if err = rows.Err(); err != nil {
-		ctx.Logger.Error("Error retrieving pokemon rows for game", zap.String("gameName", gameName), zap.Error(err))
+	if dberr = rows.Err(); dberr != nil {
+		ctx.Logger.Error("Error retrieving pokemon rows for game", zap.String("gameName", gameName), zap.Error(dberr))
 		return nil, model.InternalServerError
 	}
-	err = gs.loadRibbonsForPokemon(ctx, gameName, pokemonList)
+	err := gs.loadRibbonsForPokemon(ctx, gameName, pokemonList)
 	if err != nil {
 		return nil, err
 	}
@@ -128,10 +129,11 @@ func (gs *GameService) getPokemonByGame(ctx *cmodel.DAContext, gameName string) 
 	return pokemonList, nil
 }
 
-func (gs *GameService) loadRibbonsForPokemon(ctx *cmodel.DAContext, gameName string, pokemon []*dto.GamePokemon) error {
-	rows, err := gs.connection.GetDB().Query(getGameRibbons, gameName)
-	if err != nil {
-		return err
+func (gs *GameService) loadRibbonsForPokemon(ctx *cmodel.DAContext, gameName string, pokemon []*dto.GamePokemon) errors.Error {
+	rows, dberr := gs.connection.GetDB().Query(getGameRibbons, gameName)
+	if dberr != nil {
+		ctx.Logger.Error("Error getting ribbons for Pokemon in game", zap.String("gameName", gameName))
+		return model.InternalServerError
 	}
 	defer rows.Close()
 
@@ -139,10 +141,10 @@ func (gs *GameService) loadRibbonsForPokemon(ctx *cmodel.DAContext, gameName str
 		var pokemonName string
 		var ribbon dto.PokemonRibbon
 		var achievedAt sql.NullTime
-		err := rows.Scan(&pokemonName, &ribbon.RibbonKey, &ribbon.Name, &ribbon.Achieved, &achievedAt, &ribbon.Category)
-		if err != nil {
-			ctx.Logger.Error("Error retrieving pokemon ribbons for game", zap.String("gameName", gameName), zap.Error(err))
-			return err
+		dberr := rows.Scan(&pokemonName, &ribbon.RibbonKey, &ribbon.Name, &ribbon.Achieved, &achievedAt, &ribbon.Category)
+		if dberr != nil {
+			ctx.Logger.Error("Error retrieving pokemon ribbons for game", zap.String("gameName", gameName), zap.Error(dberr))
+			return model.InternalServerError
 		}
 		if achievedAt.Valid {
 			ribbon.AchievedAt = &achievedAt.Time
@@ -154,15 +156,15 @@ func (gs *GameService) loadRibbonsForPokemon(ctx *cmodel.DAContext, gameName str
 			}
 		}
 	}
-	if err = rows.Err(); err != nil {
-		ctx.Logger.Error("Error retrieving pokemon ribbons for game", zap.String("gameName", gameName), zap.Error(err))
+	if dberr = rows.Err(); dberr != nil {
+		ctx.Logger.Error("Error retrieving pokemon ribbons for game", zap.String("gameName", gameName), zap.Error(dberr))
 		return model.InternalServerError
 	}
 	ctx.Logger.Info("Retrieved pokemon ribbons for game", zap.String("gameName", gameName))
 	return nil
 }
 
-func (gs *GameService) GetAllGames(ctx *cmodel.DAContext) ([]*dto.GameWithStats, error) {
+func (gs *GameService) GetAllGames(ctx *cmodel.DAContext) ([]*dto.GameWithStats, errors.Error) {
 	games := []*dto.GameWithStats{}
 	rows, err := gs.connection.GetDB().Query(getAllGamesQuery)
 	if err != nil {
@@ -179,7 +181,7 @@ func (gs *GameService) GetAllGames(ctx *cmodel.DAContext) ([]*dto.GameWithStats,
 		err := rows.Scan(&game.GameKey, &game.Name, &achievedRow, &total)
 		if err != nil {
 			ctx.Logger.Error("GetAllGames: error scanning games", zap.Error(err))
-			return nil, err
+			return nil, errors.InternalServerError
 		}
 		if _, exists := allGames[game.GameKey]; !exists {
 			allGames[game.GameKey] = game

@@ -36,7 +36,7 @@ func (ec *EventsController) getEvents(c *gin.Context) {
 	pokemon := c.Query("pokemon")
 	events, err := ec.eventService.GetEvents(ctx, date, category, pokemon)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 	var result = dto.Page[dto.Event]{

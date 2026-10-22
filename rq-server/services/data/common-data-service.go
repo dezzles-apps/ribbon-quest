@@ -7,7 +7,6 @@ import (
 	repos "dezzles-apps/rq-server/repositories"
 
 	cmodel "github.com/dezzles-apps/go-common/model"
-	"github.com/dezzles-apps/go-common/model/responses"
 	"go.uber.org/zap"
 )
 
@@ -22,7 +21,7 @@ func NewCommonDataService(repository repos.CommonDataRepository) *CommonDataServ
 	return cds
 }
 
-func (cds *CommonDataService) GetAllData(ctx *cmodel.DAContext) (*data.CommonData, error) {
+func (cds *CommonDataService) GetAllData(ctx *cmodel.DAContext) (*data.CommonData, errors.Error) {
 	result := &data.CommonData{}
 	ctx.Logger.Info("Getting common data: Characteristics")
 	kvp, err := cds.GetCharacteristics()
@@ -60,27 +59,27 @@ func (cds *CommonDataService) GetAllData(ctx *cmodel.DAContext) (*data.CommonDat
 	return result, nil
 }
 
-func (cds *CommonDataService) GetCharacteristics() ([]model.KeyValuePair, *responses.Error) {
+func (cds *CommonDataService) GetCharacteristics() ([]model.KeyValuePair, errors.Error) {
 	return cds.repository.GetCharacteristics()
 }
 
-func (cds *CommonDataService) GetGames() ([]model.KeyValuePair, *responses.Error) {
+func (cds *CommonDataService) GetGames() ([]model.KeyValuePair, errors.Error) {
 	return cds.repository.GetGames()
 }
 
-func (cds *CommonDataService) GetNatures() ([]model.KeyValuePair, *responses.Error) {
+func (cds *CommonDataService) GetNatures() ([]model.KeyValuePair, errors.Error) {
 	return cds.repository.GetNatures()
 }
 
-func (cds *CommonDataService) GetMethods() ([]model.KeyValuePair, *responses.Error) {
+func (cds *CommonDataService) GetMethods() ([]model.KeyValuePair, errors.Error) {
 	return cds.repository.GetMethods()
 }
 
-func (cds *CommonDataService) GetGenders() ([]model.KeyValuePair, *responses.Error) {
+func (cds *CommonDataService) GetGenders() ([]model.KeyValuePair, errors.Error) {
 	return cds.repository.GetGenders()
 }
 
-func (cds *CommonDataService) ValidGame(game string) *responses.Error {
+func (cds *CommonDataService) ValidGame(game string) errors.Error {
 	games, err := cds.GetGames()
 	if err != nil {
 		return nil
@@ -90,10 +89,10 @@ func (cds *CommonDataService) ValidGame(game string) *responses.Error {
 			return nil
 		}
 	}
-	return &errors.InvalidGame
+	return errors.InvalidGame
 }
 
-func (cds *CommonDataService) ValidMethod(method string) *responses.Error {
+func (cds *CommonDataService) ValidMethod(method string) errors.Error {
 	methods, err := cds.GetMethods()
 	if err != nil {
 		return nil
@@ -103,10 +102,10 @@ func (cds *CommonDataService) ValidMethod(method string) *responses.Error {
 			return nil
 		}
 	}
-	return &errors.InvalidMethod
+	return errors.InvalidMethod
 }
 
-func (cds *CommonDataService) ValidCharacteristic(characteristic string) *responses.Error {
+func (cds *CommonDataService) ValidCharacteristic(characteristic string) errors.Error {
 	characteristics, err := cds.GetCharacteristics()
 	if err != nil {
 		return nil
@@ -116,10 +115,10 @@ func (cds *CommonDataService) ValidCharacteristic(characteristic string) *respon
 			return nil
 		}
 	}
-	return &errors.InvalidCharacteristic
+	return errors.InvalidCharacteristic
 }
 
-func (cds *CommonDataService) ValidNature(nature string) *responses.Error {
+func (cds *CommonDataService) ValidNature(nature string) errors.Error {
 	natures, err := cds.GetNatures()
 	if err != nil {
 		return nil
@@ -129,10 +128,10 @@ func (cds *CommonDataService) ValidNature(nature string) *responses.Error {
 			return nil
 		}
 	}
-	return &errors.InvalidNature
+	return errors.InvalidNature
 }
 
-func (cds *CommonDataService) ValidGender(gender string) *responses.Error {
+func (cds *CommonDataService) ValidGender(gender string) errors.Error {
 	genders, err := cds.GetGenders()
 	if err != nil {
 		return nil
@@ -142,5 +141,5 @@ func (cds *CommonDataService) ValidGender(gender string) *responses.Error {
 			return nil
 		}
 	}
-	return &errors.InvalidGender
+	return errors.InvalidGender
 }

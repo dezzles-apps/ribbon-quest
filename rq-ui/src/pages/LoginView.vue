@@ -39,14 +39,12 @@ async function handleLogin() {
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(`${data.error || 'Unknown error'}`);
+      viewError.value = data.errors[0].message
+      throw new Error(data.errors);
     }
 
     authStore.setToken(data.token);
     router.push('/');
-  } catch (error) {
-    console.error('Error during login:', error);
-    viewError.value = (error as Error).message;
   } finally {
     loading.value = false;
   }

@@ -3,20 +3,17 @@ package services
 import (
 	"database/sql"
 	"dezzles-apps/rq-server/model/dto"
-	"errors"
 	"strings"
 	"time"
 
 	_ "embed"
 
-	cmodel "github.com/dezzles-apps/go-common/model"
+	"dezzles-apps/rq-server/model/errors"
 
 	cdb "github.com/dezzles-apps/go-common/db"
+	cmodel "github.com/dezzles-apps/go-common/model"
 	"go.uber.org/zap"
 )
-
-//go:embed sql/get-events.sql
-var getAllEvents string
 
 type EventService struct {
 	connection *cdb.Database
@@ -28,7 +25,7 @@ func NewEventService(db *cdb.Database) *EventService {
 	}
 }
 
-func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
+func (es *EventService) readEvents(ctx *cmodel.DAContext, rows *sql.Rows) ([]dto.Event, errors.Error) {
 	eventList := []dto.Event{}
 	for rows.Next() {
 		var ribbonKey sql.NullString
@@ -52,7 +49,8 @@ func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 			&pokedex,
 		)
 		if err != nil {
-			return nil, err
+			ctx.Logger.Error("Error loading event row", zap.Error(err))
+			return nil, errors.InternalServerError
 		}
 		event.MetaData = make(map[string]string)
 		if ribbonKey.Valid {
@@ -81,7 +79,7 @@ func (es *EventService) readEvents(rows *sql.Rows) ([]dto.Event, error) {
 	return eventList, nil
 }
 
-func (es *EventService) GetLatestEvents(ctx *cmodel.DAContext, date string) ([]dto.Event, error) {
+func (es *EventService) GetLatestEvents(ctx *cmodel.DAContext, date string) ([]dto.Event, errors.Error) {
 	var rows *sql.Rows
 	var err error
 	ctx.Logger.Info("Getting latest events")
@@ -90,7 +88,7 @@ func (es *EventService) GetLatestEvents(ctx *cmodel.DAContext, date string) ([]d
 		parsedDate, err := time.Parse(time.RFC3339, date)
 		if err != nil {
 			ctx.Logger.Info("Invalid date provided", zap.String("date", date))
-			return nil, errors.New("Invalid key")
+			return nil, errors.InvalidKey
 		}
 		rows, err = es.connection.GetDB().Query("SELECT * FROM events_v2 WHERE timestamp < ? LIMIT 10", parsedDate)
 	} else {
@@ -98,13 +96,14 @@ func (es *EventService) GetLatestEvents(ctx *cmodel.DAContext, date string) ([]d
 	}
 	defer rows.Close()
 	if err != nil {
-		return nil, err
+		ctx.Logger.Error("Error loading latest event row", zap.Error(err))
+		return nil, errors.InternalServerError
 	}
 	ctx.Logger.Info("Latest events retrieved")
-	return es.readEvents(rows)
+	return es.readEvents(ctx, rows)
 }
 
-func (es *EventService) GetEvents(ctx *cmodel.DAContext, date string, category string, pokemon string) ([]dto.Event, error) {
+func (es *EventService) GetEvents(ctx *cmodel.DAContext, date string, category string, pokemon string) ([]dto.Event, errors.Error) {
 	var query strings.Builder
 	var params []any
 	query.WriteString("SELECT * FROM events_v5 WHERE 1")
@@ -113,7 +112,7 @@ func (es *EventService) GetEvents(ctx *cmodel.DAContext, date string, category s
 		parsedDate, err := time.Parse(time.RFC3339, date)
 		if err != nil {
 			ctx.Logger.Info("Invalid date provided", zap.String("date", date))
-			return nil, errors.New("Invalid key")
+			return nil, errors.InvalidKey
 		}
 		params = append(params, parsedDate)
 		query.WriteString(" AND timestamp < ?")
@@ -128,10 +127,11 @@ func (es *EventService) GetEvents(ctx *cmodel.DAContext, date string, category s
 	}
 	query.WriteString(" LIMIT 10")
 	rows, err := es.connection.GetDB().Query(query.String(), params...)
-	defer rows.Close()
 	if err != nil {
-		return nil, err
+		ctx.Logger.Error("Error getting events", zap.Error(err))
+		return nil, errors.InternalServerError
 	}
+	defer rows.Close()
 	ctx.Logger.Info("Latest events retrieved")
-	return es.readEvents(rows)
+	return es.readEvents(ctx, rows)
 }

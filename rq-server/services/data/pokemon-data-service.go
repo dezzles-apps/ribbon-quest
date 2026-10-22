@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"dezzles-apps/rq-server/model"
 	dto "dezzles-apps/rq-server/model/dto/data"
+	"dezzles-apps/rq-server/model/errors"
 	derrors "dezzles-apps/rq-server/model/errors"
 
 	_ "embed"
 
 	"github.com/dezzles-apps/go-common/db"
 	cmodel "github.com/dezzles-apps/go-common/model"
-	"github.com/dezzles-apps/go-common/model/responses"
 	"go.uber.org/zap"
 )
 
@@ -29,7 +29,7 @@ func NewPokemonDataService(
 	}
 }
 
-func (pc *PokemonDataService) GetAllPokemon(ctx *cmodel.DAContext) ([]*dto.PokemonData, error) {
+func (pc *PokemonDataService) GetAllPokemon(ctx *cmodel.DAContext) ([]*dto.PokemonData, errors.Error) {
 	var pokemonMap = make(map[int]*dto.PokemonData)
 	var results = []*dto.PokemonData{}
 
@@ -69,12 +69,18 @@ func (pc *PokemonDataService) GetAllPokemon(ctx *cmodel.DAContext) ([]*dto.Pokem
 			data.Forms = append(data.Forms, form)
 
 		}
+
+	}
+	e := rows.Err()
+	if e != nil {
+		ctx.Logger.Error("GetAllPokemon: Failed to read pokemon row", zap.Error(e))
+		return nil, errors.InternalServerError
 	}
 	ctx.Logger.Info("Successfully retrieved pokemon data")
 	return results, nil
 }
 
-func (pc *PokemonDataService) GetPokemon(ctx *cmodel.DAContext, pokedexNo int) (*dto.PokemonData, error) {
+func (pc *PokemonDataService) GetPokemon(ctx *cmodel.DAContext, pokedexNo int) (*dto.PokemonData, errors.Error) {
 	var result *dto.PokemonData = nil
 	ctx.Logger.Info("Retrieving Pokemon", zap.Int("pokedexNo", pokedexNo))
 	var rows, err = pc.connection.GetDB().Query(getPokemonDataQuery+" AND pf.pokedex_id = ?", pokedexNo)
@@ -102,11 +108,17 @@ func (pc *PokemonDataService) GetPokemon(ctx *cmodel.DAContext, pokedexNo int) (
 
 		result.Forms = append(result.Forms, form)
 	}
+	e := rows.Err()
+	if e != nil {
+		ctx.Logger.Error("GetPokemon: Failed to read pokemon row", zap.Error(e))
+		return nil, errors.InternalServerError
+	}
+
 	ctx.Logger.Info("Successfully retrieved Pokemon", zap.Int("pokedexNo", pokedexNo))
 	return result, nil
 }
 
-func (pds *PokemonDataService) GetFormIdByName(ctx *cmodel.DAContext, formName string) (int, *responses.Error) {
+func (pds *PokemonDataService) GetFormIdByName(ctx *cmodel.DAContext, formName string) (int, errors.Error) {
 	var formId int
 	ctx.Logger.Info("Retrieving Pokemon form id", zap.String("formName", formName))
 	row := pds.connection.GetDB().QueryRow(
@@ -117,17 +129,17 @@ func (pds *PokemonDataService) GetFormIdByName(ctx *cmodel.DAContext, formName s
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.Logger.Error("No form found", zap.String("formName", formName), zap.Error(err))
-			return 0, &derrors.InvalidFormError
+			return 0, derrors.InvalidFormError
 		} else {
 			ctx.Logger.Error("Error retrieving Pokemon form", zap.String("formName", formName), zap.Error(err))
-			return 0, &derrors.InternalServerError
+			return 0, derrors.InternalServerError
 		}
 	}
 	ctx.Logger.Info("Retrieved Pokemon form", zap.String("formName", formName), zap.Int("formId", formId))
 	return formId, nil
 }
 
-func (pds *PokemonDataService) GetFormId(ctx *cmodel.DAContext, pokedexNo int, form string) (int, error) {
+func (pds *PokemonDataService) GetFormId(ctx *cmodel.DAContext, pokedexNo int, form string) (int, errors.Error) {
 	var formId int
 	ctx.Logger.Info("Retrieving Pokemon form id", zap.Int("pokedexNo", pokedexNo), zap.String("form", form))
 	row := pds.connection.GetDB().QueryRow(

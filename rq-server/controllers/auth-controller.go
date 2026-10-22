@@ -3,6 +3,7 @@ package controllers
 import (
 	"dezzles-apps/rq-server/interfaces"
 	"dezzles-apps/rq-server/model"
+	"dezzles-apps/rq-server/model/errors"
 	"dezzles-apps/rq-server/services"
 
 	"net/http"
@@ -39,13 +40,13 @@ func (ac *AuthController) registerRoutes(ctx interfaces.ControllerInitContext) {
 func (ac *AuthController) register(c *gin.Context) {
 	var input model.AuthInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"errors": errors.InvalidRequestBody})
 		return
 	}
 	ctx := cmodel.GetContext(c)
 	err := ac.userService.RegisterUser(ctx, input)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 	c.JSON(200, gin.H{"message": "user registered successfully"})
@@ -54,13 +55,13 @@ func (ac *AuthController) register(c *gin.Context) {
 func (ac *AuthController) login(c *gin.Context) {
 	var input model.AuthInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"errors": errors.InvalidRequestBody})
 		return
 	}
 	ctx := cmodel.GetContext(c)
 	err := ac.userService.LoginUser(ctx, input)
 	if err != nil {
-		c.JSON(401, gin.H{"error": err.Error()})
+		c.JSON(401, gin.H{"errors": err.Errors()})
 		return
 	}
 	generateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -68,10 +69,11 @@ func (ac *AuthController) login(c *gin.Context) {
 		"exp": time.Now().Add(time.Hour * 72).Unix(),
 	})
 
-	token, err := generateToken.SignedString([]byte(ac.config.JwtSecret))
+	token, e := generateToken.SignedString([]byte(ac.config.JwtSecret))
 
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to generate token"})
+	if e != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"errors": gin.H{"errors": errors.InternalServerError.Errors()}})
+		return
 	}
 
 	c.JSON(200, gin.H{

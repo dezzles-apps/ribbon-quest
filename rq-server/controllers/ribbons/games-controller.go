@@ -33,7 +33,7 @@ func (gc *GamesController) getAllGames(c *gin.Context) {
 	ctx := cmodel.GetContext(c)
 	allGames, err := gc.gameService.GetAllGames(ctx)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -45,7 +45,7 @@ func (gc *GamesController) getGame(c *gin.Context) {
 	game := c.Param("game")
 	gameData, err := gc.gameService.GetGame(ctx, game)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
