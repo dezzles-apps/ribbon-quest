@@ -75,3 +75,4 @@ __screenshots__/
 *.timestamp-*-*.mjs
 
 .planning
+.documentation
