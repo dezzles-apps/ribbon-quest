@@ -6,14 +6,12 @@ import (
 	repositories "dezzles-apps/rq-server/repositories"
 	dataServices "dezzles-apps/rq-server/services/data"
 	"testing"
-
-	"github.com/dezzles-apps/go-common/model/responses"
 )
 
 type CreateShinyTest struct {
 	Description string
 	Request     shinies.CreateShinyRequest
-	Expected    responses.Error
+	Expected    errors.Error
 }
 
 func setupTestService() *ShinyService {
@@ -122,13 +120,13 @@ func TestValidateCreateShiny(t *testing.T) {
 		},
 	}
 	for _, test := range tests {
-		actual := testService.validateRequest(test.Request)
+		actual := testService.validateRequest(test.Request).Errors()
 		if len(actual) != 1 {
 			t.Errorf("%s: expected 1 error, got %d", test.Description, len(actual))
 			continue
 		}
 		if actual[0] != test.Expected {
-			t.Errorf("%s: Expected %s, got but got %s", test.Description, &test.Expected, &actual[0])
+			t.Errorf("%s: Expected %s, got but got %s", test.Description, test.Expected.Error(), actual[0].Error())
 		}
 	}
 }
