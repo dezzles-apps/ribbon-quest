@@ -1,5 +1,7 @@
+import type { PokedexNo } from './pokedex'
+
 interface PokemonData {
-  pokedexNo : number
+  pokedexNo : PokedexNo
   species: string
   forms: Form[]
 }

@@ -37,7 +37,7 @@ func (pc *ShinyController) getShinies(c *gin.Context) {
 	ctx := cmodel.GetContext(c)
 	pokedexes, err := pc.shinyService.GetShinies(ctx)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -47,17 +47,13 @@ func (pc *ShinyController) getShinies(c *gin.Context) {
 func (pc *ShinyController) createShiny(c *gin.Context) {
 	var input dto.CreateShinyRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(400, gin.H{"errors": errors.InvalidRequestBody.Errors()})
 		return
 	}
 	ctx := cmodel.GetContext(c)
 	err := pc.shinyService.CreateShiny(ctx, input)
 	if err != nil {
-		if err[0] == errors.InternalServerError {
-			c.JSON(500, gin.H{"errors": err})
-		} else {
-			c.JSON(400, gin.H{"errors": err})
-		}
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -71,7 +67,7 @@ func (pc *ShinyController) getShinyStats(c *gin.Context) {
 
 	stats, err := pc.shinyService.GetShinyStats(ctx, startDate, endDate)
 	if err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 

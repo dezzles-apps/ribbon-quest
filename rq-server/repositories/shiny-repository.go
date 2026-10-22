@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"dezzles-apps/rq-server/model/dto"
+	"dezzles-apps/rq-server/model/dto/data"
 	"dezzles-apps/rq-server/model/dto/shinies"
 	"dezzles-apps/rq-server/model/errors"
 	_ "embed"
@@ -11,7 +12,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/dezzles-apps/go-common/db"
-	"github.com/dezzles-apps/go-common/model/responses"
 )
 
 //go:embed "sql/get-all-shinies.sql"
@@ -21,9 +21,9 @@ var getAllShinies string
 var getShiniesByDateRange string
 
 type ShinyRepository interface {
-	GetAllShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, *responses.Error)
-	GetShiniesByDateRange(ctx *cmodel.DAContext, startDate string, endDate string) ([]dto.ShinyPokemon, *responses.Error)
-	SaveShiny(ctx *cmodel.DAContext, request shinies.CreateShinyRequest) []responses.Error
+	GetAllShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, errors.Error)
+	GetShiniesByDateRange(ctx *cmodel.DAContext, startDate string, endDate string) ([]dto.ShinyPokemon, errors.Error)
+	SaveShiny(ctx *cmodel.DAContext, request shinies.CreateShinyRequest) errors.Error
 }
 
 type DatabaseShinyRepository struct {
@@ -41,7 +41,7 @@ func NewDatabaseShinyRepository(
 	}
 }
 
-func (repo *DatabaseShinyRepository) SaveShiny(ctx *cmodel.DAContext, request shinies.CreateShinyRequest) []responses.Error {
+func (repo *DatabaseShinyRepository) SaveShiny(ctx *cmodel.DAContext, request shinies.CreateShinyRequest) errors.Error {
 	// Get form_id from the form sprite_ref
 	var formId int
 	row := repo.connection.GetDB().QueryRow(
@@ -51,7 +51,7 @@ func (repo *DatabaseShinyRepository) SaveShiny(ctx *cmodel.DAContext, request sh
 	err := row.Scan(&formId)
 	if err != nil {
 		ctx.Logger.Error("Error getting form ID", zap.String("form", request.Form), zap.Error(err))
-		return []responses.Error{errors.InternalServerError}
+		return errors.InternalServerError
 	}
 
 	// Insert shiny into database
@@ -76,29 +76,29 @@ func (repo *DatabaseShinyRepository) SaveShiny(ctx *cmodel.DAContext, request sh
 			zap.String("game", request.Game),
 			zap.Error(err),
 		)
-		return []responses.Error{errors.InternalServerError}
+		return errors.InternalServerError
 	}
 
 	shinyId, err := result.LastInsertId()
 	if err != nil {
 		ctx.Logger.Error("Error retrieving shiny ID after insert", zap.Error(err))
-		return []responses.Error{errors.InternalServerError}
+		return errors.InternalServerError
 	}
 
 	ctx.Logger.Info("Shiny successfully saved", zap.Int64("shinyId", shinyId), zap.String("form", request.Form))
 	return nil
 }
 
-func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, *responses.Error) {
+func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, errors.Error) {
 	shinies := make([]dto.ShinyPokemon, 0)
 	rows, err := repo.connection.GetDB().Query(getAllShinies)
 	if err != nil {
 		ctx.Logger.Info("Error getting shinies", zap.Error(err))
-		return nil, &errors.InternalServerError
+		return nil, errors.InternalServerError
 	}
 	if rows.Err() != nil {
 		ctx.Logger.Info("Error getting shiny rows", zap.Error(err))
-		return nil, &errors.InternalServerError
+		return nil, errors.InternalServerError
 	}
 	defer rows.Close()
 	for rows.Next() {
@@ -117,10 +117,11 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 		)
 		if err != nil {
 			ctx.Logger.Info("Error getting shinies", zap.Error(err))
-			return nil, &errors.InternalServerError
+			return nil, errors.InternalServerError
 		}
 
-		entry.Species.PokedexId = fmt.Sprintf(format, pokedexNo)
+		entry.Species.PokedexNo.Number = pokedexNo
+		entry.Species.PokedexNo.Text = fmt.Sprintf(format, pokedexNo)
 
 		// Map Game
 		if game, err := repo.common.GetGame(gameKey); err != nil {
@@ -161,28 +162,27 @@ func (repo *DatabaseShinyRepository) GetAllShinies(ctx *cmodel.DAContext) ([]dto
 	}
 	if err := rows.Err(); err != nil {
 		ctx.Logger.Info("Error getting shiny rows", zap.Error(err))
-		return nil, &errors.InternalServerError
+		return nil, errors.InternalServerError
 	}
 	return shinies, nil
 }
 
-func (repo *DatabaseShinyRepository) GetShiniesByDateRange(ctx *cmodel.DAContext, startDate string, endDate string) ([]dto.ShinyPokemon, *responses.Error) {
+func (repo *DatabaseShinyRepository) GetShiniesByDateRange(ctx *cmodel.DAContext, startDate string, endDate string) ([]dto.ShinyPokemon, errors.Error) {
 	shinies := make([]dto.ShinyPokemon, 0)
 	rows, err := repo.connection.GetDB().Query(getShiniesByDateRange, startDate, endDate)
 	if err != nil {
 		ctx.Logger.Info("Error getting shinies by date range", zap.String("startDate", startDate), zap.String("endDate", endDate), zap.Error(err))
-		return nil, &errors.InternalServerError
+		return nil, errors.InternalServerError
 	}
 	if rows.Err() != nil {
 		ctx.Logger.Info("Error getting shiny rows", zap.Error(err))
-		return nil, &errors.InternalServerError
+		return nil, errors.InternalServerError
 	}
 	defer rows.Close()
 	for rows.Next() {
 		var entry dto.ShinyPokemon
 		entry.Details.Shiny = true
 		var pokedexNo int
-		var format string = "#%04d"
 		var gameKey string
 		var natureKey string
 		var characteristicKey string
@@ -194,10 +194,10 @@ func (repo *DatabaseShinyRepository) GetShiniesByDateRange(ctx *cmodel.DAContext
 		)
 		if err != nil {
 			ctx.Logger.Info("Error scanning shiny from date range query", zap.Error(err))
-			return nil, &errors.InternalServerError
+			return nil, errors.InternalServerError
 		}
 
-		entry.Species.PokedexId = fmt.Sprintf(format, pokedexNo)
+		entry.Species.PokedexNo = data.CreatePokedexNumber(pokedexNo, "#", 4)
 
 		// Map Game
 		if game, err := repo.common.GetGame(gameKey); err != nil {
@@ -238,7 +238,7 @@ func (repo *DatabaseShinyRepository) GetShiniesByDateRange(ctx *cmodel.DAContext
 	}
 	if err := rows.Err(); err != nil {
 		ctx.Logger.Info("Error getting shiny rows", zap.Error(err))
-		return nil, &errors.InternalServerError
+		return nil, errors.InternalServerError
 	}
 	return shinies, nil
 }

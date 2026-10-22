@@ -1,13 +1,100 @@
 package errors
 
-import (
-	"github.com/dezzles-apps/go-common/model/responses"
-)
+type Errors interface {
+	StatusCode() int
+	Err() []Error
+	Fail() bool
+	Error() string
+}
 
-var InvalidGame = responses.CreateError("game", "Invalid game")
-var InvalidMethod = responses.CreateError("method", "Invalid method")
-var InvalidCharacteristic = responses.CreateError("characteristic", "Invalid characteristic")
-var InvalidNature = responses.CreateError("nature", "Invalid nature")
-var InvalidGender = responses.CreateError("gender", "Invalid gender")
+type Error interface {
+	StatusCode() int
+	Errors() []Error
+	Err() Error
+	Fail() bool
+	Error() string
+}
 
-var InternalServerError = responses.CreateError("Internal Server Error", "Something went wrong")
+type ValidationErrors struct {
+	errors []Error
+}
+
+func (ve *ValidationErrors) StatusCode() int {
+	return 400
+}
+func (ve *ValidationErrors) Fail() bool {
+	return len(ve.errors) > 0
+}
+func (ve *ValidationErrors) Errors() []Error {
+	return ve.errors
+}
+func (ve *ValidationErrors) AddError(err Error) {
+	ve.errors = append(ve.errors, err)
+}
+func (ve *ValidationErrors) Err() Error {
+	return ve
+}
+func (ve *ValidationErrors) Error() string {
+	return "Validation errors occurred"
+}
+
+type ValidationError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+	fail    bool
+	code    int
+}
+
+func (ve *ValidationError) StatusCode() int {
+	return ve.code
+}
+
+func (ve *ValidationError) Err() Error {
+	return ve
+}
+
+func (ve *ValidationError) Error() string {
+	return ve.Message
+}
+
+func (ve *ValidationError) Errors() []Error {
+	return []Error{ve}
+}
+
+func (ve *ValidationError) Fail() bool {
+	return ve.fail
+}
+
+func CreateError(field string, message string) Error {
+	return &ValidationError{
+		Field:   field,
+		Message: message,
+		fail:    false,
+		code:    400,
+	}
+}
+
+var InvalidGame = CreateError("game", "Invalid game")
+var InvalidMethod = CreateError("method", "Invalid method")
+var InvalidCharacteristic = CreateError("characteristic", "Invalid characteristic")
+var InvalidNature = CreateError("nature", "Invalid nature")
+var InvalidGender = CreateError("gender", "Invalid gender")
+var InvalidKey = CreateError("key", "Invalid key provided")
+var UserRegistrationDisabled = CreateError("", "User registration disabled")
+var IncorrectUsernameOrPassword = CreateError("", "Incorrect username or password")
+var InvalidRibbonCombination = CreateError("", "Invalid ribbon combination")
+var InvalidRequestBody = CreateError("", "Invalid Request Body")
+var MissingAuthHeader = CreateError("", "Authorization header is required")
+var InvalidAuthorizationHeader = CreateError("", "Invalid Authorization Header")
+var ExpiredToken = CreateError("", "Expired Auth Token")
+var InternalServerError = &ValidationError{
+	Message: "Internal Server Error",
+	fail:    true,
+	code:    500,
+}
+
+func FromError(title string, e error) Error {
+	return &ValidationError{
+		Message: e.Error(),
+	}
+}

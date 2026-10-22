@@ -36,7 +36,7 @@ function getRibbonClass(entry: PokedexEntry): string[] {
     classes.push('ribbon-not-achieved' + mod);
   }
   if (authStore.isAuthenticated) {
-    if (loadingRibbons.value.get(entry.pokedexNo)) {
+    if (loadingRibbons.value.get(entry.pokedexNo.text)) {
       classes.push('ribbon-loading');
     } else {
       classes.push('ribbon-clickable');
@@ -51,14 +51,14 @@ function toggleEntry(entry: PokedexEntry) {
   if (!authStore.isAuthenticated) {
     return;
   }
-  const isLoading = loadingRibbons.value.get(entry.pokedexNo) || false;
+  const isLoading = loadingRibbons.value.get(entry.pokedexNo.text) || false;
   if (isLoading) {
     return;
   }
 
-  loadingRibbons.value.set(entry.pokedexNo, true);
+  loadingRibbons.value.set(entry.pokedexNo.text, true);
   let method = entry.caught ? 'DELETE' : 'POST';
-  api.apiFetch(API.Pokedexes.UpdatePokedex(props.pokedex, entry.pokedexNo), {
+  api.apiFetch(API.Pokedexes.UpdatePokedex(props.pokedex, entry.pokedexNo.text), {
     method: method,
     headers: {
       'Content-Type': 'application/json'
@@ -75,7 +75,7 @@ function toggleEntry(entry: PokedexEntry) {
       console.error('Error toggling catch:', error);
     })
     .finally(() => {
-      loadingRibbons.value.set(entry.pokedexNo, false);
+      loadingRibbons.value.set(entry.pokedexNo.text, false);
     });
 }
 
@@ -85,7 +85,7 @@ function toggleEntry(entry: PokedexEntry) {
 <template>
   <div class="box ma-auto text-center" style="width: 100%;">
     <slot name="title">
-      <h2 class="title is-4">{{ entries[0].pokedexNo }} - {{ entries[entries.length -1].pokedexNo }}</h2>
+      <h2 class="title is-4">{{ entries[0].pokedexNo.text }} - {{ entries[entries.length -1].pokedexNo.text }}</h2>
     </slot>
     <div style="display: inline-flex; flex-wrap: wrap; max-width: 780px;" class="ma-auto">
       <div
@@ -93,11 +93,11 @@ function toggleEntry(entry: PokedexEntry) {
         :class="getRibbonClass(entry)"
         v-for="entry in props.entries"
         :style="{ backgroundImage: `url('${getPokemonImage(entry)}')` }"
-        :key="entry.pokedexNo"
+        :key="entry.pokedexNo.text"
         @click="toggleEntry(entry)"
       >
         <div class="ribbon-name">
-          {{ entry.pokedexNo }}
+          {{ entry.pokedexNo.text }}
         </div>
 
         <div class="ribbon-pokemon-name">

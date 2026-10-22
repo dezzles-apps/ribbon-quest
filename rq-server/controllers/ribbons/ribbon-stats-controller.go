@@ -2,7 +2,6 @@ package ribbons
 
 import (
 	"dezzles-apps/rq-server/interfaces"
-	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/services/ribbons"
 
 	cmodel "github.com/dezzles-apps/go-common/model"
@@ -30,7 +29,7 @@ func (rsc *RibbonStatsController) getStats(c *gin.Context) {
 	ctx := cmodel.GetContext(c)
 	stats, err := rsc.ribbonStatsService.GetStats(ctx)
 	if err != nil {
-		c.JSON(200, gin.H{"errors": model.InternalServerError})
+		c.JSON(200, gin.H{"errors": err.Errors()})
 		return
 	}
 	c.JSON(200, gin.H{"data": stats})

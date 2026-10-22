@@ -3,6 +3,7 @@ package ribbons
 import (
 	"dezzles-apps/rq-server/interfaces"
 	"dezzles-apps/rq-server/model/dto"
+	"dezzles-apps/rq-server/model/errors"
 	services "dezzles-apps/rq-server/services/ribbons"
 
 	cmodel "github.com/dezzles-apps/go-common/model"
@@ -45,7 +46,7 @@ func (pc *PokemonController) getAllPokemon(c *gin.Context) {
 	ctx := cmodel.GetContext(c)
 	allPokemon, err := pc.pokemonService.GetAllPokemon(ctx)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -57,7 +58,7 @@ func (pc *PokemonController) getPokemon(c *gin.Context) {
 	pokemon := c.Param("pokemon")
 	pokemonData, err := pc.pokemonService.GetPokemon(ctx, pokemon)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -71,7 +72,7 @@ func (pc *PokemonController) addRibbon(c *gin.Context) {
 
 	ribbonData, err := pc.ribbonService.AddRibbon(ctx, pokemon, ribbon)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -85,7 +86,7 @@ func (pc *PokemonController) removeRibbon(c *gin.Context) {
 
 	ribbonData, err := pc.ribbonService.RemoveRibbon(ctx, pokemon, ribbon)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -98,7 +99,7 @@ func (pc *PokemonController) catchPokemon(c *gin.Context) {
 
 	pokemonData, err := pc.pokemonService.CatchPokemon(ctx, pokemon)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -110,13 +111,13 @@ func (pc *PokemonController) updatePokemon(c *gin.Context) {
 	pokemon := c.Param("pokemon")
 	var updateData dto.UpdatePokemon
 	if err := c.ShouldBindJSON(&updateData); err != nil {
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+		c.JSON(400, gin.H{"errors": errors.InvalidRequestBody.Errors()})
 		return
 	}
 
 	updatedPokemon, err := pc.pokemonService.UpdatePokemon(ctx, pokemon, updateData)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -129,22 +130,19 @@ func (pc *PokemonController) createPokemon(c *gin.Context) {
 	ctx.Logger.Info("Creating new pokemon")
 	if err := c.ShouldBindJSON(&updateData); err != nil {
 		ctx.Logger.Info("Creating new pokemon failed", zap.Error(err))
-		c.JSON(400, gin.H{"error": "Invalid request body"})
+		c.JSON(400, gin.H{"errors": errors.InvalidRequestBody.Errors()})
 		return
 	}
-	validations, err := pc.pokemonService.ValidateCreate(ctx, &updateData)
-	if err != nil {
-		c.JSON(500, gin.H{"errors": err.Error()})
-		return
-	}
+	validations := pc.pokemonService.ValidateCreate(ctx, &updateData)
+
 	if validations != nil {
-		c.JSON(400, gin.H{"errors": validations})
+		c.JSON(validations.StatusCode(), gin.H{"errors": validations.Errors()})
 		return
 	}
 
 	updatedPokemon, err := pc.pokemonService.CreatePokemon(ctx, &updateData)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -158,7 +156,7 @@ func (pc *PokemonController) addPokemonGame(c *gin.Context) {
 
 	updatedPokemon, err := pc.pokemonService.AddPokemonGame(ctx, pokemon, gameKey)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 
@@ -172,7 +170,7 @@ func (pc *PokemonController) removePokemonGame(c *gin.Context) {
 
 	updatedPokemon, err := pc.pokemonService.RemovePokemonGame(ctx, pokemon, gameKey)
 	if err != nil {
-		c.JSON(500, gin.H{"error": err.Error()})
+		c.JSON(err.StatusCode(), gin.H{"errors": err.Errors()})
 		return
 	}
 

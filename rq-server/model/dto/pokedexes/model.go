@@ -1,5 +1,7 @@
 package pokedexes
 
+import "dezzles-apps/rq-server/model/dto/data"
+
 type Pokedex struct {
 	Name    string         `json:"name"`
 	Entries []PokedexEntry `json:"entries"`
@@ -9,10 +11,10 @@ type Pokedex struct {
 }
 
 type PokedexEntry struct {
-	PokedexNo string `json:"pokedexNo"`
-	Pokemon   string `json:"pokemon"`
-	Caught    bool   `json:"caught"`
-	SpriteRef string `json:"spriteRef"`
+	PokedexNo data.PokedexNo `json:"pokedexNo"`
+	Pokemon   string         `json:"pokemon"`
+	Caught    bool           `json:"caught"`
+	SpriteRef string         `json:"spriteRef"`
 }
 
 type PokedexStats struct {

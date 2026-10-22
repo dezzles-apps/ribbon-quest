@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"dezzles-apps/rq-server/model"
+	"dezzles-apps/rq-server/model/errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -24,14 +25,14 @@ func NewAuthMiddleware(config *model.AppConfig) *AuthMiddleware {
 func (am *AuthMiddleware) ValidateUser(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
+		c.JSON(http.StatusUnauthorized, gin.H{"errors": errors.MissingAuthHeader.Errors()})
 		c.Abort()
 		return
 	}
 
 	authToken := strings.Split(authHeader, " ")
 	if len(authToken) != 2 || authToken[0] != "Bearer" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token format"})
+		c.JSON(http.StatusUnauthorized, gin.H{"errors": errors.InvalidAuthorizationHeader.Errors()})
 		c.Abort()
 		return
 	}
@@ -44,20 +45,20 @@ func (am *AuthMiddleware) ValidateUser(c *gin.Context) {
 		return []byte(am.config.JwtSecret), nil
 	})
 	if err != nil || !token.Valid {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+		c.JSON(http.StatusUnauthorized, gin.H{"errors": errors.InvalidAuthorizationHeader.Errors()})
 		c.Abort()
 		return
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		c.JSON(http.StatusUnauthorized, gin.H{"errors": errors.InvalidAuthorizationHeader.Errors()})
 		c.Abort()
 		return
 	}
 
 	if float64(time.Now().Unix()) > claims["exp"].(float64) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expired"})
+		c.JSON(http.StatusUnauthorized, gin.H{"errors": errors.ExpiredToken.Errors()})
 		c.Abort()
 		return
 	}

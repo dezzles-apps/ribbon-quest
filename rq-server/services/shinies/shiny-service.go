@@ -9,8 +9,6 @@ import (
 	"time"
 
 	cmodel "github.com/dezzles-apps/go-common/model"
-
-	"github.com/dezzles-apps/go-common/model/responses"
 )
 
 type ShinyService struct {
@@ -31,11 +29,11 @@ func NewShinyService(
 	}
 }
 
-func (svc *ShinyService) GetShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, *responses.Error) {
+func (svc *ShinyService) GetShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, errors.Error) {
 	return svc.shinyRepository.GetAllShinies(ctx)
 }
 
-func (svc *ShinyService) GetShinyStats(ctx *cmodel.DAContext, startDate, endDate string) (*request.ShinyStatsResponse, *responses.Error) {
+func (svc *ShinyService) GetShinyStats(ctx *cmodel.DAContext, startDate, endDate string) (*request.ShinyStatsResponse, errors.Error) {
 	// Parse and validate dates
 	start, end, err := svc.validateAndParseDates(startDate, endDate)
 	if err != nil {
@@ -56,7 +54,7 @@ func (svc *ShinyService) GetShinyStats(ctx *cmodel.DAContext, startDate, endDate
 }
 
 // validateAndParseDates parses date strings and applies defaults
-func (svc *ShinyService) validateAndParseDates(startDate, endDate string) (time.Time, time.Time, *responses.Error) {
+func (svc *ShinyService) validateAndParseDates(startDate, endDate string) (time.Time, time.Time, errors.Error) {
 	now := time.Now().UTC()
 	var start, end time.Time
 	var err error
@@ -67,8 +65,8 @@ func (svc *ShinyService) validateAndParseDates(startDate, endDate string) (time.
 	} else {
 		start, err = time.Parse("2006-01-02", startDate)
 		if err != nil {
-			e := responses.CreateError("startDate", "Invalid date format. Use YYYY-MM-DD")
-			return time.Time{}, time.Time{}, &e
+			e := errors.CreateError("startDate", "Invalid date format. Use YYYY-MM-DD")
+			return time.Time{}, time.Time{}, e
 		}
 	}
 
@@ -78,90 +76,96 @@ func (svc *ShinyService) validateAndParseDates(startDate, endDate string) (time.
 	} else {
 		end, err = time.Parse("2006-01-02", endDate)
 		if err != nil {
-			e := responses.CreateError("endDate", "Invalid date format. Use YYYY-MM-DD")
-			return time.Time{}, time.Time{}, &e
+			e := errors.CreateError("endDate", "Invalid date format. Use YYYY-MM-DD")
+			return time.Time{}, time.Time{}, e
 		}
 	}
 
 	// Validate order
 	if start.After(end) {
-		e := responses.CreateError("dateRange", "Start date must be before end date")
-		return time.Time{}, time.Time{}, &e
+		e := errors.CreateError("dateRange", "Start date must be before end date")
+		return time.Time{}, time.Time{}, e
 	}
 
 	return start, end, nil
 }
 
-func (svc *ShinyService) ValidateRequest(ctx *cmodel.DAContext, request request.CreateShinyRequest) []responses.Error {
+func (svc *ShinyService) ValidateRequest(ctx *cmodel.DAContext, request request.CreateShinyRequest) errors.Error {
 	err := svc.validateRequest(request)
 	_, e := svc.pokemonDataService.GetFormIdByName(ctx, request.Form)
 	if e != nil {
-		if e == &errors.InvalidFormError {
-			err = append(err, errors.InvalidFormError)
+		if e.Fail() {
+			return e
 		} else {
-			return []responses.Error{*e}
+			res := &errors.ValidationErrors{}
+			res.AddError(errors.InvalidFormError)
+			for _, e := range err.Errors() {
+				res.AddError(e)
+			}
+			return res
 		}
 	}
-	if len(err) > 0 {
+	if err.Fail() {
 		return err
 	}
 
 	return nil
 }
 
-func (svc *ShinyService) validateRequest(request request.CreateShinyRequest) []responses.Error {
-	results := make([]responses.Error, 0)
-
+func (svc *ShinyService) validateRequest(request request.CreateShinyRequest) errors.Error {
+	result := errors.ValidationErrors{}
 	if request.Level < 1 || request.Level > 100 {
-		results = append(results, errors.InvalidLevel)
+		result.AddError(errors.InvalidLevel)
 	}
 
 	gameErr := svc.commonDataService.ValidGame(request.Game)
 	if gameErr != nil {
-		if gameErr == &errors.InternalServerError {
-			return []responses.Error{*gameErr}
+		if gameErr.Fail() {
+			return gameErr
 		}
-		results = append(results, *gameErr)
+		result.AddError(gameErr)
 	}
 
 	methodErr := svc.commonDataService.ValidMethod(request.Method)
 	if methodErr != nil {
-		if methodErr == &errors.InternalServerError {
-			return []responses.Error{*methodErr}
+		if methodErr.Fail() {
+			return methodErr
 		}
-		results = append(results, *methodErr)
+		result.AddError(methodErr)
 	}
 
 	characteristicErr := svc.commonDataService.ValidCharacteristic(request.Characteristic)
 	if characteristicErr != nil {
-		if characteristicErr == &errors.InternalServerError {
-			return []responses.Error{*characteristicErr}
+		if characteristicErr.Fail() {
+			return characteristicErr
 		}
-		results = append(results, *characteristicErr)
+		result.AddError(characteristicErr)
 	}
 
 	natureErr := svc.commonDataService.ValidNature(request.Nature)
 	if natureErr != nil {
-		if natureErr == &errors.InternalServerError {
-			return []responses.Error{*natureErr}
+		if natureErr.Fail() {
+			return natureErr
 		}
-		results = append(results, *natureErr)
+		result.AddError(natureErr)
 	}
 
 	genderErr := svc.commonDataService.ValidGender(request.Gender)
 	if genderErr != nil {
-		if genderErr == &errors.InternalServerError {
-			return []responses.Error{*genderErr}
+		if genderErr.Fail() {
+			return genderErr
 		}
-		results = append(results, *genderErr)
+		result.AddError(genderErr)
 	}
-
-	return results
+	if result.Fail() {
+		return &result
+	}
+	return nil
 }
 
-func (svc *ShinyService) CreateShiny(ctx *cmodel.DAContext, request request.CreateShinyRequest) []responses.Error {
+func (svc *ShinyService) CreateShiny(ctx *cmodel.DAContext, request request.CreateShinyRequest) errors.Error {
 	errs := svc.ValidateRequest(ctx, request)
-	if len(errs) > 0 {
+	if errs != nil {
 		return errs
 	}
 	return svc.shinyRepository.SaveShiny(ctx, request)

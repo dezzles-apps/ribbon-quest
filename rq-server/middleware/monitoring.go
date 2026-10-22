@@ -40,7 +40,7 @@ func WithTraceMetadata(logger *zap.Logger) gin.HandlerFunc {
 
 		if len(c.Errors) > 0 {
 			for _, err := range c.Errors {
-				l.Error("request error", zap.String("error", err.Error()))
+				l.Error("request error", zap.Error(err))
 			}
 		}
 

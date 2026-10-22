@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/db"
-	"errors"
+	"dezzles-apps/rq-server/model/errors"
 	"strings"
 
 	cdb "github.com/dezzles-apps/go-common/db"
@@ -28,29 +28,29 @@ func NewUserService(
 	}
 }
 
-func (us *UserService) LoginUser(ctx *cmodel.DAContext, input model.AuthInput) error {
-	user, err := us.GetUserByUsername(ctx, input.Username)
-	if err != nil {
-		return err
+func (us *UserService) LoginUser(ctx *cmodel.DAContext, input model.AuthInput) errors.Error {
+	user, e := us.GetUserByUsername(ctx, input.Username)
+	if e != nil {
+		return e
 	}
 	if user == nil {
-		return errors.New("invalid username or password")
+		return errors.IncorrectUsernameOrPassword
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(input.Password))
 	if err != nil {
-		return errors.New("invalid username or password")
+		return errors.IncorrectUsernameOrPassword
 	}
 	return nil
 }
 
-func (us *UserService) RegisterUser(ctx *cmodel.DAContext, input model.AuthInput) error {
+func (us *UserService) RegisterUser(ctx *cmodel.DAContext, input model.AuthInput) errors.Error {
 	if !us.configService.CanRegisterUsers() {
-		return errors.New("user registration is disabled")
+		return errors.UserRegistrationDisabled
 	}
 	input.Username = strings.ToLower(input.Username)
-	existingUser, err := us.GetUserByUsername(ctx, input.Username)
-	if err == nil && existingUser != nil {
+	existingUser, e := us.GetUserByUsername(ctx, input.Username)
+	if e == nil && existingUser != nil {
 		return model.InvalidUsernameOrPassword
 	}
 
@@ -69,7 +69,7 @@ func (us *UserService) RegisterUser(ctx *cmodel.DAContext, input model.AuthInput
 
 }
 
-func (us *UserService) GetUserByUsername(ctx *cmodel.DAContext, username string) (*db.User, error) {
+func (us *UserService) GetUserByUsername(ctx *cmodel.DAContext, username string) (*db.User, errors.Error) {
 	username = strings.ToLower(username)
 	var user db.User
 	err := us.database.GetDB().QueryRow("SELECT username, password_hash FROM users WHERE username = ?", username).Scan(&user.Username, &user.Password)

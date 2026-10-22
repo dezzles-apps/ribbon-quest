@@ -1,8 +1,13 @@
 interface PokedexEntry {
-  pokedexNo: string
+  pokedexNo: PokedexNo
   pokemon: string
   spriteRef: string
   caught: boolean
+}
+
+interface PokedexNo {
+  number: number
+  text: string
 }
 
 interface PokedexStats {
@@ -21,5 +26,6 @@ interface Pokedex {
 export type {
   PokedexEntry,
   Pokedex,
+  PokedexNo,
   PokedexStats
 }
