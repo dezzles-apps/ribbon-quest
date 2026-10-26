@@ -91,6 +91,7 @@ func (cds *StaticCommonDataRepository) GetGender(key string) (*model.KeyValuePai
 
 func (cds *StaticCommonDataRepository) loadNatures() {
 	cds.natures = []model.KeyValuePair{
+		{Key: "UNKOWN", Value: "Unknown"},
 		{Key: "ADAMANT", Value: "Adamant"},
 		{Key: "BASHFUL", Value: "Bashful"},
 		{Key: "BOLD", Value: "Bold"},
@@ -121,6 +122,7 @@ func (cds *StaticCommonDataRepository) loadNatures() {
 
 func (cds *StaticCommonDataRepository) loadCharacteristics() {
 	cds.characteristics = []model.KeyValuePair{
+		{Key: "UNKOWN", Value: "Unknown"},
 		{Key: "EAT", Value: "It loves to eat!"},
 		{Key: "SIESTAS", Value: "It takes plenty of siestas!"},
 		{Key: "NODS_OFF", Value: "It nods off a lot!"},
