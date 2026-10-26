@@ -30,7 +30,7 @@ type ServiceContext struct {
 func (ctx *ServiceContext) Initialise(database *db.Database, repos repositories.RepositoryContext) {
 	ctx.Config = NewConfigService(database)
 	ctx.Users = NewUserService(database, ctx.Config)
-	ctx.Events = NewEventService(database)
+	ctx.Events = NewEventService(repos.Events)
 
 	ctx.CommonData = data.NewCommonDataService(repos.CommonData)
 	ctx.PokemonData = data.NewPokemonDataService(database)

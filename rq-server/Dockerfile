@@ -1,11 +1,14 @@
 # syntax=docker/dockerfile:1
 
+
 FROM golang:1.27.1 AS builder
 
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
+RUN cd rq-server && go test ./...
+RUN cd ../
 RUN CGO_ENABLED=0 GOOS=linux go build -o /rq-server
 
 FROM golang:1.27.1 AS runtime

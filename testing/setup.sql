@@ -1,0 +1,1 @@
+UPDATE config SET value = "true" WHERE config_key= "register_enabled"

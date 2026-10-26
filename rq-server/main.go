@@ -23,7 +23,6 @@ var monitor = monitoring.Monitoring{}
 var database *db.Database = &db.Database{}
 var configService *services.ConfigService = services.NewConfigService(database)
 var userService *services.UserService = services.NewUserService(database, configService)
-var eventService *services.EventService = services.NewEventService(database)
 
 func newResource() *resource.Resource {
 	hostName, _ := os.Hostname()

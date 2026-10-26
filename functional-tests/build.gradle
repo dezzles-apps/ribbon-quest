@@ -1,0 +1,36 @@
+plugins {
+  id 'java'
+}
+
+group = 'com.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  testImplementation 'io.karatelabs:karate-core:2.1.4'
+  testImplementation platform('org.junit:junit-bom:5.10.3')
+  testImplementation 'org.junit.jupiter:junit-jupiter-api'
+  testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+sourceSets {
+  test {
+    resources {
+      srcDir 'src/test/java'
+      exclude '**/*.java'
+    }
+  }
+}
+test {
+  useJUnitPlatform()
+  // Karate uses virtual threads, ensure Java 21+
+  jvmArgs '--enable-preview'
+  
+  systemProperty "karate.options", System.properties.getProperty("karate.options")
+  systemProperty "karate.env", System.properties.getProperty("karate.env")
+  outputs.upToDateWhen { false }
+}

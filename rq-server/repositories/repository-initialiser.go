@@ -13,6 +13,7 @@ type RepositoryContext struct {
 	Shiny       interfaces.ShinyRepository
 	Ribbons     interfaces.RibbonRepository
 	RibbonGames interfaces.RibbonGameRepository
+	Events      interfaces.EventRepository
 }
 
 func InitaliseRepositories(database *db.Database) *RepositoryContext {
@@ -21,5 +22,6 @@ func InitaliseRepositories(database *db.Database) *RepositoryContext {
 	ctx.Shiny = dbrepos.NewDatabaseShinyRepository(database, ctx.CommonData)
 	ctx.Ribbons = dbrepos.NewDatabaseRibbonRepository(database, ctx.CommonData)
 	ctx.RibbonGames = dbrepos.NewDBRibbonGameRepository(database)
+	ctx.Events = dbrepos.NewDBEventRepository(database)
 	return ctx
 }
