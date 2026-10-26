@@ -1,22 +1,10 @@
-package repositories
+package static
 
 import (
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/errors"
+	"dezzles-apps/rq-server/repositories/interfaces"
 )
-
-type CommonDataRepository interface {
-	GetCharacteristics() ([]model.KeyValuePair, errors.Error)
-	GetNatures() ([]model.KeyValuePair, errors.Error)
-	GetGames() ([]model.KeyValuePair, errors.Error)
-	GetMethods() ([]model.KeyValuePair, errors.Error)
-	GetGenders() ([]model.KeyValuePair, errors.Error)
-	GetCharacteristic(key string) (*model.KeyValuePair, errors.Error)
-	GetNature(key string) (*model.KeyValuePair, errors.Error)
-	GetGame(key string) (*model.KeyValuePair, errors.Error)
-	GetMethod(key string) (*model.KeyValuePair, errors.Error)
-	GetGender(key string) (*model.KeyValuePair, errors.Error)
-}
 
 type StaticCommonDataRepository struct {
 	characteristics []model.KeyValuePair
@@ -26,7 +14,7 @@ type StaticCommonDataRepository struct {
 	genders         []model.KeyValuePair
 }
 
-func NewCommonDataService() CommonDataRepository {
+func NewCommonDataService() interfaces.CommonDataRepository {
 	cds := &StaticCommonDataRepository{}
 	cds.loadCharacteristics()
 	cds.loadNatures()

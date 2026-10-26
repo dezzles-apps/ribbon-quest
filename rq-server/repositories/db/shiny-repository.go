@@ -1,10 +1,11 @@
-package repositories
+package db
 
 import (
 	"dezzles-apps/rq-server/model/dto"
 	"dezzles-apps/rq-server/model/dto/data"
 	"dezzles-apps/rq-server/model/dto/shinies"
 	"dezzles-apps/rq-server/model/errors"
+	"dezzles-apps/rq-server/repositories/interfaces"
 	_ "embed"
 	"fmt"
 
@@ -14,27 +15,21 @@ import (
 	"github.com/dezzles-apps/go-common/db"
 )
 
-//go:embed "sql/get-all-shinies.sql"
+//go:embed "shinies/get-all-shinies.sql"
 var getAllShinies string
 
-//go:embed "sql/get-shinies-by-date-range.sql"
+//go:embed "shinies/get-shinies-by-date-range.sql"
 var getShiniesByDateRange string
-
-type ShinyRepository interface {
-	GetAllShinies(ctx *cmodel.DAContext) ([]dto.ShinyPokemon, errors.Error)
-	GetShiniesByDateRange(ctx *cmodel.DAContext, startDate string, endDate string) ([]dto.ShinyPokemon, errors.Error)
-	SaveShiny(ctx *cmodel.DAContext, request shinies.CreateShinyRequest) errors.Error
-}
 
 type DatabaseShinyRepository struct {
 	connection *db.Database
-	common     CommonDataRepository
+	common     interfaces.CommonDataRepository
 }
 
 func NewDatabaseShinyRepository(
 	connection *db.Database,
-	common CommonDataRepository,
-) ShinyRepository {
+	common interfaces.CommonDataRepository,
+) interfaces.ShinyRepository {
 	return &DatabaseShinyRepository{
 		connection: connection,
 		common:     common,

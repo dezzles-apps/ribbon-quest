@@ -45,6 +45,7 @@ func (ctx *ServiceContext) Initialise(database *db.Database, repos repositories.
 	ctx.Ribbons = ribbons.NewRibbonService(
 		database,
 		ctx.RibbonPokemon,
+		repos.Ribbons,
 	)
 	ctx.RibbonStats = ribbons.NewRibbonStatsService(
 		database,

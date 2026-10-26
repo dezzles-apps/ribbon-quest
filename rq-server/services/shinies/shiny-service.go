@@ -4,7 +4,7 @@ import (
 	"dezzles-apps/rq-server/model/dto"
 	request "dezzles-apps/rq-server/model/dto/shinies"
 	"dezzles-apps/rq-server/model/errors"
-	"dezzles-apps/rq-server/repositories"
+	"dezzles-apps/rq-server/repositories/interfaces"
 	data "dezzles-apps/rq-server/services/data"
 	"time"
 
@@ -14,13 +14,13 @@ import (
 type ShinyService struct {
 	commonDataService  *data.CommonDataService
 	pokemonDataService *data.PokemonDataService
-	shinyRepository    repositories.ShinyRepository
+	shinyRepository    interfaces.ShinyRepository
 }
 
 func NewShinyService(
 	commonDataService *data.CommonDataService,
 	pokemonDataService *data.PokemonDataService,
-	shinyRepository repositories.ShinyRepository,
+	shinyRepository interfaces.ShinyRepository,
 ) *ShinyService {
 	return &ShinyService{
 		commonDataService:  commonDataService,
@@ -105,7 +105,7 @@ func (svc *ShinyService) ValidateRequest(ctx *cmodel.DAContext, request request.
 			return res
 		}
 	}
-	if err.Fail() {
+	if err != nil && err.Fail() {
 		return err
 	}
 

@@ -5,6 +5,7 @@ import (
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 	"dezzles-apps/rq-server/model/errors"
+	"dezzles-apps/rq-server/repositories/interfaces"
 	"log"
 
 	_ "embed"
@@ -18,17 +19,20 @@ import (
 var getRibbonQuery string
 
 type RibbonService struct {
-	connection     *cdb.Database
-	pokemonService PokemonService
+	connection       *cdb.Database
+	pokemonService   PokemonService
+	ribbonRepository interfaces.RibbonRepository
 }
 
 func NewRibbonService(
 	connection *cdb.Database,
 	PokemonService *PokemonService,
+	ribbonRepository interfaces.RibbonRepository,
 ) *RibbonService {
 	return &RibbonService{
-		connection:     connection,
-		pokemonService: *PokemonService,
+		connection:       connection,
+		pokemonService:   *PokemonService,
+		ribbonRepository: ribbonRepository,
 	}
 }
 
