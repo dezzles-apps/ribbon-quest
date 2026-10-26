@@ -36,7 +36,7 @@ func (ctx *ServiceContext) Initialise(database *db.Database, repos repositories.
 	ctx.PokemonData = data.NewPokemonDataService(database)
 	ctx.Pokedex = pokedexes.NewPokedexService(database)
 
-	ctx.RibbonGames = ribbons.NewGameService(database)
+	ctx.RibbonGames = ribbons.NewGameService(repos.RibbonGames)
 	ctx.RibbonPokemon = ribbons.NewPokemonService(
 		database,
 		ctx.RibbonGames,

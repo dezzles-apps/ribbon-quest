@@ -9,9 +9,10 @@ import (
 )
 
 type RepositoryContext struct {
-	CommonData interfaces.CommonDataRepository
-	Shiny      interfaces.ShinyRepository
-	Ribbons    interfaces.RibbonRepository
+	CommonData  interfaces.CommonDataRepository
+	Shiny       interfaces.ShinyRepository
+	Ribbons     interfaces.RibbonRepository
+	RibbonGames interfaces.RibbonGameRepository
 }
 
 func InitaliseRepositories(database *db.Database) *RepositoryContext {
@@ -19,5 +20,6 @@ func InitaliseRepositories(database *db.Database) *RepositoryContext {
 	ctx.CommonData = static.NewCommonDataService()
 	ctx.Shiny = dbrepos.NewDatabaseShinyRepository(database, ctx.CommonData)
 	ctx.Ribbons = dbrepos.NewDatabaseRibbonRepository(database, ctx.CommonData)
+	ctx.RibbonGames = dbrepos.NewDBRibbonGameRepository(database)
 	return ctx
 }
