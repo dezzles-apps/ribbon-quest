@@ -1,34 +1,33 @@
 package ribbons
 
 import (
-	"database/sql"
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto"
 	"dezzles-apps/rq-server/model/errors"
+	"dezzles-apps/rq-server/repositories/interfaces"
 	"log"
 
 	_ "embed"
 
 	cdb "github.com/dezzles-apps/go-common/db"
 	cmodel "github.com/dezzles-apps/go-common/model"
-	"go.uber.org/zap"
 )
 
-//go:embed sql/get-ribbon.sql
-var getRibbonQuery string
-
 type RibbonService struct {
-	connection     *cdb.Database
-	pokemonService PokemonService
+	connection       *cdb.Database
+	pokemonService   PokemonService
+	ribbonRepository interfaces.RibbonRepository
 }
 
 func NewRibbonService(
 	connection *cdb.Database,
 	PokemonService *PokemonService,
+	ribbonRepository interfaces.RibbonRepository,
 ) *RibbonService {
 	return &RibbonService{
-		connection:     connection,
-		pokemonService: *PokemonService,
+		connection:       connection,
+		pokemonService:   *PokemonService,
+		ribbonRepository: ribbonRepository,
 	}
 }
 
@@ -39,18 +38,14 @@ func (rs *RibbonService) AddRibbon(ctx *cmodel.DAContext, pokemon string, ribbon
 		log.Printf("AddRibbon: Error adding ribbon %s to %s. %s", ribbon, pokemon, err.Error())
 		return nil, model.InternalServerError
 	}
-	r, err := rs.getRibbon(ctx, pokemonId, ribbon)
+	r, err := rs.ribbonRepository.GetRibbon(ctx, pokemonId, ribbon)
 	if err != nil {
 		return nil, err
 	}
 	if r.Achieved {
 		return r, nil
 	}
-	err = rs.addRibbon(ctx, pokemonId, ribbon)
-	if err != nil {
-		return nil, err
-	}
-	return rs.getRibbon(ctx, pokemonId, ribbon)
+	return rs.ribbonRepository.AddRibbon(ctx, pokemonId, ribbon)
 }
 
 func (rs *RibbonService) RemoveRibbon(ctx *cmodel.DAContext, pokemon string, ribbon string) (*dto.PokemonRibbon, errors.Error) {
@@ -59,57 +54,11 @@ func (rs *RibbonService) RemoveRibbon(ctx *cmodel.DAContext, pokemon string, rib
 		return nil, err
 	}
 
-	_, err = rs.getRibbon(ctx, pokemonId, ribbon)
+	_, err = rs.ribbonRepository.GetRibbon(ctx, pokemonId, ribbon)
 	if err != nil {
 		return nil, err
 	}
-	err = rs.removeRibbon(ctx, pokemonId, ribbon)
-	if err != nil {
-		return nil, err
-	}
-	return rs.getRibbon(ctx, pokemonId, ribbon)
-}
 
-func (rs *RibbonService) addRibbon(ctx *cmodel.DAContext, pokemon int, ribbon string) errors.Error {
-	ctx.Logger.Info("Adding earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
-	_, err := rs.connection.GetDB().Exec("INSERT INTO ribbons_earned (ribbon_pokemon_id, ribbon_key) VALUES (?, ?)", pokemon, ribbon)
-	if err != nil {
-		ctx.Logger.Error("Error adding ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon), zap.Error(err))
-		return model.InternalServerError
-	}
-	ctx.Logger.Info("Added earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
-	return nil
-}
+	return rs.ribbonRepository.RemoveRibbon(ctx, pokemonId, ribbon)
 
-func (rs *RibbonService) removeRibbon(ctx *cmodel.DAContext, pokemon int, ribbon string) errors.Error {
-	ctx.Logger.Info("Removing earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
-	_, err := rs.connection.GetDB().Exec("DELETE FROM ribbons_earned WHERE ribbon_pokemon_id = ? AND ribbon_key = ?", pokemon, ribbon)
-	if err != nil {
-		ctx.Logger.Error("Error removing ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon), zap.Error(err))
-		return errors.InternalServerError
-	}
-	ctx.Logger.Info("Removing earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
-	return nil
-}
-
-func (rs *RibbonService) getRibbon(ctx *cmodel.DAContext, pokemon int, ribbon string) (*dto.PokemonRibbon, errors.Error) {
-	ctx.Logger.Info("Retrieving earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
-	ribbonData := &dto.PokemonRibbon{}
-	log.Printf("getRibbon: Retrieving ribbon %d:%s", pokemon, ribbon)
-	err := rs.connection.GetDB().QueryRow(getRibbonQuery, pokemon, ribbon).Scan(
-		&ribbonData.RibbonKey,
-		&ribbonData.Name,
-		&ribbonData.Achieved,
-		&ribbonData.Category,
-	)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, errors.InvalidRibbonCombination
-		}
-		ctx.Logger.Error("Error retrieving ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon), zap.Error(err))
-		return nil, model.InternalServerError
-	}
-	ctx.Logger.Info("Retrieved earned ribbon", zap.Int("pokemonId", pokemon), zap.String("ribbon", ribbon))
-
-	return ribbonData, nil
 }

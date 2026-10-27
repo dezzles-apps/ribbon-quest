@@ -3,7 +3,7 @@ package shinies
 import (
 	"dezzles-apps/rq-server/model/dto/shinies"
 	"dezzles-apps/rq-server/model/errors"
-	repositories "dezzles-apps/rq-server/repositories"
+	"dezzles-apps/rq-server/repositories/static"
 	dataServices "dezzles-apps/rq-server/services/data"
 	"testing"
 )
@@ -17,7 +17,7 @@ type CreateShinyTest struct {
 func setupTestService() *ShinyService {
 	return NewShinyService(
 		dataServices.NewCommonDataService(
-			repositories.NewCommonDataService(),
+			static.NewCommonDataService(),
 		),
 		nil,
 		nil,

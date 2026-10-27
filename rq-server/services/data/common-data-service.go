@@ -4,7 +4,7 @@ import (
 	"dezzles-apps/rq-server/model"
 	"dezzles-apps/rq-server/model/dto/data"
 	"dezzles-apps/rq-server/model/errors"
-	repos "dezzles-apps/rq-server/repositories"
+	repos "dezzles-apps/rq-server/repositories/interfaces"
 
 	cmodel "github.com/dezzles-apps/go-common/model"
 	"go.uber.org/zap"

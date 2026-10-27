@@ -396,7 +396,8 @@ func (ps *PokemonService) ValidateCreate(ctx *cmodel.DAContext, pokemon *dto.Add
 		}
 		errors.AddError(validation)
 	}
-	if len(validation.Errors()) > 0 {
+	ctx.Logger.Info("About to check validations")
+	if validation != nil && len(validation.Errors()) > 0 {
 		return errors
 	}
 	return nil

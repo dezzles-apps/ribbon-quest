@@ -30,13 +30,13 @@ type ServiceContext struct {
 func (ctx *ServiceContext) Initialise(database *db.Database, repos repositories.RepositoryContext) {
 	ctx.Config = NewConfigService(database)
 	ctx.Users = NewUserService(database, ctx.Config)
-	ctx.Events = NewEventService(database)
+	ctx.Events = NewEventService(repos.Events)
 
 	ctx.CommonData = data.NewCommonDataService(repos.CommonData)
 	ctx.PokemonData = data.NewPokemonDataService(database)
 	ctx.Pokedex = pokedexes.NewPokedexService(database)
 
-	ctx.RibbonGames = ribbons.NewGameService(database)
+	ctx.RibbonGames = ribbons.NewGameService(repos.RibbonGames)
 	ctx.RibbonPokemon = ribbons.NewPokemonService(
 		database,
 		ctx.RibbonGames,
@@ -45,6 +45,7 @@ func (ctx *ServiceContext) Initialise(database *db.Database, repos repositories.
 	ctx.Ribbons = ribbons.NewRibbonService(
 		database,
 		ctx.RibbonPokemon,
+		repos.Ribbons,
 	)
 	ctx.RibbonStats = ribbons.NewRibbonStatsService(
 		database,
