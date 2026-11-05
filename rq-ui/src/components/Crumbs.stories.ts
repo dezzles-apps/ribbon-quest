@@ -6,7 +6,7 @@ import Crumbs from './Crumbs.vue'
 
 const Empty = { render: () => null }
 
-const meta = {
+const meta: Meta<typeof Crumbs> = {
   title: 'Components/Crumbs',
   component: Crumbs,
   decorators: [
@@ -26,10 +26,10 @@ const meta = {
       }
     },
   ],
-} satisfies Meta<typeof Crumbs>
+}
 export default meta
 
-export const Nested: StoryObj<typeof meta> = {
+export const Nested: StoryObj<typeof Crumbs> = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     await expect(await canvas.findByText('Home')).toBeVisible()
