@@ -46,7 +46,7 @@ function getRibbonClass() {
   if (props.highlighted) {
     classes.push(`ribbon-highlighted`)
   }
-  classes.push(`ribbon-${props.theme.toLocaleLowerCase()}`);
+  classes.push(`ribbon-${props.theme.toLowerCase()}`);
 
   if (props.state === RibbonState.Clickable) {
     classes.push('ribbon-clickable')
