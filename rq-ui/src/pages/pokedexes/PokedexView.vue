@@ -58,7 +58,7 @@ function isVisible(box : PokedexEntry[]) {
   if (filter.value.hideCompleteBoxes) {
     shouldDisplay = box.filter(v => v.caught).length != box.length
   }
-  let search = filter.value.pokemon
+  let search = filter.value.pokemon.trim()
   if (search) {
     shouldDisplay = shouldDisplay && box.map((v : PokedexEntry) => v.pokemon).filter(entryVisible(search)).length > 0
   }
@@ -67,7 +67,7 @@ function isVisible(box : PokedexEntry[]) {
 
 function updateFilter() {
   filter.value.hideCompleteBoxes = modelFilter.value.hideCompleteBoxes
-  filter.value.pokemon = modelFilter.value.pokemon
+  filter.value.pokemon = modelFilter.value.pokemon ?? ''
 }
 
 function clearFilter() {
