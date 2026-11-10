@@ -13,10 +13,16 @@ const route = useRoute();
 const loading = ref(true);
 const { apiFetch } = useApi();
 
+class SearchDetails {
+  pokemon: string = '';
+  hideCompleteBoxes: boolean = false;
+}
+
 const pokedex = ref<Pokedex | null>(null);
 const entries = ref<PokedexEntry[][]>([]);
-const filter = ref('');
-const hideCompleteBoxes = ref(false);
+
+const filter = ref(new SearchDetails())
+const modelFilter = ref(new SearchDetails())
 
 function createEntries(input: PokedexEntry[]) {
   let result = [] as PokedexEntry[][]
@@ -49,14 +55,19 @@ async function fetchPokedex() {
 
 function isVisible(box : PokedexEntry[]) {
   let shouldDisplay = true
-  if (hideCompleteBoxes.value) {
+  if (filter.value.hideCompleteBoxes) {
     shouldDisplay = box.filter(v => v.caught).length != box.length
   }
-  let search = filter.value.trim()
+  let search = filter.value.pokemon
   if (search) {
     shouldDisplay = shouldDisplay && box.map((v : PokedexEntry) => v.pokemon).filter(entryVisible(search)).length > 0
   }
   return shouldDisplay
+}
+
+function updateFilter() {
+  filter.value.hideCompleteBoxes = modelFilter.value.hideCompleteBoxes
+  filter.value.pokemon = modelFilter.value.pokemon
 }
 
 onMounted(fetchPokedex);
@@ -76,9 +87,12 @@ onMounted(fetchPokedex);
     <v-text-field
       label="Filter"
       prepend-inner-icon="mdi-map-marker"
-      v-model="filter"
+      v-model="modelFilter.pokemon"
     ></v-text-field>
-    <v-checkbox label="Hide Complete Boxes" v-model="hideCompleteBoxes"></v-checkbox>
+    <v-checkbox label="Hide Complete Boxes" v-model="modelFilter.hideCompleteBoxes"></v-checkbox>
+    <v-btn
+      @click="updateFilter"
+    >Filter</v-btn>
     <div
       v-for="box in entries"
     >
@@ -86,7 +100,7 @@ onMounted(fetchPokedex);
         v-if="isVisible(box)"
         :entries="box"
         :pokedex="pokedex.name"
-        :filter="filter"
+        :filter="filter.pokemon"
       />
     </div>
 

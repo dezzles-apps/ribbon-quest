@@ -4,8 +4,6 @@ import type { PropType } from 'vue';
 import type { Pokedex } from '@/types/pokedex';
 import { useDates } from '@/composables/useDates';
 
-const dates = useDates();
-
 const props = defineProps({
   details: {
     type: Object as PropType<Pokedex>,
@@ -21,19 +19,6 @@ const props = defineProps({
   }
 });
 
-function getCounterClass(): string[] {
-  if (props.details.stats.caught === undefined || props.details.stats.total === undefined) {
-    return [];
-  }
-  const classes: string[] = [];
-  if (props.details.stats.caught >= props.details.stats.caught) {
-    classes.push('is-success');
-  } else {
-    classes.push('is-danger');
-  }
-
-  return classes;
-}
 
 function getImage(): string {
   return props.details.image
