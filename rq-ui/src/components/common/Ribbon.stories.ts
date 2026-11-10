@@ -29,6 +29,34 @@ export const Default: Story = {
   },
 }
 
+export const TopText: Story = {
+  args: {
+    topText: 'Effort',
+    theme: RibbonTheme.Stats,
+    achieved: true,
+    icon: 'mdi-seal',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText('Effort')).toBeVisible()
+  },
+}
+
+export const BothText: Story = {
+  args: {
+    topText: 'Ribbon',
+    bottomText: 'Effort',
+    theme: RibbonTheme.Stats,
+    achieved: true,
+    icon: 'mdi-seal',
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await expect(canvas.getByText('Ribbon')).toBeVisible()
+    await expect(canvas.getByText('Effort')).toBeVisible()
+  },
+}
+
 export const LongText: Story = {
   args: {
     bottomText: 'Toughness Master',
@@ -42,6 +70,7 @@ export const NotAchieved: Story = {
     bottomText: 'Jeff',
     theme: RibbonTheme.Champion,
     icon: 'mdi-seal',
+    achieved: false,
   },
 }
 

@@ -61,14 +61,6 @@ function isAchieved() {
   return props.achieved === undefined || props.achieved
 }
 
-function iconClasses() {
-  let classes = ['icon']
-  if (props.topText && props.bottomText) {
-    classes.push('centre-icon')
-  }
-  return iconClasses
-}
-
 function onClick() {
   if (props.onClick) {
     props.onClick()
@@ -97,7 +89,7 @@ function getStyle() {
       <div class="ribbon-top-text">
         {{ props.topText }}
       </div>
-      <span :class="iconClasses()">
+      <span>
         <i :class="`mdi ${props.icon} mdi-36px`"></i>
       </span>
       <div :class="props.topText ? 'ribbon-bottom-text' : 'ribbon-top-text'">
@@ -159,10 +151,6 @@ function getStyle() {
   margin-right: 10px;
   width: 100%;
   color: darkslategray;
-}
-
-.icon {
-  position: absolute;
 }
 
 .centre-icon {
