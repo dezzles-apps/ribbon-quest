@@ -1,13 +1,21 @@
 <script setup lang="ts">
 
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useTheme } from 'vuetify';
 import { useAuthStore } from '@/stores/authStore';
+import Crumbs from '@/components/Crumbs.vue'
 
 const drawer = ref(false);
 
 const authStore = useAuthStore();
+const theme = useTheme();
+const isDark = computed(() => theme.global.current.value.dark);
 
-import Crumbs from '@/components/Crumbs.vue'
+function toggleTheme() {
+  const nextTheme = isDark.value ? 'light' : 'dark';
+  theme.global.name.value = nextTheme;
+  localStorage.setItem('theme', nextTheme);
+}
 
 function logout() {
   authStore.clearToken();
@@ -23,6 +31,15 @@ function logout() {
     </template>
 
     <v-app-bar-title>Dezzles' Pokemon Challenges</v-app-bar-title>
+
+    <v-btn
+      icon
+      :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+      :title="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+      @click="toggleTheme"
+    >
+      <v-icon>{{ isDark ? 'mdi-weather-sunny' : 'mdi-weather-night' }}</v-icon>
+    </v-btn>
   </v-app-bar>
   <v-navigation-drawer
     v-model="drawer"

@@ -13,10 +13,16 @@ const route = useRoute();
 const loading = ref(true);
 const { apiFetch } = useApi();
 
+class SearchDetails {
+  pokemon: string = '';
+  hideCompleteBoxes: boolean = false;
+}
+
 const pokedex = ref<Pokedex | null>(null);
 const entries = ref<PokedexEntry[][]>([]);
-const filter = ref('');
-const hideCompleteBoxes = ref(false);
+
+const filter = ref(new SearchDetails())
+const modelFilter = ref(new SearchDetails())
 
 function createEntries(input: PokedexEntry[]) {
   let result = [] as PokedexEntry[][]
@@ -49,14 +55,24 @@ async function fetchPokedex() {
 
 function isVisible(box : PokedexEntry[]) {
   let shouldDisplay = true
-  if (hideCompleteBoxes.value) {
+  if (filter.value.hideCompleteBoxes) {
     shouldDisplay = box.filter(v => v.caught).length != box.length
   }
-  let search = filter.value.trim()
+  let search = filter.value.pokemon.trim()
   if (search) {
     shouldDisplay = shouldDisplay && box.map((v : PokedexEntry) => v.pokemon).filter(entryVisible(search)).length > 0
   }
   return shouldDisplay
+}
+
+function updateFilter() {
+  filter.value.hideCompleteBoxes = modelFilter.value.hideCompleteBoxes
+  filter.value.pokemon = modelFilter.value.pokemon ?? ''
+}
+
+function clearFilter() {
+  modelFilter.value = new SearchDetails()
+  updateFilter()
 }
 
 onMounted(fetchPokedex);
@@ -73,12 +89,35 @@ onMounted(fetchPokedex);
         :includeLink="false"
       />
     </section>
-    <v-text-field
-      label="Filter"
-      prepend-inner-icon="mdi-map-marker"
-      v-model="filter"
-    ></v-text-field>
-    <v-checkbox label="Hide Complete Boxes" v-model="hideCompleteBoxes"></v-checkbox>
+    <v-form
+      class="d-flex flex-wrap align-center ga-4 my-4"
+      @submit.prevent="updateFilter"
+    >
+      <v-text-field
+        label="Filter"
+        prepend-inner-icon="mdi-magnify"
+        v-model="modelFilter.pokemon"
+        variant="outlined"
+        density="compact"
+        hide-details
+        clearable
+        style="min-width: 250px; max-width: 400px"
+      ></v-text-field>
+      <v-checkbox
+        label="Hide Complete Boxes"
+        v-model="modelFilter.hideCompleteBoxes"
+        density="compact"
+        hide-details
+      ></v-checkbox>
+      <v-btn
+        type="submit"
+        color="primary"
+      >Filter</v-btn>
+      <v-btn
+        variant="outlined"
+        @click="clearFilter"
+      >Clear</v-btn>
+    </v-form>
     <div
       v-for="box in entries"
     >
@@ -86,7 +125,7 @@ onMounted(fetchPokedex);
         v-if="isVisible(box)"
         :entries="box"
         :pokedex="pokedex.name"
-        :filter="filter"
+        :filter="filter.pokemon"
       />
     </div>
 

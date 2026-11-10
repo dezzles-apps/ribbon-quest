@@ -4,8 +4,9 @@ import { ref } from 'vue';
 import { useAuthStore } from '@/stores/authStore';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
-import { isEntryVisible } from '@/composables/box';
-
+import { isEntryHighlighted } from '@/composables/box';
+import Ribbon from '@/components/common/Ribbon.vue';
+import { RibbonState, RibbonTheme } from '@/types/enums';
 const authStore = useAuthStore();
 const api = useApi();
 
@@ -23,29 +24,6 @@ function getPokemonImage(entry: PokedexEntry): string {
 }
 
 const loadingRibbons = ref(new Map<string, boolean>());
-
-function getRibbonClass(entry: PokedexEntry): string[] {
-  const classes: string[] = [];
-  let mod = ''
-  if (!isEntryVisible(props.filter, entry.pokemon)) {
-    mod = '-low-opacity'
-  }
-  if (entry.caught) {
-    classes.push('ribbon-achieved' + mod);
-  } else {
-    classes.push('ribbon-not-achieved' + mod);
-  }
-  if (authStore.isAuthenticated) {
-    if (loadingRibbons.value.get(entry.pokedexNo.text)) {
-      classes.push('ribbon-loading');
-    } else {
-      classes.push('ribbon-clickable');
-    }
-  }
-  classes.push(`ribbon-stats`);
-  
-  return classes;
-}
 
 function toggleEntry(entry: PokedexEntry) {
   if (!authStore.isAuthenticated) {
@@ -79,6 +57,16 @@ function toggleEntry(entry: PokedexEntry) {
     });
 }
 
+function ribbonState(entry: PokedexEntry) : RibbonState {
+  if (authStore.isAuthenticated) {
+    if (loadingRibbons.value.get(entry.pokedexNo.text)) {
+      return RibbonState.Loading;
+    } else {
+      return RibbonState.Clickable;
+    }
+  }
+  return RibbonState.Standard;
+}
 
 </script>
 
@@ -88,104 +76,18 @@ function toggleEntry(entry: PokedexEntry) {
       <h2 class="title is-4">{{ entries[0].pokedexNo.text }} - {{ entries[entries.length -1].pokedexNo.text }}</h2>
     </slot>
     <div style="display: inline-flex; flex-wrap: wrap; max-width: 780px;" class="ma-auto">
-      <div
-        class="ribbon"
-        :class="getRibbonClass(entry)"
+      <Ribbon
         v-for="entry in props.entries"
-        :style="{ backgroundImage: `url('${getPokemonImage(entry)}')` }"
         :key="entry.pokedexNo.text"
-        @click="toggleEntry(entry)"
-      >
-        <div class="ribbon-name">
-          {{ entry.pokedexNo.text }}
-        </div>
-
-        <div class="ribbon-pokemon-name">
-          {{ entry.pokemon }}
-        </div>
-      </div>
+        :theme="RibbonTheme.Stats"
+        :top-text="entry.pokedexNo.text"
+        :bottom-text="entry.pokemon"
+        :image="getPokemonImage(entry)"
+        :state="ribbonState(entry)"
+        :achieved="entry.caught"
+        :highlighted="isEntryHighlighted(props.filter, entry.pokemon)"
+        :onClick="() => toggleEntry(entry)"
+      />
     </div>
   </div>
 </template>
-
-<style scoped>
-.ribbon {
-  margin: 10px;
-  position: relative;
-  align-items: center;
-  text-align: center;
-  width: 110px;
-  height: 100px;
-  outline-width: 5px;
-  outline-style: solid;
-  border-radius: 10px;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 50% auto;
-}
-
-.ribbon-loading {
-  cursor: wait;
-}
-
-.ribbon-clickable {
-  cursor: pointer;
-}
-
-.ribbon-name {
-  font-weight: bold;
-  margin-right: 10px;
-  width: 100%;
-  color: darkslategray;
-}
-
-.ribbon-pokemon-name {
-  position: absolute;
-  bottom: 4px;
-  left: 0;
-  font-weight: bold;
-  margin-right: 10px;
-  width: 100%;
-  color: darkslategray;
-}
-
-.ribbon-achieved-low-opacity {
-  opacity: 0.5;
-}
-
-.ribbon-not-achieved {
-  opacity: 0.5;
-}
-
-.ribbon-not-achieved-low-opacity {
-  opacity: 0.20;
-}
-
-.ribbon-julie {
-  background-color: #DCB0F2;
-  outline-color: #a35ec9;
-}
-.ribbon-champion {
-  background-color: #66C5CC;
-  outline-color: #358d95;
-}
-.ribbon-battle {
-  background-color: #F89C74;
-  outline-color: #754834;
-}
-.ribbon-contest {
-  background-color: #FE88B1;
-  outline-color: #8e3d5a;
-}
-.ribbon-stats {
-  background-color: #9EB9F3;
-  outline-color: #62749b;
-}
-.ribbon-shopping {
-  background-color: #F6CF71;
-  outline-color: #d5a32c;
-}
-.ribbon-low-opacity {
-  opacity: 10%;
-}
-</style>

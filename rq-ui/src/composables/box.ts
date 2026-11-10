@@ -10,3 +10,10 @@ export function isEntryVisible(filter : string, pokemon : string) {
   }
   return pokemon.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
 }
+
+export function isEntryHighlighted(filter: string, pokemon : string) {
+  if (!filter.trim()) {
+    return false;
+  }
+  return pokemon.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+}
