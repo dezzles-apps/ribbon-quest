@@ -70,6 +70,11 @@ function updateFilter() {
   filter.value.pokemon = modelFilter.value.pokemon
 }
 
+function clearFilter() {
+  modelFilter.value = new SearchDetails()
+  updateFilter()
+}
+
 onMounted(fetchPokedex);
 </script>
 
@@ -84,15 +89,35 @@ onMounted(fetchPokedex);
         :includeLink="false"
       />
     </section>
-    <v-text-field
-      label="Filter"
-      prepend-inner-icon="mdi-map-marker"
-      v-model="modelFilter.pokemon"
-    ></v-text-field>
-    <v-checkbox label="Hide Complete Boxes" v-model="modelFilter.hideCompleteBoxes"></v-checkbox>
-    <v-btn
-      @click="updateFilter"
-    >Filter</v-btn>
+    <v-form
+      class="d-flex flex-wrap align-center ga-4 my-4"
+      @submit.prevent="updateFilter"
+    >
+      <v-text-field
+        label="Filter"
+        prepend-inner-icon="mdi-magnify"
+        v-model="modelFilter.pokemon"
+        variant="outlined"
+        density="compact"
+        hide-details
+        clearable
+        style="min-width: 250px; max-width: 400px"
+      ></v-text-field>
+      <v-checkbox
+        label="Hide Complete Boxes"
+        v-model="modelFilter.hideCompleteBoxes"
+        density="compact"
+        hide-details
+      ></v-checkbox>
+      <v-btn
+        type="submit"
+        color="primary"
+      >Filter</v-btn>
+      <v-btn
+        variant="outlined"
+        @click="clearFilter"
+      >Clear</v-btn>
+    </v-form>
     <div
       v-for="box in entries"
     >
