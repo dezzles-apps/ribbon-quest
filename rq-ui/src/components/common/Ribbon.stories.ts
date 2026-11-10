@@ -25,7 +25,7 @@ export const Default: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
-    await expect(canvas.getByText('Champion')).toBeVisible()
+    await expect(canvas.getByText('Effort')).toBeVisible()
   },
 }
 
