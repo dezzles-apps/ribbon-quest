@@ -5,6 +5,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
 import type { RibbonFilter } from '@/types/filters';
+import Ribbon from './common/Ribbon.vue';
+import { RibbonState, type RibbonTheme } from '@/types/enums';
 const authStore = useAuthStore();
 const api = useApi();
 
@@ -16,25 +18,6 @@ const props = defineProps<{
 }>()
 
 const loadingRibbons = ref(new Map<string, boolean>());
-
-function getRibbonClass(ribbon: PokemonRibbon): string[] {
-  const classes: string[] = [];
-  if (ribbon.achieved) {
-    classes.push('ribbon-achieved');
-  } else {
-    classes.push('ribbon-not-achieved');
-  }
-  if (authStore.isAuthenticated) {
-    if (loadingRibbons.value.get(ribbon.ribbonKey)) {
-      classes.push('ribbon-loading');
-    } else {
-      classes.push('ribbon-clickable');
-    }
-  }
-  classes.push(`ribbon-${ribbon.category.toLowerCase()}`);
-
-  return classes;
-}
 
 function toggleRibbon(ribbon: PokemonRibbon) {
   if (!authStore.isAuthenticated) {
@@ -80,6 +63,17 @@ function showRibbon(ribbon : PokemonRibbon) {
   return true;
 }
 
+function ribbonState(ribbon : PokemonRibbon) : RibbonState {
+  if (authStore.isAuthenticated) {
+    if (loadingRibbons.value.get(ribbon.ribbonKey)) {
+      return RibbonState.Loading;
+    } else {
+      return RibbonState.Clickable;
+    }
+  }
+  return RibbonState.Standard;
+}
+
 </script>
 
 <template>
@@ -88,77 +82,19 @@ function showRibbon(ribbon : PokemonRibbon) {
       <h2 class="title is-4">{{ props.title }}</h2>
     </slot>
     <div style="display: inline-flex; flex-wrap: wrap;">
-      <div
-        class="ribbon"
-        :class="getRibbonClass(ribbon)"
+      <Ribbon
         v-for="ribbon in props.ribbons.filter(showRibbon)"
-        :key="ribbon.ribbonKey"
-        @click="toggleRibbon(ribbon)"
-      >
-        <span :class="['icon', ribbon.achieved ? 'has-text-success' : 'has-text-grey']">
-          <i class="mdi mdi-seal mdi-36px"></i>
-        </span>
-        <div class="ribbon-name">
-          {{ ribbon.name }}
-        </div>
-      </div>
+        :theme="ribbon.category as RibbonTheme"
+        icon="mdi-seal"
+        :bottom-text="ribbon.name"
+        :achieved="ribbon.achieved"
+        :state="ribbonState(ribbon)"
+        :onClick="() => toggleRibbon(ribbon)"
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
-.ribbon {
-  margin: 10px;
-  align-items: center;
-  text-align: center;
-  width: 110px;
-  height: 100px;
-  outline-width: 5px;
-  outline-style: solid;
-  border-radius: 10px;
-}
 
-.ribbon-loading {
-  cursor: wait;
-}
-
-.ribbon-clickable {
-  cursor: pointer;
-}
-
-.ribbon-name {
-  font-weight: bold;
-  margin-right: 10px;
-  width: 100%;
-  color: darkslategray;
-}
-
-.ribbon-not-achieved {
-  opacity: 0.5;
-}
-
-.ribbon-julie {
-  background-color: #DCB0F2;
-  outline-color: #a35ec9;
-}
-.ribbon-champion {
-  background-color: #66C5CC;
-  outline-color: #358d95;
-}
-.ribbon-battle {
-  background-color: #F89C74;
-  outline-color: #754834;
-}
-.ribbon-contest {
-  background-color: #FE88B1;
-  outline-color: #8e3d5a;
-}
-.ribbon-stats {
-  background-color: #9EB9F3;
-  outline-color: #62749b;
-}
-.ribbon-shopping {
-  background-color: #F6CF71;
-  outline-color: #d5a32c;
-}
 </style>

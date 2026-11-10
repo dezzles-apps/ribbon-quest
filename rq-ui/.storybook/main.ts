@@ -4,6 +4,7 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx)'],
   addons: ['@storybook/addon-vitest', '@storybook/addon-a11y'],
   framework: '@storybook/vue3-vite',
+  staticDirs: ['../test-resources'],
 }
 
 export default config

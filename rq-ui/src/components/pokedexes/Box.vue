@@ -5,7 +5,8 @@ import { useAuthStore } from '@/stores/authStore';
 import { useApi } from '@/composables/useApi';
 import API from '@/composables/endpoints';
 import { isEntryVisible } from '@/composables/box';
-
+import Ribbon from '@/components/common/Ribbon.vue';
+import { RibbonState, RibbonTheme } from '@/types/enums';
 const authStore = useAuthStore();
 const api = useApi();
 
@@ -79,6 +80,16 @@ function toggleEntry(entry: PokedexEntry) {
     });
 }
 
+function ribbonState(entry: PokedexEntry) : RibbonState {
+  if (authStore.isAuthenticated) {
+    if (loadingRibbons.value.get(entry.pokedexNo.text)) {
+      return RibbonState.Loading;
+    } else {
+      return RibbonState.Clickable;
+    }
+  }
+  return RibbonState.Standard;
+}
 
 </script>
 
@@ -88,6 +99,17 @@ function toggleEntry(entry: PokedexEntry) {
       <h2 class="title is-4">{{ entries[0].pokedexNo.text }} - {{ entries[entries.length -1].pokedexNo.text }}</h2>
     </slot>
     <div style="display: inline-flex; flex-wrap: wrap; max-width: 780px;" class="ma-auto">
+      <Ribbon
+        v-for="entry in props.entries"
+        :key="entry.pokedexNo.text"
+        :theme="RibbonTheme.Stats"
+        :top-text="entry.pokedexNo.text"
+        :bottom-text="entry.pokemon"
+        :image="getPokemonImage(entry)"
+        :state="ribbonState(entry)"
+        :achieved="entry.caught"
+        :onClick="() => toggleEntry(entry)"
+      />
       <div
         class="ribbon"
         :class="getRibbonClass(entry)"
